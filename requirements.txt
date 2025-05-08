@@ -1,0 +1,14 @@
+Flask
+Flask-Cors
+openai
+httpx
+pandas
+numpy
+scikit-learn
+scipy
+python-dateutil
+pytz
+PyYAML
+requests
+python-dotenv
+notion-client

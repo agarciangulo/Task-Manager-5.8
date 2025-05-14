@@ -68,23 +68,23 @@ def create_compatibility_layer():
     # Create core/__init__.py that exposes old interfaces
     core_init = """\"\"\"
 Core package for Task Manager.
-This module provides compatibility with the old structure.
+This module provides compatibility with the new structure.
 \"\"\"
-# Import from new locations but expose with old names
-from core.adapters.notion_adapter import NotionAdapter
+# Import from new locations
+from core.notion_service import NotionService
 
-# Create instances with default config for backward compatibility
-notion_adapter = NotionAdapter()
+# Create instance with default config
+notion_service = NotionService()
 
-# Functions from notion_client.py
-fetch_notion_tasks = notion_adapter.fetch_tasks
-identify_stale_tasks = notion_adapter.identify_stale_tasks
-mark_task_as_reminded = notion_adapter.mark_task_as_reminded
-insert_task_to_notion = notion_adapter.insert_task
-update_task_in_notion = notion_adapter.update_task
-fetch_peer_feedback = notion_adapter.fetch_peer_feedback
-list_all_categories = notion_adapter.list_all_categories
-validate_notion_connection = notion_adapter.validate_connection
+# Functions from notion_service.py
+fetch_notion_tasks = notion_service.fetch_tasks
+identify_stale_tasks = notion_service.identify_stale_tasks
+mark_task_as_reminded = notion_service.mark_task_as_reminded
+insert_task_to_notion = notion_service.insert_task
+update_task_in_notion = notion_service.update_task
+fetch_peer_feedback = notion_service.fetch_peer_feedback
+list_all_categories = notion_service.list_all_categories
+validate_notion_connection = notion_service.validate_connection
 """
     
     with open(Path('core/__init__.py'), 'w') as f:
@@ -93,7 +93,6 @@ validate_notion_connection = notion_adapter.validate_connection
     # Add imports to make the new modules available
     with open(Path('core/adapters/__init__.py'), 'w') as f:
         f.write('"""\nAdapters package for Task Manager.\n"""\n')
-        f.write('from core.adapters.notion_adapter import NotionAdapter\n')
         f.write('from core.adapters.plugin_base import PluginBase\n')
         f.write('from core.adapters.plugin_manager import PluginManager\n')
     
@@ -172,7 +171,7 @@ def update_app_imports():
         # Update imports
         import_lines = [
             "# Import from the new structure",
-            "from core.adapters.notion_adapter import NotionAdapter",
+            "from core.notion_service import NotionService",
             "from core.ui.interface import create_ui",
             "# Initialize plugins",
             "from plugins import initialize_all_plugins",

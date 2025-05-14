@@ -8,18 +8,17 @@ from datetime import datetime, timedelta
 from config import (
     DEBUG_MODE
 )
-from core.notion_client import (
-    fetch_notion_tasks, 
-    identify_stale_tasks, 
-    list_all_categories, 
-    fetch_peer_feedback
-)
+from core.agents.notion_agent import NotionAgent
+from core.agents.task_extraction_agent import TaskExtractionAgent
+from core.agents.task_processing_agent import TaskProcessingAgent
 from core.openai_client import (
     get_coaching_insight,
     get_project_insight
 )
-from core.task_extractor import extract_tasks_from_update
-from core.task_processor import insert_or_update_task
+
+notion_agent = NotionAgent()
+task_extraction_agent = TaskExtractionAgent()
+task_processing_agent = TaskProcessingAgent()
 
 def process_freeform_input(update_text):
     """Process freeform text input and handle task extraction and validation."""
@@ -32,7 +31,7 @@ def process_freeform_input(update_text):
 
         # Extract tasks from update text
         print(f"Extracting tasks from update...")
-        tasks = extract_tasks_from_update(update_text)
+        tasks = task_extraction_agent.extract_tasks(update_text)
 
         if not tasks:
             return "❌ No tasks could be extracted from your update. Please check your input and try again."
@@ -41,13 +40,13 @@ def process_freeform_input(update_text):
 
         # Get existing tasks from Notion
         log_output.append("⏳ Fetching existing tasks from Notion...")
-        existing_tasks = fetch_notion_tasks()
+        existing_tasks = notion_agent.fetch_tasks()
         log_output.append(f"✅ Fetched {len(existing_tasks)} existing tasks")
 
         # Process clear tasks
         log_output.append("⏳ Processing tasks...")
         for task in tasks:
-            insert_or_update_task(task, existing_tasks, log_output)
+            task_processing_agent.process_task(task, existing_tasks, log_output)
 
         # Get more info for coaching insights
         person_name = ""
@@ -59,7 +58,7 @@ def process_freeform_input(update_text):
         peer_feedback = []
         if person_name:
             try:
-                peer_feedback = fetch_peer_feedback(person_name)
+                peer_feedback = notion_agent.fetch_peer_feedback(person_name)
                 log_output.append(f"✅ Fetched {len(peer_feedback)} peer feedback entries")
             except Exception as e:
                 log_output.append(f"⚠️ Error fetching peer feedback: {e}")
@@ -113,21 +112,30 @@ def process_freeform_input(update_text):
 def show_stale_tasks():
     """Show overdue tasks that need follow-up."""
     try:
-        df = fetch_notion_tasks()
-        stale = identify_stale_tasks(df)
-        if stale.empty:
+        stale = notion_agent.identify_stale_tasks(days=7)
+        if not stale:
             return "✅ No overdue tasks!"
-
-        grouped = stale.groupby("employee")
+        # Group by employee
+        grouped = {}
+        for task in stale:
+            employee = task.get('employee', 'Unknown')
+            if employee not in grouped:
+                grouped[employee] = []
+            date_str = task.get('due_date') or task.get('date') or 'No date'
+            grouped[employee].append({
+                'task': task.get('task', ''),
+                'status': task.get('status', 'Unknown'),
+                'date': date_str
+            })
         result_lines = []
-        for name, group in grouped:
+        for name, tasks in grouped.items():
             result_lines.append(f"👤 {name}:\n")
-            for _, row in group.iterrows():
-                date_str = row['date'].strftime('%Y-%m-%d') if row['date'] else "No date"
-                result_lines.append(f"   • {row['task']} — {row['status']} (since {date_str})\n")
+            for t in tasks:
+                result_lines.append(f"   • {t['task']} — {t['status']} (since {t['date']})\n")
             result_lines.append("")
         return "".join(result_lines)
     except Exception as e:
+        import traceback
         print(f"Error in show_stale_tasks: {traceback.format_exc()}")
         return f"❌ Error checking overdue tasks: {e}"
 
@@ -137,7 +145,7 @@ def show_tasks_by_category(selected_category):
         return "Please select a category first."
 
     try:
-        df = fetch_notion_tasks()
+        df = notion_agent.fetch_tasks()
         filtered = df[(df["category"] == selected_category) & (df["status"] != "Completed")]
         if filtered.empty:
             return f"✅ No open tasks in project '{selected_category}'"
@@ -175,7 +183,7 @@ def create_ui():
     """Create and configure the Gradio UI."""
     # Try to get initial categories, with a fallback
     try:
-        initial_categories = list_all_categories()
+        initial_categories = notion_agent.list_all_categories()
     except:
         initial_categories = ["Uncategorized"]
         
@@ -276,7 +284,7 @@ def create_ui():
 
         # Add category refresh to update dropdown after task changes
         submit_btn.click(
-            fn=lambda: gr.update(choices=list_all_categories()),
+            fn=lambda: gr.update(choices=notion_agent.list_all_categories()),
             inputs=[],
             outputs=[category_dropdown]
         )

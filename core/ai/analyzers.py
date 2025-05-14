@@ -43,7 +43,7 @@ class AnalyzerBase:
 
     def generate_text(self, prompt: str) -> str:
         """Generate text using OpenAI."""
-        response = self.client.chat.completions.create(
+        response = self.client.chat_completions_create(
             model=self.model_name,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
@@ -155,12 +155,18 @@ class TaskAnalyzer(AnalyzerBase):
             prompt = self._create_insights_prompt(tasks_df, **kwargs)
             
             # Generate insights using the appropriate model
-            insight = self.generate_text(prompt)
+            try:
+                insight = self.generate_text(prompt)
                 
-            return {
-                "insight": insight,
-                "raw_tasks": tasks_df.to_dict('records')
-            }
+                return {
+                    "insight": insight,
+                    "raw_tasks": tasks_df.to_dict('records')
+                }
+            except Exception as e:
+                import traceback
+                print(f"Error analyzing tasks: {e}")
+                print(traceback.format_exc())
+                raise ValueError(f"Task analysis failed: {str(e)}\n{traceback.format_exc()}")
             
         # Default case
         return {
@@ -175,15 +181,15 @@ class TaskAnalyzer(AnalyzerBase):
         
         # Format tasks
         tasks_text = "\n".join([
-            f"- {row['task']} (Status: {row['status']})"
+            f"- {row['task']} (Status: {row['status']}, Category: {row.get('category', 'Uncategorized')})"
             for _, row in tasks_df.iterrows()
         ])
         
         # Format recent tasks
         recent_text = ""
         if not recent_tasks.empty:
-            recent_text = "\nRecent tasks:\n" + "\n".join([
-                f"- {row['task']} (Status: {row['status']})"
+            recent_text = "\nRecent tasks (last 14 days):\n" + "\n".join([
+                f"- {row['task']} (Status: {row['status']}, Category: {row.get('category', 'Uncategorized')})"
                 for _, row in recent_tasks.iterrows()
             ])
         
@@ -196,18 +202,31 @@ class TaskAnalyzer(AnalyzerBase):
             ])
         
         # Create the prompt
-        prompt = f"""Analyze the following tasks and provide insights for {person_name}:
+        prompt = f"""You are a productivity coach analyzing {person_name}'s work patterns and progress.
 
-Current tasks:
+CURRENT TASKS:
 {tasks_text}
 {recent_text}
 {feedback_text}
 
-Please provide:
-1. A summary of the current workload
-2. Suggestions for task prioritization
-3. Areas where {person_name} might need support
-4. Recommendations for improving productivity
+Please provide a comprehensive analysis with the following sections:
+
+1. WORKLOAD SUMMARY:
+- Current task distribution across projects/categories
+- Task completion patterns
+- Any potential bottlenecks or blockers
+
+2. PRODUCTIVITY INSIGHTS:
+- Notable achievements or progress
+- Areas where efficiency could be improved
+- Task prioritization effectiveness
+
+3. RECOMMENDATIONS:
+- 2-3 specific, actionable suggestions for improvement
+- Tips for better task management
+- Ways to optimize workflow
+
+Keep your tone supportive and constructive. Focus on actionable insights that can help {person_name} improve their productivity and work quality.
 
 Analysis:"""
         
@@ -396,7 +415,7 @@ class ProjectAnalyzer(AnalyzerBase):
 def get_ai_response(prompt: str) -> str:
     """Get response from the configured AI provider."""
     from core.openai_client import client
-    response = client.chat.completions.create(
+    response = client.chat_completions_create(
         model=CHAT_MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3

@@ -131,7 +131,7 @@ Now extract the tasks from this input: {protected_text}"""
 
     try:
         print("Calling OpenAI API...")
-        response = client.chat.completions.create(
+        response = client.chat_completions_create(
             model=CHAT_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
@@ -255,11 +255,11 @@ Now extract the tasks from this input: {protected_text}"""
         print(f"Error extracting tasks: {e}")
         print(traceback.format_exc())
         # Return a more informative error that you'll display to the user
-        raise ValueError(f"Task extraction failed: {str(e)}")
+        raise ValueError(f"Task extraction failed: {str(e)}\n{traceback.format_exc()}")
 
 def get_ai_response(prompt: str) -> str:
     """Get response from the configured AI provider."""
-    response = client.chat.completions.create(
+    response = client.chat_completions_create(
         model=CHAT_MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3

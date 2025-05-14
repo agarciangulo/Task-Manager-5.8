@@ -1,0 +1,164 @@
+{
+  "timestamp": "20250513_112832",
+  "input_text": "From: Kevin Garcia <kgarcia@company.com>\nDate: 2024-03-22\n\n**Emergency Fixes:**\n- Fixed critical payment bug for E-commerce client (one-time emergency fix)\n- Fixed user-reported UI issues for MobileApp project (one-time fix)\n\n**Regular Meetings:**\n- Attended weekly team standup\n- Weekly client check-in call with TechStart\n- Bi-weekly infrastructure cost analysis\n\n**Daily Tasks:**\n- Daily database backup check\n- Daily monitoring dashboard review\n- Daily ticket triage session\n\n**Period Projects:**\n- Implemented new feature for Q2 release\n- Monthly security certificate renewal\n- One-time data migration for legacy systems\n- Annual performance review preparation",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Kevin Garcia <kgarcia@company.com>\nDate: 2024-03-22\n\n**Emergency Fixes:**\n- Fixed critical payment bug for E-commerce client (one-time emergency fix)\n- Fixed user-reported UI issues for MobileApp project (one-time fix)\n\n**Regular Meetings:**\n- Attended weekly team standup\n- Weekly client check-in call with TechStart\n- Bi-weekly infrastructure cost analysis\n\n**Daily Tasks:**\n- Daily database backup check\n- Daily monitoring dashboard review\n- Daily ticket triage session\n\n**Period Projects:**\n- Implemented new feature for Q2 release\n- Monthly security certificate renewal\n- One-time data migration for legacy systems\n- Annual performance review preparation\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Fixed critical payment bug for E-commerce client (one-time emergency fix)\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Emergency Fixes\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Fixed user-reported UI issues for MobileApp project (one-time fix)\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Emergency Fixes\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Attended weekly team standup\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Regular Meetings\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What were the key points discussed in the team standup?\"\n    },\n    {\n        \"task\": \"Weekly client check-in call with TechStart\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Regular Meetings\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What updates were shared during the client check-in call with TechStart?\"\n    },\n    {\n        \"task\": \"Bi-weekly infrastructure cost analysis\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Regular Meetings\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What were the findings from the infrastructure cost analysis?\"\n    },\n    {\n        \"task\": \"Daily database backup check\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Daily Tasks\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Daily monitoring dashboard review\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Daily Tasks\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Daily ticket triage session\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Daily Tasks\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Implemented new feature for Q2 release\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Period Projects\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Monthly security certificate renewal\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Period Projects\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"One-time data migration for legacy systems\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Period Projects\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Annual performance review preparation\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kevin Garcia\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Period Projects\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Fixed critical payment bug for E-commerce client (one-time emergency fix)",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Emergency Fixes",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Fixed user-reported UI issues for MobileApp project (one-time fix)",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Emergency Fixes",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Attended weekly team standup",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Regular Meetings",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Weekly client check-in call with TechStart",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Regular Meetings",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Bi-weekly infrastructure cost analysis",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Regular Meetings",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Daily database backup check",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Daily Tasks",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Daily monitoring dashboard review",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Daily Tasks",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Daily ticket triage session",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Daily Tasks",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Implemented new feature for Q2 release",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Period Projects",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Monthly security certificate renewal",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Period Projects",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "One-time data migration for legacy systems",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Period Projects",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Annual performance review preparation",
+      "status": "Completed",
+      "employee": "Kevin Garcia",
+      "date": "2024-03-22",
+      "category": "Period Projects",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

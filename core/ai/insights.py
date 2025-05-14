@@ -113,7 +113,7 @@ def get_coaching_insight(person_name: str, tasks: List[Dict[str, Any]], recent_t
     if AI_PROVIDER == 'openai':
         from core.openai_client import client
         try:
-            response = client.chat.completions.create(
+            response = client.chat_completions_create(
                 model=CHAT_MODEL,
                 messages=[{"role": "user", "content": feedback_prompt}],
                 temperature=0.4
@@ -230,7 +230,7 @@ def get_project_insight(selected_category: str, filtered_tasks: pd.DataFrame) ->
     if AI_PROVIDER == 'openai':
         from core.openai_client import client
         try:
-            response = client.chat.completions.create(
+            response = client.chat_completions_create(
                 model=CHAT_MODEL,
                 messages=[{"role": "user", "content": project_prompt}],
                 temperature=0.5
@@ -256,7 +256,7 @@ def get_ai_response(prompt: str) -> str:
     """Get response from the configured AI provider."""
     if AI_PROVIDER == 'openai':
         from core.openai_client import client
-        response = client.chat.completions.create(
+        response = client.chat_completions_create(
             model=CHAT_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3

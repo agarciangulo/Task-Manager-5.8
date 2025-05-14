@@ -103,7 +103,7 @@ Return the information in this JSON format:
 """
     
     try:
-        response = client.completions_create(
+        response = client.chat_completions_create(
             model=CHAT_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
@@ -318,7 +318,7 @@ Keep insights conversational (3-4 sentences per insight) and avoid technical ter
 """
 
     try:
-        response = client.chat.completions.create(
+        response = client.chat_completions_create(
             model=CHAT_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4

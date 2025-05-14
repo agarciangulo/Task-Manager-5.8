@@ -8,13 +8,19 @@ import traceback
 
 from core.task_extractor import extract_tasks_from_update
 from core.task_processor import insert_or_update_task, batch_insert_tasks
-from core.notion_client import normalize_date_for_notion
+from core.notion_service import NotionService
 from core import fetch_notion_tasks
 
 from core.chat.verification import (
     generate_verification_questions,
     parse_verification_response
 )
+
+from core.agents.notion_agent import NotionAgent
+from core.agents.task_processing_agent import TaskProcessingAgent
+
+notion_agent = NotionAgent()
+task_processing_agent = TaskProcessingAgent()
 
 def is_email_content(message):
     """
@@ -86,7 +92,7 @@ def process_email_tasks(email_content, user_id, chat_context):
     # Normalize dates for all tasks
     for task in extracted_tasks:
         if "date" in task and task["date"]:
-            task["date"] = normalize_date_for_notion(task["date"])
+            task["date"] = notion_agent.normalize_date_for_notion(task["date"])
     
     # Identify tasks needing verification using the integrated context evaluation
     complete_tasks = []
@@ -136,7 +142,7 @@ def process_email_tasks(email_content, user_id, chat_context):
     for task in complete_tasks:
         try:
             task_log = []
-            success, result = insert_or_update_task(task, existing_tasks, task_log)
+            success, result = task_processing_agent.process_task(task, existing_tasks, task_log)
             processing_log.extend(task_log)
             
             if success:

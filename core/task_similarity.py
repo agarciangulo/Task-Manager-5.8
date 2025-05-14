@@ -12,8 +12,10 @@ from config import (
     MIN_TASK_LENGTH,
     USE_AI_MATCHING
 )
-from core.embeddings import get_batch_embeddings
+from core.embedding_manager import EmbeddingManager
 from core.ai.analyzers import TaskAnalyzer
+
+_embedding_manager = EmbeddingManager()
 
 def debug_print(message):
     """Print debug messages if DEBUG_MODE is True."""
@@ -44,7 +46,7 @@ def find_similar_tasks(new_task: Dict[str, Any], existing_tasks: List[Dict[str, 
         
         # Get embeddings for all tasks
         debug_print("Getting embeddings for tasks...")
-        embeddings_dict = get_batch_embeddings(all_texts)
+        embeddings_dict = _embedding_manager.get_batch_embeddings(all_texts)
         
         if not embeddings_dict:
             debug_print("No embeddings generated")
@@ -242,4 +244,65 @@ def check_task_similarity(new_task: Dict[str, Any], existing_tasks: List[Dict[st
         return check_task_similarity_ai(new_task, existing_tasks)
     else:
         debug_print("Using embedding-based task similarity check")
-        return find_similar_tasks(new_task, existing_tasks) 
+        return find_similar_tasks(new_task, existing_tasks)
+
+def find_top_k_similar_tasks(new_task: Dict[str, Any], existing_tasks: List[Dict[str, Any]], k: int = 5) -> List[Dict[str, Any]]:
+    """
+    Find the top-k most similar tasks using embeddings.
+    Returns a list of dicts with 'task' and 'similarity'.
+    """
+    if not new_task or not existing_tasks:
+        return []
+    try:
+        all_texts = [new_task["task"]] + [t["task"] for t in existing_tasks]
+        embeddings_dict = _embedding_manager.get_batch_embeddings(all_texts)
+        if not embeddings_dict:
+            return []
+        new_task_embedding = np.array(embeddings_dict[new_task["task"]]).reshape(1, -1)
+        similarities = []
+        for existing_task in existing_tasks:
+            if existing_task["task"] not in embeddings_dict:
+                continue
+            existing_embedding = np.array(embeddings_dict[existing_task["task"]]).reshape(1, -1)
+            similarity = float(np.dot(new_task_embedding, existing_embedding.T)[0][0])
+            similarities.append({
+                "task": existing_task,
+                "similarity": similarity
+            })
+        # Sort by similarity descending and return top k
+        similarities.sort(key=lambda x: x["similarity"], reverse=True)
+        return similarities[:k]
+    except Exception as e:
+        debug_print(f"Error in find_top_k_similar_tasks: {e}")
+        debug_print(traceback.format_exc())
+        return []
+
+def check_task_similarity_mode(new_task: Dict[str, Any], existing_tasks: List[Dict[str, Any]], mode: str = 'embedding', top_k: int = 5) -> Dict[str, Any]:
+    """
+    Flexible similarity checker: 'embedding', 'ai', or 'hybrid'.
+    - 'embedding': embedding-only
+    - 'ai': LLM-only (all tasks)
+    - 'hybrid': embeddings for top_k, then LLM for those
+    """
+    if not new_task or not new_task.get("task"):
+        return {
+            "is_match": False,
+            "confidence": 0.0,
+            "explanation": "Invalid task"
+        }
+    if mode == 'embedding':
+        return find_similar_tasks(new_task, existing_tasks)
+    elif mode == 'ai':
+        return check_task_similarity_ai(new_task, existing_tasks)
+    elif mode == 'hybrid':
+        # 1. Get top_k candidates by embedding
+        top_candidates = find_top_k_similar_tasks(new_task, existing_tasks, k=top_k)
+        candidate_tasks = [c['task'] for c in top_candidates]
+        # 2. Use LLM to compare only those
+        return check_task_similarity_ai(new_task, candidate_tasks)
+    else:
+        return {
+            "is_match": False,
+            "confidence": 0.0,
+            "explanation": f"Unknown mode: {mode}"
+        } 

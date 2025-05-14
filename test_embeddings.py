@@ -6,7 +6,9 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Dict, Any, Tuple
 
-from core.embeddings import get_batch_embeddings
+from core.embedding_manager import EmbeddingManager
+
+_embedding_manager = EmbeddingManager()
 
 def load_test_tasks() -> Tuple[List[str], List[Dict[str, Any]]]:
     """Load test cases with freeform text input and existing tasks."""
@@ -81,8 +83,8 @@ def test_embedding_quality(test_inputs: List[str], existing_tasks: List[Dict[str
         for task in existing_tasks
     ]
     
-    test_embeddings = get_batch_embeddings(test_inputs)
-    existing_embeddings = get_batch_embeddings(existing_texts)
+    test_embeddings = _embedding_manager.get_batch_embeddings(test_inputs)
+    existing_embeddings = _embedding_manager.get_batch_embeddings(existing_texts)
     
     # Calculate similarities
     for test_input, test_text in zip(test_inputs, test_inputs):  # Using input as both identifier and text
@@ -122,7 +124,7 @@ def test_embedding_performance(texts: List[str], num_runs: int = 3) -> Dict[str,
     
     for _ in range(num_runs):
         start_time = time.time()
-        get_batch_embeddings(texts)
+        _embedding_manager.get_batch_embeddings(texts)
         end_time = time.time()
         times.append(end_time - start_time)
     

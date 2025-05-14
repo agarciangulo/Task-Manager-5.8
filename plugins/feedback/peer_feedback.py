@@ -7,7 +7,9 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 from core.adapters.plugin_base import PluginBase
-from core.adapters.notion_adapter import NotionAdapter
+from core.notion_service import NotionService
+
+notion_service = NotionService()
 
 class PeerFeedbackPlugin(PluginBase):
     """Plugin for collecting and analyzing peer feedback."""
@@ -20,7 +22,6 @@ class PeerFeedbackPlugin(PluginBase):
             config: Configuration dictionary.
         """
         super().__init__(config)
-        self.notion = NotionAdapter()
         self.feedback_db_id = self.config.get('feedback_database_id')
         
         # Cache feedback data
@@ -42,7 +43,7 @@ class PeerFeedbackPlugin(PluginBase):
             
         # Check if we can fetch sample feedback
         try:
-            test_feedback = self.notion.fetch_peer_feedback("test", self.feedback_db_id, days_back=1)
+            test_feedback = notion_service.fetch_peer_feedback("test", self.feedback_db_id, days_back=1)
             return True
         except Exception as e:
             print(f"Error connecting to feedback database: {e}")
@@ -66,7 +67,7 @@ class PeerFeedbackPlugin(PluginBase):
             return self._feedback_cache[cache_key]
             
         # Fetch fresh data
-        feedback = self.notion.fetch_peer_feedback(person_name, self.feedback_db_id, days_back)
+        feedback = notion_service.fetch_peer_feedback(person_name, self.feedback_db_id, days_back)
         
         # Update cache
         self._feedback_cache[cache_key] = feedback
@@ -198,7 +199,8 @@ class PeerFeedbackPlugin(PluginBase):
         Returns:
             bool: True if submission was successful, False otherwise.
         """
-        # This would require implementing a method in NotionAdapter
-        # to create new feedback entries
-        print("Feedback submission not implemented yet")
-        return False
+        try:
+            return notion_service.insert_feedback(feedback_data, self.feedback_db_id)
+        except Exception as e:
+            print(f"Error submitting feedback: {e}")
+            return False

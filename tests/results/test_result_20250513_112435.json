@@ -1,0 +1,190 @@
+{
+  "timestamp": "20250513_112435",
+  "input_text": "From: William Mora <wmora@paloaltonetworks.com>\nDate: 2024-03-19\n\nHours Breakdown:\n- Tyson - EE Engagement: 8 hours\n\nPlanned Activities:\n**Tyson tasks:**\n- PC CSMP weekly sync with Tyson\n- PC consulting Wednesday  \n- PC cve management\n- Tyson sync with PA and account team\n- Work on WAAS, there are apis that need to be enabled\n- Check on SNOW notification template\n- Support team on CSPM policies\n\nCompleted tasks:\n- We had our weekly sync meeting for CSMP where we discussed our roadmap\n- Joined the PC with Zarwan, we had Sara present on DSPM, it was a high level overview\n- Joined the bi-weekly meeting to check on plan for cortex on cloud and engagement\n- Worked on cve management went through the unmanaged assets and all cve that are showing for many assets\n- Met with Tyson to work on WAAS for two applications, I am following up tomorrow to check where we are taking this forward\n- Went over the notification template, made some changes to test a few things for a missing field in SNOW\n- Working on cortex on cloud training with power hours",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: William Mora <wmora@paloaltonetworks.com>\nDate: 2024-03-19\n\nHours Breakdown:\n- Tyson - EE Engagement: 8 hours\n\nPlanned Activities:\n**Tyson tasks:**\n- PC CSMP weekly sync with Tyson\n- PC consulting Wednesday  \n- PC cve management\n- Tyson sync with PA and account team\n- Work on WAAS, there are apis that need to be enabled\n- Check on SNOW notification template\n- Support team on CSPM policies\n\nCompleted tasks:\n- We had our weekly sync meeting for CSMP where we discussed our roadmap\n- Joined the PC with Zarwan, we had Sara present on DSPM, it was a high level overview\n- Joined the bi-weekly meeting to check on plan for cortex on cloud and engagement\n- Worked on cve management went through the unmanaged assets and all cve that are showing for many assets\n- Met with Tyson to work on WAAS for two applications, I am following up tomorrow to check where we are taking this forward\n- Went over the notification template, made some changes to test a few things for a missing field in SNOW\n- Working on cortex on cloud training with power hours\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"PC CSMP weekly sync with Tyson\",\n        \"status\": \"Completed\",\n        \"employee\": \"Tyson\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"EE Engagement\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"PC consulting Wednesday\",\n        \"status\": \"Completed\",\n        \"employee\": \"Tyson\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"EE Engagement\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"PC cve management\",\n        \"status\": \"Completed\",\n        \"employee\": \"Tyson\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"EE Engagement\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Tyson sync with PA and account team\",\n        \"status\": \"Completed\",\n        \"employee\": \"Tyson\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"EE Engagement\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Work on WAAS, there are apis that need to be enabled\",\n        \"status\": \"Completed\",\n        \"employee\": \"Tyson\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"EE Engagement\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the APIs that needed to be enabled for WAAS?\"\n    },\n    {\n        \"task\": \"Check on SNOW notification template\",\n        \"status\": \"Completed\",\n        \"employee\": \"Tyson\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"EE Engagement\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Support team on CSPM policies\",\n        \"status\": \"Completed\",\n        \"employee\": \"Tyson\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"EE Engagement\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Weekly sync meeting for CSMP where we discussed our roadmap\",\n        \"status\": \"Completed\",\n        \"employee\": \"William Mora\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Joined the PC with Zarwan, Sara present on DSPM, high level overview\",\n        \"status\": \"Completed\",\n        \"employee\": \"William Mora\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the high-level overview of DSPM presented by Sara?\"\n    },\n    {\n        \"task\": \"Joined the bi-weekly meeting to check on plan for cortex on cloud and engagement\",\n        \"status\": \"Completed\",\n        \"employee\": \"William Mora\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Worked on cve management went through the unmanaged assets and all cve that are showing for many assets\",\n        \"status\": \"Completed\",\n        \"employee\": \"William Mora\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the CVEs that were found during the management process?\"\n    },\n    {\n        \"task\": \"Met with Tyson to work on WAAS for two applications, following up tomorrow\",\n        \"status\": \"Completed\",\n        \"employee\": \"William Mora\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific work was done on WAAS for the two applications during the meeting with Tyson?\"\n    },\n    {\n        \"task\": \"Went over the notification template, made some changes to test a few things for a missing field in SNOW\",\n        \"status\": \"Completed\",\n        \"employee\": \"William Mora\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Working on cortex on cloud training with power hours\",\n        \"status\": \"In Progress\",\n        \"employee\": \"William Mora\",\n        \"date\": \"2024-03-19\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "PC CSMP weekly sync with Tyson",
+      "status": "Completed",
+      "employee": "Tyson",
+      "date": "2024-03-19",
+      "category": "EE Engagement",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "PC consulting Wednesday",
+      "status": "Completed",
+      "employee": "Tyson",
+      "date": "2024-03-19",
+      "category": "EE Engagement",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "PC cve management",
+      "status": "Completed",
+      "employee": "Tyson",
+      "date": "2024-03-19",
+      "category": "EE Engagement",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tyson sync with PA and account team",
+      "status": "Completed",
+      "employee": "Tyson",
+      "date": "2024-03-19",
+      "category": "EE Engagement",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Work on WAAS, there are apis that need to be enabled",
+      "status": "Completed",
+      "employee": "Tyson",
+      "date": "2024-03-19",
+      "category": "EE Engagement",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the APIs that needed to be enabled for WAAS?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Check on SNOW notification template",
+      "status": "Completed",
+      "employee": "Tyson",
+      "date": "2024-03-19",
+      "category": "EE Engagement",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Support team on CSPM policies",
+      "status": "Completed",
+      "employee": "Tyson",
+      "date": "2024-03-19",
+      "category": "EE Engagement",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Weekly sync meeting for CSMP where we discussed our roadmap",
+      "status": "Completed",
+      "employee": "William Mora",
+      "date": "2024-03-19",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Joined the PC with Zarwan, Sara present on DSPM, high level overview",
+      "status": "Completed",
+      "employee": "William Mora",
+      "date": "2024-03-19",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the high-level overview of DSPM presented by Sara during the meeting with Zarwan?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Joined the bi-weekly meeting to check on plan for cortex on cloud and engagement",
+      "status": "Completed",
+      "employee": "William Mora",
+      "date": "2024-03-19",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Worked on cve management went through the unmanaged assets and all cve that are showing for many assets",
+      "status": "Completed",
+      "employee": "William Mora",
+      "date": "2024-03-19",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the CVE management work done and the findings related to unmanaged assets and CVEs?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Met with Tyson to work on WAAS for two applications, following up tomorrow",
+      "status": "Completed",
+      "employee": "William Mora",
+      "date": "2024-03-19",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific actions were taken during the meeting with Tyson regarding WAAS for the two applications?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Went over the notification template, made some changes to test a few things for a missing field in SNOW",
+      "status": "Completed",
+      "employee": "William Mora",
+      "date": "2024-03-19",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What changes were made to the notification template and what specific testing was done for the missing field in SNOW?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Working on cortex on cloud training with power hours",
+      "status": "In Progress",
+      "employee": "William Mora",
+      "date": "2024-03-19",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

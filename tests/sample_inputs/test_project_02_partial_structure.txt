@@ -1,0 +1,24 @@
+From: William Mora <wmora@paloaltonetworks.com>
+Date: 2024-03-19
+
+Hours Breakdown:
+- Tyson - EE Engagement: 8 hours
+
+Planned Activities:
+**Tyson tasks:**
+- PC CSMP weekly sync with Tyson
+- PC consulting Wednesday  
+- PC cve management
+- Tyson sync with PA and account team
+- Work on WAAS, there are apis that need to be enabled
+- Check on SNOW notification template
+- Support team on CSPM policies
+
+Completed tasks:
+- We had our weekly sync meeting for CSMP where we discussed our roadmap
+- Joined the PC with Zarwan, we had Sara present on DSPM, it was a high level overview
+- Joined the bi-weekly meeting to check on plan for cortex on cloud and engagement
+- Worked on cve management went through the unmanaged assets and all cve that are showing for many assets
+- Met with Tyson to work on WAAS for two applications, I am following up tomorrow to check where we are taking this forward
+- Went over the notification template, made some changes to test a few things for a missing field in SNOW
+- Working on cortex on cloud training with power hours

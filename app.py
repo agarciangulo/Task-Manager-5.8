@@ -57,16 +57,7 @@ def install_requirements():
 install_requirements()
 
 from core.ui.interface import create_ui
-from core.notion_client import validate_notion_connection
-from config import (
-    OPENAI_API_KEY, 
-    NOTION_TOKEN, 
-    NOTION_DATABASE_ID, 
-    NOTION_FEEDBACK_DB_ID
-)
-
-from core.ui.interface import create_ui
-from core.notion_client import validate_notion_connection
+from core.notion_service import NotionService
 from config import (
     OPENAI_API_KEY, 
     NOTION_TOKEN, 
@@ -117,8 +108,9 @@ def main():
     if not check_environment():
         sys.exit(1)
     
-    # Validate Notion connection
-    if not validate_notion_connection():
+    # Initialize NotionService and validate connection
+    notion_service = NotionService()
+    if not notion_service.validate_connection():
         print("❌ Failed to connect to Notion. Please check your credentials.")
         sys.exit(1)
     

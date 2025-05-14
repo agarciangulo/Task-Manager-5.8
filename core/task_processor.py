@@ -25,18 +25,13 @@ from config import (
     ENABLE_CHAT_VERIFICATION,
     DAYS_THRESHOLD
 )
-from core.embeddings import (
-    get_embedding,
-    get_batch_embeddings
-)
-from core.notion_client import (
-    Client as NotionClient,
-    insert_task_to_notion,
-    update_task_in_notion,
-    normalize_date_for_notion
-)
+from core.embedding_manager import EmbeddingManager
+from core.notion_service import NotionService
 from core.task_similarity import check_task_similarity
 from plugins import plugin_manager
+
+_embedding_manager = EmbeddingManager()
+notion_service = NotionService()
 
 def debug_print(message):
     """Print debug messages if DEBUG_MODE is True."""
@@ -69,6 +64,21 @@ def classify_task_type(task):
 
     # Default: regular task
     return "regular"
+
+def normalize_date_for_notion(date_value):
+    """
+    Normalize a date value to Notion's expected format (YYYY-MM-DD).
+    Accepts a string or datetime object.
+    """
+    if isinstance(date_value, datetime):
+        return date_value.strftime("%Y-%m-%d")
+    try:
+        # Try to parse string to datetime
+        dt = datetime.fromisoformat(date_value)
+        return dt.strftime("%Y-%m-%d")
+    except Exception:
+        # Fallback: just return the string as-is
+        return str(date_value)
 
 def insert_or_update_task(task, existing_tasks, log_output=None, batch_mode=False):
     """
@@ -137,7 +147,7 @@ def insert_or_update_task(task, existing_tasks, log_output=None, batch_mode=Fals
             
             # Update the existing task
             if not batch_mode:
-                success, message = update_task_in_notion(matched_task["id"], task)
+                success, message = notion_service.update_task(matched_task["id"], task)
                 if success:
                     log_output.append(f"✅ Updated existing task: {task['task']}")
                 else:
@@ -150,7 +160,8 @@ def insert_or_update_task(task, existing_tasks, log_output=None, batch_mode=Fals
             
             # Create new task
             if not batch_mode:
-                success, message = insert_task_to_notion(task)
+                success = notion_service.insert_task(task)
+                message = "Inserted" if success else "Failed to insert"
                 if success:
                     log_output.append(f"✅ Created new task: {task['task']}")
                 else:

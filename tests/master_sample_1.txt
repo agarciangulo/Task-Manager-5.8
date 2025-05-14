@@ -1,0 +1,628 @@
+## FILE: test_basic_01_simple_tasks.txt
+From: Sarah Johnson <sjohnson@company.com>
+Date: 2024-03-22
+
+**Project Alpha:**
+- Updated project documentation
+- Attended team standup meeting
+- Fixed bug in authentication module
+
+**Admin:**
+- Review pull requests
+- Update deployment scripts
+- Meet with stakeholders
+
+## FILE: test_basic_02_clear_sections.txt
+From: Michael Chen <mchen@company.com>
+Date: 2024-03-22
+
+Completed Activities:
+**Client Engagement:**
+- Database migration script development
+- Code review for team members
+- Infrastructure monitoring setup
+
+In Progress:
+**Internal Projects:**
+- API endpoint optimization
+- Unit test suite expansion
+
+Planned Activities:
+**Client Engagement:**
+- Security audit preparation
+- Performance benchmarking
+
+**Admin:**
+- Documentation update for new features
+
+## FILE: test_basic_03_standard_format.txt
+From: Lisa Park <lpark@company.com>
+Date: 2024-03-22
+To: Team Lead <tlead@company.com>
+Subject: Daily Activity Update
+
+Dear Team,
+
+Yesterday's accomplishments:
+- Completed user interface redesign
+- Conducted customer feedback sessions
+- Updated project timeline
+
+Today's focus:
+- Implement new design components
+- Test cross-browser compatibility
+- Prepare presentation for stakeholders
+
+Best regards,
+Lisa Park
+
+## FILE: test_format_01_bullet_points.txt
+From: Alex Rodriguez <arodriguez@company.com>
+Date: 2024-03-22
+
+**Bank of America:**
+• Fixed critical login bug
+• Updated API documentation
+• Deployed security patches
+
+**Tesla:**
+• Attended architecture review meeting
+• Completed code review for 5 pull requests
+
+**Admin:**
+• Implement new authentication flow
+• Configure monitoring alerts
+• Update user documentation
+• Schedule security audit
+• Review infrastructure costs
+
+## FILE: test_format_02_paragraphs.txt
+From: David Wong <dwong@company.com>
+Date: 2024-03-22
+
+Today I focused on several important activities. I started by working on the Microsoft customer support ticket backlog, resolving approximately 15 tickets that had been pending for more than a week. After that, I moved on to updating our internal knowledge base with new troubleshooting procedures that our team developed last month. The afternoon was spent implementing the new chat bot functionality for the Apple project that will help automate responses to common customer inquiries. I also spent time training the junior support staff on the new escalation procedures we implemented. Finally, I attended the weekly Google product team meeting where we discussed upcoming features and their potential impact on our support workload.
+
+## FILE: test_format_03_mixed_format.txt
+From: Emma Thompson <ethompson@company.com>
+Date: 2024-03-22
+
+Yesterday's work summary:
+
+**Client Work:**
+• Fixed the payment processing bug that was affecting international customers for Facebook project
+• Conducted a training session for new team members on the Amazon integration
+
+I also spent considerable time working on the mobile app optimization project for Netflix. This involved analyzing performance metrics, identifying bottlenecks in the checkout process, and implementing several UI improvements that should reduce cart abandonment rates.
+
+Next steps:
+1. Deploy the payment fix to production
+2. Monitor error rates after deployment
+
+Additionally, I need to review the competitor analysis report that the marketing team prepared for the Spotify project and provide technical feedback on the features they've identified as potential additions to our platform.
+
+## FILE: test_volume_01_few_tasks.txt
+From: Tom Wilson <twilson@company.com>
+Date: 2024-03-22
+
+**ClientCorp:**
+- Updated readme file
+
+**Admin:**
+- Team meeting at 2 PM
+
+## FILE: test_volume_02_many_tasks.txt
+From: Jennifer Lee <jlee@company.com>
+Date: 2024-03-22
+
+**Client Alpha:**
+- Updated user authentication system
+- Fixed database connection issues
+- Reviewed and merged 8 pull requests
+- Completed security vulnerability assessment
+- Updated project documentation
+- Implemented new logging system
+- Conducted code review for junior developers
+- Fixed performance issues in search functionality
+
+**Client Beta:**
+- Updated API rate limiting
+- Attended architecture review meeting
+- Completed unit tests for new features
+- Updated deployment scripts
+- Fixed client-reported bugs
+- Implemented caching layer
+
+**Admin:**
+- Attended sprint planning meeting
+- Design new microservice architecture
+- Implement OAuth2 authentication
+- Update monitoring dashboards
+- Conduct performance testing
+- Review infrastructure costs
+- Meet with product management team
+- Implement automated testing suite
+- Update security protocols
+
+## FILE: test_volume_03_massive_email.txt
+From: Robert Martinez <rmartinez@company.com>
+Date: 2024-03-22
+
+Today's Tasks Completed:
+
+**Enterprise Client:**
+1. Resolved critical production issue affecting payment processing
+2. Updated customer database with new security protocols
+3. Implemented automated backup system for user data
+4. Conducted security audit on all API endpoints
+5. Fixed memory leak in background job processor
+6. Updated documentation for new team members
+7. Reviewed and approved infrastructure upgrade proposal
+8. Implemented rate limiting on public API
+9. Fixed cross-browser compatibility issues
+10. Updated monitoring alerts configuration
+
+**Startup Client:**
+11. Resolved database query performance issues
+12. Implemented new user role management system
+13. Fixed email notification delivery problems
+14. Updated error handling in checkout process
+15. Conducted training session for support team
+16. Implemented new caching strategy
+17. Fixed timezone handling in scheduling system
+18. Updated third-party integrations
+19. Resolved SSL certificate renewal issues
+20. Implemented automated testing for critical paths
+
+**Internal/Admin:**
+21. Fixed responsive design issues on mobile
+22. Updated backup and recovery procedures
+23. Resolved CDN cache invalidation problems
+24. Implemented new logging format
+25. Fixed data synchronization issues
+26. Updated API documentation
+27. Resolved memory optimization in image processing
+28. Implemented new search indexing strategy
+29. Fixed internationalization string handling
+30. Updated deployment pipeline configuration
+
+## FILE: test_complexity_01_short_tasks.txt
+From: Kate Brown <kbrown@company.com>
+Date: 2024-03-22
+
+**Client A:**
+- Bug fix
+- Meeting
+- Code review
+
+**Client B:**
+- Testing
+- Deploy
+
+**Admin:**
+- Standup
+- Design
+- Implementation
+- Review
+
+## FILE: test_complexity_02_detailed_tasks.txt
+From: Paul Anderson <panderson@company.com>
+Date: 2024-03-22
+
+**Financial Services Client:**
+- Implemented comprehensive error tracking system with detailed logging capabilities, including stack trace capture, error categorization by severity levels, and automated alerting mechanisms that notify the on-call engineer within 5 minutes of critical failures, while also maintaining a searchable database of historical errors for pattern analysis and prevention of recurring issues
+
+**E-commerce Platform:**
+- Conducted thorough security review of the entire payment processing pipeline, examining each component for potential vulnerabilities including SQL injection, XSS attacks, CSRF protection, rate limiting effectiveness, and PCI DSS compliance standards, resulting in the identification of 12 security improvements and the development of a comprehensive remediation plan with prioritized action items
+
+**Internal Architecture:**
+- Designed and implemented a microservices architecture migration strategy for our monolithic application, including detailed service boundary definitions, data consistency patterns, event sourcing implementation for cross-service communication, containerization with Docker, orchestration with Kubernetes, and a phased rollout plan that minimizes downtime and allows for easy rollback if issues arise during the transition
+
+## FILE: test_complexity_03_mixed_length.txt
+From: Rachel Green <rgreen@company.com>
+Date: 2024-03-22
+
+**TechCorp:**
+- Fixed login issues that were preventing users from accessing their accounts due to a misconfigured session timeout setting in the authentication middleware, affecting approximately 15% of our user base over the past 24 hours
+- Meeting
+
+**StartupXYZ:**
+- Implemented automated deployment pipeline using GitHub Actions, Docker containers, and AWS ECS, including proper environment management, automated testing, rollback capabilities, and monitoring integration that provides real-time deployment status and health checks
+- Code review
+
+**Administration:**
+- Updated user documentation with screenshots, step-by-step instructions, troubleshooting sections, and video tutorials covering the new features released in version 2.5, ensuring our support team has comprehensive materials for customer assistance
+- Testing
+- Database optimization involving index analysis, query performance tuning, connection pooling configuration, and backup strategy improvements that reduced average response time by 40% and increased concurrent user capacity by 25%
+- Deploy
+
+## FILE: test_status_01_implicit.txt
+From: Mark Davis <mdavis@company.com>
+Date: 2024-03-22
+
+Today I worked on optimizing database queries for the Microsoft Azure project and saw significant performance improvements. The team also reviewed the new feature requirements that came from product management for the IBM engagement. In addition, I helped troubleshoot some deployment issues that occurred during our afternoon release window for the Amazon Web Services client.
+
+Tomorrow I'll be focusing on implementing the user dashboard redesign that was approved last week for the Google Cloud project. I'll also need to follow up on the client feedback we received about the Oracle application's loading speed and investigate potential solutions for improving performance on slower devices.
+
+## FILE: test_status_02_ambiguous.txt
+From: Jessica White <jwhite@company.com>
+Date: 2024-03-22
+
+**Acme Corp:**
+- Working on database migration
+- Team standup (was rescheduled)
+- API documentation updates (partially done)
+- Bug fixes (some resolved, others pending)
+
+**Beta Industries:**
+- Code review session (interrupted by urgent call)
+- Performance testing (started, results pending)
+- Client meeting preparation (almost ready)
+
+**Admin:**
+- Security audit (in progress, maybe finishing tomorrow)
+- Documentation review (could be completed but might carry over)
+
+## FILE: test_status_03_no_indicators.txt
+From: Steve Miller <smiller@company.com>
+Date: 2024-03-22
+
+**Client Projects:**
+- Database optimization 
+- Meeting with product team
+- Code refactoring for payment module
+- Update monitoring dashboards
+
+**Internal Work:**
+- Security vulnerability research
+- User interface improvements
+- Documentation writing
+- Testing new features
+- Support ticket review
+
+## FILE: test_category_01_no_headers.txt
+From: Amy Johnson <ajohnson@company.com>
+Date: 2024-03-22
+
+Today's work:
+- Fixed user authentication problems for TechStart
+- Updated software dependencies
+- Attended meeting about upcoming feature releases for MegaCorp
+- Reviewed pull requests from team members
+- Investigated performance issues in checkout process for E-commerce client
+- Wrote technical documentation
+- Tested mobile application on various devices
+- Analyzed server logs for error patterns for Banking client
+- Created backup of production database
+
+## FILE: test_category_02_implicit.txt
+From: Brian Lee <blee@company.com>
+Date: 2024-03-22
+
+Daily activities:
+- Reviewed customer feedback and bug reports for RetailChain
+- Called client to discuss integration timeline with FinanceFirst
+- Updated Jira tickets with latest progress
+- Installed security patches on staging servers for HealthcareHQ
+- Analyzed query performance in production
+- Sent weekly status email to stakeholders for TechInnovate
+- Configured monitoring alerts for new service
+- Tested payment gateway failover scenarios for PaymentPro
+- Mentored junior developer on testing practices
+
+## FILE: test_category_03_overlapping.txt
+From: Carol Turner <cturner@company.com>
+Date: 2024-03-22
+
+Work completed:
+- Implemented user authentication system with email verification for CloudFirst
+- Attended client meeting to discuss API integration requirements with DataCorp
+- Fixed database connection issues affecting multiple services for both TechGiant and StartupAlpha
+- Conducted security review for the payment processing module (affects all client projects)
+- Updated documentation for the new deployment process 
+- Mentored junior developer on test-driven development practices for the InnovateNow project
+- Analyzed server performance metrics and identified bottlenecks for the GlobalTech engagement
+- Created automated backup scripts for production databases across all client environments
+- Participated in architecture planning session for Q2 features
+
+## FILE: test_vague_01_single_words.txt
+From: Nancy Clark <nclark@company.com>
+Date: 2024-03-22
+
+**Client A:**
+- Training
+- Resume  
+- VC University
+- Meeting
+
+**Client B:**
+- Project work
+
+**Admin:**
+- Documentation
+- Testing
+- Review
+- Implementation
+
+## FILE: test_vague_02_generic.txt
+From: George Wilson <gwilson@company.com>
+Date: 2024-03-22
+
+**BigCorp:**
+- Made some updates
+- Worked on the project
+- Had a call
+- Checked on stuff
+
+**SmallBiz:**
+- Did some coding
+- Looked into issues
+- Made improvements
+
+**Admin:**
+- Handled requests
+- Reviewed things
+- Took care of problems
+
+## FILE: test_vague_03_missing_context.txt
+From: Linda Brown <lbrown@company.com>
+Date: 2024-03-22
+
+**Enterprise Client:**
+- Database work
+- Client presentation
+- Bug investigation
+- Code optimization
+
+**Startup Engagement:**
+- System deployment
+- Meeting participation
+- Documentation updates
+
+**Internal:**
+- Problem resolution
+- Progress monitoring
+- Feature development
+- Team coordination
+- Issue handling
+- Process improvement
+
+## FILE: test_recurring_01_daily.txt
+From: William Martinez <wmartinez@company.com>
+Date: 2024-03-22
+
+**Daily Admin Tasks:**
+- Morning standup meeting (9:00 AM daily)
+- Updated task tracking in Jira
+- Team lunch conversation about process improvements
+- Afternoon check-in with project manager
+- Evening review of tomorrow's priorities
+- Daily backup verification
+
+**Client Work:**
+- Code review session
+- Daily sync with TechCorp team
+
+Upcoming:
+- Sprint planning meeting tomorrow
+- Weekly team retrospective on Friday
+- Monthly all-hands meeting next Tuesday
+
+## FILE: test_recurring_02_weekly.txt
+From: Diana Taylor <dtaylor@company.com>
+Date: 2024-03-22
+
+This week's activities:
+**Monday - DataFirst:**
+- Monday team meeting (weekly)
+- Tuesday architecture review session
+
+**Wednesday - CyberSec:**
+- Wednesday deployment tracking
+- Thursday sprint retrospective (weekly)
+- Friday code review sessions
+
+**Recurring Admin:**
+- Weekly one-on-one with manager
+- Weekly security audit review
+- Weekly client status update
+- Bi-weekly infrastructure planning
+- Monthly performance reviews
+
+**One-time projects:**
+- Quarterly security assessment for FinancePlus
+- Annual compliance audit preparation
+- End-of-year documentation cleanup
+
+## FILE: test_recurring_03_mixed.txt
+From: Kevin Garcia <kgarcia@company.com>
+Date: 2024-03-22
+
+**Emergency Fixes:**
+- Fixed critical payment bug for E-commerce client (one-time emergency fix)
+- Fixed user-reported UI issues for MobileApp project (one-time fix)
+
+**Regular Meetings:**
+- Attended weekly team standup
+- Weekly client check-in call with TechStart
+- Bi-weekly infrastructure cost analysis
+
+**Daily Tasks:**
+- Daily database backup check
+- Daily monitoring dashboard review
+- Daily ticket triage session
+
+**Period Projects:**
+- Implemented new feature for Q2 release
+- Monthly security certificate renewal
+- One-time data migration for legacy systems
+- Annual performance review preparation
+
+## FILE: test_noise_01_signatures.txt
+From: Helen Rodriguez <hrodriguez@company.com>
+Date: 2024-03-22
+To: Team Lead <tlead@company.com>
+CC: Project Manager <pm@company.com>
+Subject: RE: Daily Activity Report - Critical Issues Resolved
+
+Dear Team,
+
+I hope this email finds you well. As requested, here's my daily activity summary for March 22, 2024.
+
+**MegaBank Project:**
+- Resolved the database timeout issue that was affecting user login
+- Updated the payment processing module with new security protocols
+- Attended the architecture review meeting
+
+**FinTech Startup:**
+- Deploy the authentication fix to production
+- Complete the API documentation update
+- Prepare for next week's client presentation
+
+Please note that I'll be out of office next Thursday for a medical appointment.
+
+Best regards,
+Helen Rodriguez
+Senior Software Engineer
+helen.rodriguez@company.com
+Mobile: (555) 123-4567
+
+-- 
+This email was sent from our secure email system. Please verify the sender before clicking any links.
+Company Confidential - Do not forward without authorization
+
+## FILE: test_noise_02_typos.txt
+From: James Wilson <jwilson@company.com>
+Date: 2024-03-22
+
+todays work summery:
+
+**TechGiant Projecct:**
+- fxied the databse conecction isue that was cuasing problmes 
+- complted code reveiw for 3 pull reqeusts
+- atended meetng about new featur implemtation
+
+**StartUp Alpha:**
+- updatted documntation with latest chnages
+- helpd troublshoot server problms
+
+**Admin:**
+- implmnt new autentication systm 
+- finsh testng mobile app upates
+- meet wit cleint about projecg timeline
+- revew performnce metrucs fro last wek
+- updte monitorng dashboard
+
+## FILE: test_noise_03_irrelevant.txt
+From: Susan Miller <smiller@company.com>
+Date: 2024-03-22
+
+Hi everyone! Hope you're having a great day. Just wanted to share what I've been working on lately.
+
+**TechCorp Project:**
+I finally finished fixing that annoying database bug that's been causing login issues for our users. Speaking of users, I saw on the news that coffee prices are expected to rise again this quarter - that's going to hurt our office budget LOL! 😂
+
+Also completed for **DataFlow Inc:**
+- Code review for the payment module
+- Meeting with the product team about new features
+
+Oh, and did I mention that my cat, Mr. Whiskers, knocked over my coffee this morning? Thank goodness it didn't spill on my keyboard! 🐱☕
+
+**Admin tasks:**
+- Deploy the authentication fix
+- Update the monitoring dashboard
+
+BTW, has anyone seen the latest episode of that new TV show everyone's talking about? I watched it last night and it's pretty good!
+
+Random thought: why do people say "after dark" when it's actually after light? 🤔
+
+Anyway, that's all for now!
+
+Susan
+
+## FILE: test_project_01_explicit_structure.txt
+From: Xavier Noboa <xnoboa@paloaltonetworks.com>
+Date: 2024-03-20
+
+Hours Breakdown:
+- Marriott: 4 hours
+- Advocate: 4 hours  
+- Admin - Time Expenses: 60 min
+
+Planned Activities:
+**Marriott:**
+- Pentesting mapping of documents (Revision of the results/rql again)
+- Marriott | Prisma Cloud Bi-Weekly Alignment & Success Call
+- Revision of documentation for tag resources (API)
+
+**Advocate:**
+- Reviewing Critical and High Alerts
+- Updating project plan
+- Revision of script for agentless
+- Revision of runbooks provided
+
+**Admin:**
+- PS Consulting Weekly Sync
+- PS Prisma Cloud EE Team Call
+- English classes
+
+Completed Activities:
+**Marriott:**
+- Pentesting mapping of documents: 2 hours 30 min Creation of a spreadsheet of the previous Doc. Validation of RQLs. Action item: Validate the RQLs of the High Alerts
+- Marriott | Prisma Cloud Bi-Weekly Alignment & Success Call: 30 min Action item: None
+- Revision of documentation for tag resources (API): 1 hour Revision of questions regarding tags usage by APIs. Action item: None
+
+**Advocate:**
+- Reviewing Critical and High Alerts: 1 hour revision of high alerts. Action item: Validate the alerts by total count to bring priority
+- Updating project plan: 1 hour Revision of the project plan and engagement plan. Action item: None
+- Revision of script for agentless: 1 hour 30 min Revision of the new requests for Agentless rows. Action item: Test again, the rows are not added to the csv file
+- Revision of runbooks provided: 30 min. Revision of CSMP runbook to add more detail
+
+**Admin:**
+- PS Consulting Weekly Sync
+- PS Prisma Cloud EE Team Call  
+- English classes
+
+## FILE: test_project_02_partial_structure.txt
+From: William Mora <wmora@paloaltonetworks.com>
+Date: 2024-03-19
+
+Hours Breakdown:
+- Tyson - EE Engagement: 8 hours
+
+Planned Activities:
+**Tyson tasks:**
+- PC CSMP weekly sync with Tyson
+- PC consulting Wednesday  
+- PC cve management
+- Tyson sync with PA and account team
+- Work on WAAS, there are apis that need to be enabled
+- Check on SNOW notification template
+- Support team on CSPM policies
+
+Completed tasks:
+- We had our weekly sync meeting for CSMP where we discussed our roadmap
+- Joined the PC with Zarwan, we had Sara present on DSPM, it was a high level overview
+- Joined the bi-weekly meeting to check on plan for cortex on cloud and engagement
+- Worked on cve management went through the unmanaged assets and all cve that are showing for many assets
+- Met with Tyson to work on WAAS for two applications, I am following up tomorrow to check where we are taking this forward
+- Went over the notification template, made some changes to test a few things for a missing field in SNOW
+- Working on cortex on cloud training with power hours
+
+## FILE: test_project_03_no_structure.txt
+From: Mariela Bussi <mbussi@paloaltonetworks.com>
+Date: 2024-03-21
+
+Hour breakdown for today:
+Shadow sessions (2 hours 30 mins)
+Meetings (2 hours 30 mins)
+Training (3 hours 30 mins)
+
+Completed Activities:
+Attended the MPIV use case meetings where William gave us a walkthrough to the CSPM module.
+Shadowed Jim Winchel in one of his sessions.
+Had a call with Cesar to study for the certification.
+Watched a couple of recordings of Maturity Assessment meetings to get an understanding of what those types of sessions are held.
+Had my English class with Bob.
+
+Best regards,
+Mariela Bussi

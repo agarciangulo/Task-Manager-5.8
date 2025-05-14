@@ -1,0 +1,41 @@
+From: Xavier Noboa <xnoboa@paloaltonetworks.com>
+Date: 2024-03-20
+
+Hours Breakdown:
+- Marriott: 4 hours
+- Advocate: 4 hours  
+- Admin - Time Expenses: 60 min
+
+Planned Activities:
+**Marriott:**
+- Pentesting mapping of documents (Revision of the results/rql again)
+- Marriott | Prisma Cloud Bi-Weekly Alignment & Success Call
+- Revision of documentation for tag resources (API)
+
+**Advocate:**
+- Reviewing Critical and High Alerts
+- Updating project plan
+- Revision of script for agentless
+- Revision of runbooks provided
+
+**Admin:**
+- PS Consulting Weekly Sync
+- PS Prisma Cloud EE Team Call
+- English classes
+
+Completed Activities:
+**Marriott:**
+- Pentesting mapping of documents: 2 hours 30 min Creation of a spreadsheet of the previous Doc. Validation of RQLs. Action item: Validate the RQLs of the High Alerts
+- Marriott | Prisma Cloud Bi-Weekly Alignment & Success Call: 30 min Action item: None
+- Revision of documentation for tag resources (API): 1 hour Revision of questions regarding tags usage by APIs. Action item: None
+
+**Advocate:**
+- Reviewing Critical and High Alerts: 1 hour revision of high alerts. Action item: Validate the alerts by total count to bring priority
+- Updating project plan: 1 hour Revision of the project plan and engagement plan. Action item: None
+- Revision of script for agentless: 1 hour 30 min Revision of the new requests for Agentless rows. Action item: Test again, the rows are not added to the csv file
+- Revision of runbooks provided: 30 min. Revision of CSMP runbook to add more detail
+
+**Admin:**
+- PS Consulting Weekly Sync
+- PS Prisma Cloud EE Team Call  
+- English classes

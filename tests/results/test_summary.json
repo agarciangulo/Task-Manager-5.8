@@ -1,0 +1,137 @@
+{
+  "timestamp": "20250513_112930",
+  "tests_run": [
+    {
+      "input_file": "test_category_01_no_headers.txt",
+      "output_file": "test_result_20250513_112229.json"
+    },
+    {
+      "input_file": "test_recurring_02_weekly.txt",
+      "output_file": "test_result_20250513_112243.json"
+    },
+    {
+      "input_file": "test_format_01_bullet_points.txt",
+      "output_file": "test_result_20250513_112255.json"
+    },
+    {
+      "input_file": "test_vague_01_single_words.txt",
+      "output_file": "test_result_20250513_112307.json"
+    },
+    {
+      "input_file": "test_category_02_implicit.txt",
+      "output_file": "test_result_20250513_112317.json"
+    },
+    {
+      "input_file": "test_status_02_ambiguous.txt",
+      "output_file": "test_result_20250513_112334.json"
+    },
+    {
+      "input_file": "test_complexity_01_short_tasks.txt",
+      "output_file": "test_result_20250513_112346.json"
+    },
+    {
+      "input_file": "test_volume_01_few_tasks.txt",
+      "output_file": "test_result_20250513_112349.json"
+    },
+    {
+      "input_file": "test_complexity_03_mixed_length.txt",
+      "output_file": "test_result_20250513_112402.json"
+    },
+    {
+      "input_file": "test_basic_03_standard_format.txt",
+      "output_file": "test_result_20250513_112409.json"
+    },
+    {
+      "input_file": "test_noise_03_irrelevant.txt",
+      "output_file": "test_result_20250513_112415.json"
+    },
+    {
+      "input_file": "test_project_02_partial_structure.txt",
+      "output_file": "test_result_20250513_112435.json"
+    },
+    {
+      "input_file": "test_noise_01_signatures.txt",
+      "output_file": "test_result_20250513_112512.json"
+    },
+    {
+      "input_file": "test_complexity_02_detailed_tasks.txt",
+      "output_file": "test_result_20250513_112524.json"
+    },
+    {
+      "input_file": "test_noise_02_typos.txt",
+      "output_file": "test_result_20250513_112545.json"
+    },
+    {
+      "input_file": "test_basic_01_simple_tasks.txt",
+      "output_file": "test_result_20250513_112553.json"
+    },
+    {
+      "input_file": "test_volume_03_massive_email.txt",
+      "output_file": "test_result_20250513_112623.json"
+    },
+    {
+      "input_file": "test_status_03_no_indicators.txt",
+      "output_file": "test_result_20250513_112634.json"
+    },
+    {
+      "input_file": "test_recurring_01_daily.txt",
+      "output_file": "test_result_20250513_112646.json"
+    },
+    {
+      "input_file": "test_category_03_overlapping.txt",
+      "output_file": "test_result_20250513_112657.json"
+    },
+    {
+      "input_file": "test_format_03_mixed_format.txt",
+      "output_file": "test_result_20250513_112709.json"
+    },
+    {
+      "input_file": "test_project_01_explicit_structure.txt",
+      "output_file": "test_result_20250513_112718.json"
+    },
+    {
+      "input_file": "test_vague_02_generic.txt",
+      "output_file": "test_result_20250513_112732.json"
+    },
+    {
+      "input_file": "test_volume_02_many_tasks.txt",
+      "output_file": "test_result_20250513_112756.json"
+    },
+    {
+      "input_file": "test_vague_03_missing_context.txt",
+      "output_file": "test_result_20250513_112809.json"
+    },
+    {
+      "input_file": "test_status_01_implicit.txt",
+      "output_file": "test_result_20250513_112817.json"
+    },
+    {
+      "input_file": "test_recurring_03_mixed.txt",
+      "output_file": "test_result_20250513_112832.json"
+    },
+    {
+      "input_file": "test_project_03_no_structure.txt",
+      "output_file": "test_result_20250513_112839.json"
+    },
+    {
+      "input_file": "sample1.txt",
+      "output_file": "test_result_20250513_112849.json"
+    },
+    {
+      "input_file": "test_basic_02_clear_sections.txt",
+      "output_file": "test_result_20250513_112858.json"
+    },
+    {
+      "input_file": "sample2.txt",
+      "output_file": "test_result_20250513_112903.json"
+    },
+    {
+      "input_file": "test_format_02_paragraphs.txt",
+      "output_file": "test_result_20250513_112909.json"
+    },
+    {
+      "input_file": "sample3.txt",
+      "output_file": "test_result_20250513_112930.json"
+    }
+  ]
+}

@@ -51,7 +51,7 @@ def debug_print(message):
 def get_ai_response(prompt: str) -> str:
     """Get response from the configured AI provider."""
     from core.openai_client import client
-    response = client.chat.completions.create(
+    response = client.chat_completions_create(
         model=CHAT_MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3

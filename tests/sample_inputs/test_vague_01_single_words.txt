@@ -1,0 +1,17 @@
+From: Nancy Clark <nclark@company.com>
+Date: 2024-03-22
+
+**Client A:**
+- Training
+- Resume  
+- VC University
+- Meeting
+
+**Client B:**
+- Project work
+
+**Admin:**
+- Documentation
+- Testing
+- Review
+- Implementation

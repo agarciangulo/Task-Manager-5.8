@@ -9,6 +9,7 @@ import traceback
 from datetime import datetime, timedelta
 import pandas as pd
 from dotenv import load_dotenv
+import logging
 
 # Load environment variables first
 load_dotenv()
@@ -78,10 +79,9 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 
 # Import from the new structure
-from core.adapters.notion_adapter import NotionAdapter
-from core.task_processor import insert_or_update_task
-from core.task_extractor import extract_tasks_from_update
-from core.notion_client import fetch_notion_tasks, fetch_peer_feedback, validate_notion_connection
+from core.agents.notion_agent import NotionAgent
+from core.agents.task_extraction_agent import TaskExtractionAgent
+from core.agents.task_processing_agent import TaskProcessingAgent
 from core.ai.analyzers import TaskAnalyzer, ProjectAnalyzer
 from core.openai_client import get_project_insight
 from core import identify_stale_tasks, list_all_categories
@@ -115,9 +115,18 @@ CORS(app)
 # Initialize the TaskAnalyzer
 task_analyzer = TaskAnalyzer()
 
+# Initialize NotionAgent
+notion_agent = NotionAgent()
+
+# Initialize TaskExtractionAgent
+task_extraction_agent = TaskExtractionAgent()
+
+# Initialize TaskProcessingAgent
+task_processing_agent = TaskProcessingAgent()
+
 # Validate Notion connection at startup
 print("\nValidating Notion connection...")
-notion_connected = validate_notion_connection()
+notion_connected = notion_agent.validate_connection()
 if not notion_connected:
     print("⚠️ Warning: Notion connection failed. Some features may not work.")
 else:
@@ -151,7 +160,7 @@ def api_dashboard_data():
         project_filter = request.args.get('project', 'all')
         
         # Get all tasks
-        df = fetch_notion_tasks()
+        df = notion_agent.fetch_tasks()
         
         # Apply filters
         filtered_df = df.copy()
@@ -247,77 +256,131 @@ def api_dashboard_data():
 @app.route('/api/process_update', methods=['POST'])
 def process_update():
     """Process a task update and return insights."""
+    logger = logging.getLogger("process_update")
     try:
+        logger.info("Received process_update request")
         data = request.get_json()
+        print(f"Request data: {data}")  # Debug log
         if not data or 'text' not in data:
+            logger.error("No text provided in request")
             return jsonify({"error": "No text provided"}), 400
 
         text = data['text']
-        person_name = data.get('person_name', 'Unknown')
 
-        # Extract tasks
-        processed_tasks = extract_tasks_from_update(text)
+        logger.info("Extracting tasks from input text")
+        processed_tasks = task_extraction_agent.extract_tasks(text)
+        logger.info(f"Extracted {len(processed_tasks) if processed_tasks else 0} tasks: {processed_tasks}")
         if not processed_tasks:
+            logger.error("No tasks found in the update")
             return jsonify({"error": "No tasks found in the update"}), 400
 
-        # Get recent tasks and peer feedback
-        recent_tasks = fetch_notion_tasks()
-        peer_feedback = fetch_peer_feedback(person_name=person_name)
+        logger.info("Fetching existing tasks from Notion")
+        recent_tasks = notion_agent.fetch_tasks()
+        logger.info(f"Fetched {len(recent_tasks) if hasattr(recent_tasks, '__len__') else 'unknown'} existing tasks")
 
-        # Get coaching insights using TaskAnalyzer
-        coaching = task_analyzer.analyze(
+        # Insert or update each task and log the result
+        results = []
+        print("[DEBUG] Starting task processing loop")
+        for i, task in enumerate(processed_tasks):
+            try:
+                print(f"[DEBUG] Processing task {i+1}/{len(processed_tasks)}: {task}")
+                result = task_processing_agent.process_task(task, recent_tasks)
+                print(f"[DEBUG] Result for task {i+1}: {result}")
+                results.append({"task": task, "result": result})
+            except Exception as e:
+                print(f"[DEBUG] Exception while processing task {i+1}: {e}")
+                logger.error(f"Exception while processing task {i+1}: {e}", exc_info=True)
+                results.append({"task": task, "error": str(e)})
+
+        print("[DEBUG] Finished task processing loop. Results:", results)
+
+        # Get person name from the first task if available
+        person_name = processed_tasks[0].get("employee", "Unknown") if processed_tasks else "Unknown"
+
+        logger.info(f"Fetching peer feedback for {person_name}")
+        print(f"[DEBUG] Fetching peer feedback for {person_name}")
+        peer_feedback = notion_agent.fetch_peer_feedback(person_name=person_name)
+        print(f"[DEBUG] Peer feedback: {peer_feedback}")
+
+        print("[DEBUG] Generating coaching insights using TaskAnalyzer")
+        logger.info("Generating coaching insights using TaskAnalyzer")
+        coaching_result = task_analyzer.analyze(
             tasks=processed_tasks,
             analysis_type="ai_insights",
             person_name=person_name,
             recent_tasks=recent_tasks,
             peer_feedback=peer_feedback
         )
-            
-        return jsonify({
+        print(f"[DEBUG] Coaching result: {coaching_result}")
+        coaching = coaching_result.get("insight", "Unable to generate coaching insights at this time.")
+        logger.info(f"Successfully generated coaching insights: {coaching}")
+
+        response = {
+            "success": True,
             "tasks": processed_tasks,
-            "coaching": coaching
-        })
-        
+            "coaching": coaching,
+            "results": results,
+            "needs_verification": any(task.get("needs_verification", False) for task in processed_tasks),
+            "complete_count": len([t for t in processed_tasks if not t.get("needs_verification", False)]),
+            "incomplete_count": len([t for t in processed_tasks if t.get("needs_verification", False)]),
+            "verification_message": "Some tasks need more information. Please provide additional details.",
+            "has_pending_tasks": False,
+            "processed_tasks": [{
+                "task": task["task"],
+                "status": task.get("status", "Not Started"),
+                "employee": task.get("employee", ""),
+                "category": task.get("category", "")
+            } for task in processed_tasks]
+        }
+        print(f"[DEBUG] Returning response: {response}")
+        logger.info(f"Returning response: {response}")
+        return jsonify(response)
+
     except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        logger.error(f"Error processing update: {e}\n{tb}")
         print(f"Error processing update: {e}")
-        return jsonify({"error": str(e)}), 500
+        print(tb)
+        error_response = {
+            "error": f"An error occurred while processing your update: {e}",
+            "traceback": tb
+        }
+        print(f"Error response: {error_response}")  # Debug log
+        return jsonify(error_response), 500
 
 @app.route('/api/stale_tasks')
 def api_stale_tasks():
     """API endpoint to get stale tasks."""
     try:
-        df = fetch_notion_tasks()
-        stale = identify_stale_tasks(df)
-        
-        if stale.empty:
+        stale = identify_stale_tasks(days=7)
+        if not stale:
             return jsonify({
                 'success': True,
                 'has_stale': False,
                 'message': 'No overdue tasks!'
             })
-            
         # Format stale tasks by employee
         stale_tasks_by_employee = {}
-        for _, row in stale.iterrows():
-            employee = row['employee']
+        for task in stale:
+            employee = task.get('employee', 'Unknown')
             if employee not in stale_tasks_by_employee:
                 stale_tasks_by_employee[employee] = []
-                
-            date_str = row['date'].strftime('%Y-%m-%d') if row['date'] else "No date"
+            date_str = task.get('due_date') or task.get('date') or 'No date'
+            status = task.get('status', 'Unknown')
             stale_tasks_by_employee[employee].append({
-                'task': row['task'],
-                'status': row['status'],
+                'task': task.get('task', ''),
+                'status': status,
                 'date': date_str,
-                'days_old': row['days_old']
+                'days_old': None  # Placeholder, can be improved later
             })
-            
         return jsonify({
             'success': True,
             'has_stale': True,
             'tasks_by_employee': stale_tasks_by_employee
         })
-        
     except Exception as e:
+        import traceback
         print(f"Error in api_stale_tasks: {traceback.format_exc()}")
         return jsonify({
             'success': False,
@@ -335,7 +398,7 @@ def api_tasks_by_category():
                 'message': 'No category specified'
             })
             
-        df = fetch_notion_tasks()
+        df = notion_agent.fetch_tasks()
         filtered = df[(df["category"] == category) & (df["status"] != "Completed")]
         
         if filtered.empty:

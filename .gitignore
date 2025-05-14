@@ -43,4 +43,11 @@ Thumbs.db
 # Project specific
 *.db
 *.sqlite
-*.log 
+*.log
+
+# Security
+security_tokens.json
+.env
+*.pem
+*.key
+*.cert 

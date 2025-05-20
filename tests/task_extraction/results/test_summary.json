@@ -1,0 +1,129 @@
+{
+  "timestamp": "20250519_151523",
+  "tests_run": [
+    {
+      "input_file": "test_category_01_no_headers.txt",
+      "output_file": "test_result_20250519_150828.json"
+    },
+    {
+      "input_file": "test_recurring_02_weekly.txt",
+      "output_file": "test_result_20250519_150843.json"
+    },
+    {
+      "input_file": "test_format_01_bullet_points.txt",
+      "output_file": "test_result_20250519_150855.json"
+    },
+    {
+      "input_file": "test_vague_01_single_words.txt",
+      "output_file": "test_result_20250519_150907.json"
+    },
+    {
+      "input_file": "test_category_02_implicit.txt",
+      "output_file": "test_result_20250519_150919.json"
+    },
+    {
+      "input_file": "test_status_02_ambiguous.txt",
+      "output_file": "test_result_20250519_150932.json"
+    },
+    {
+      "input_file": "test_complexity_01_short_tasks.txt",
+      "output_file": "test_result_20250519_150946.json"
+    },
+    {
+      "input_file": "test_volume_01_few_tasks.txt",
+      "output_file": "test_result_20250519_150950.json"
+    },
+    {
+      "input_file": "test_complexity_03_mixed_length.txt",
+      "output_file": "test_result_20250519_151002.json"
+    },
+    {
+      "input_file": "test_basic_03_standard_format.txt",
+      "output_file": "test_result_20250519_151013.json"
+    },
+    {
+      "input_file": "test_noise_03_irrelevant.txt",
+      "output_file": "test_result_20250519_151020.json"
+    },
+    {
+      "input_file": "master_sample_1.txt",
+      "output_file": "test_result_20250519_151031.json"
+    },
+    {
+      "input_file": "test_project_02_partial_structure.txt",
+      "output_file": "test_result_20250519_151051.json"
+    },
+    {
+      "input_file": "test_noise_01_signatures.txt",
+      "output_file": "test_result_20250519_151100.json"
+    },
+    {
+      "input_file": "test_complexity_02_detailed_tasks.txt",
+      "output_file": "test_result_20250519_151110.json"
+    },
+    {
+      "input_file": "test_noise_02_typos.txt",
+      "output_file": "test_result_20250519_151127.json"
+    },
+    {
+      "input_file": "test_basic_01_simple_tasks.txt",
+      "output_file": "test_result_20250519_151136.json"
+    },
+    {
+      "input_file": "test_volume_03_massive_email.txt",
+      "output_file": "test_result_20250519_151212.json"
+    },
+    {
+      "input_file": "test_status_03_no_indicators.txt",
+      "output_file": "test_result_20250519_151223.json"
+    },
+    {
+      "input_file": "test_recurring_01_daily.txt",
+      "output_file": "test_result_20250519_151240.json"
+    },
+    {
+      "input_file": "test_category_03_overlapping.txt",
+      "output_file": "test_result_20250519_151252.json"
+    },
+    {
+      "input_file": "test_format_03_mixed_format.txt",
+      "output_file": "test_result_20250519_151300.json"
+    },
+    {
+      "input_file": "test_project_01_explicit_structure.txt",
+      "output_file": "test_result_20250519_151313.json"
+    },
+    {
+      "input_file": "test_vague_02_generic.txt",
+      "output_file": "test_result_20250519_151330.json"
+    },
+    {
+      "input_file": "test_volume_02_many_tasks.txt",
+      "output_file": "test_result_20250519_151359.json"
+    },
+    {
+      "input_file": "test_vague_03_missing_context.txt",
+      "output_file": "test_result_20250519_151415.json"
+    },
+    {
+      "input_file": "test_status_01_implicit.txt",
+      "output_file": "test_result_20250519_151423.json"
+    },
+    {
+      "input_file": "test_recurring_03_mixed.txt",
+      "output_file": "test_result_20250519_151452.json"
+    },
+    {
+      "input_file": "test_project_03_no_structure.txt",
+      "output_file": "test_result_20250519_151503.json"
+    },
+    {
+      "input_file": "test_basic_02_clear_sections.txt",
+      "output_file": "test_result_20250519_151515.json"
+    },
+    {
+      "input_file": "test_format_02_paragraphs.txt",
+      "output_file": "test_result_20250519_151523.json"
+    }
+  ]
+}

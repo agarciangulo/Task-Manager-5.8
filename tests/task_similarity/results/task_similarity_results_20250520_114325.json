@@ -1,0 +1,266 @@
+[
+  {
+    "new_task": "need to set up Kubernetes admission control for container security",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.9,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "building a dashboard for compliance tracking",
+    "ai_results": {
+      "is_match": true,
+      "confidence": 0.9,
+      "matched_task": {
+        "task": "Create custom CSPM dashboard for compliance standards",
+        "description": "Build a dashboard showing compliance status for NIST 800-53, Azure Security Benchmark, and CIS",
+        "status": "In Progress",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-18",
+        "category": "Compliance"
+      },
+      "explanation": "This task is very similar to the new task as they both involve creating dashboards for compliance tracking, with a focus on specific standards or requirements."
+    }
+  },
+  {
+    "new_task": "script for automated tenant provisioning",
+    "ai_results": {
+      "is_match": true,
+      "confidence": 0.9,
+      "matched_task": {
+        "task": "Develop automation script for tenant creation",
+        "description": "Create script to automate tenant creation with API integration and policy assignment",
+        "status": "In Progress",
+        "employee": "Juan Navarrete",
+        "date": "2025-03-20",
+        "category": "Automation"
+      },
+      "explanation": "This task is directly related to automating the process of tenant creation, which aligns closely with the new task of creating a script for automated tenant provisioning."
+    }
+  },
+  {
+    "new_task": "fix WAAS settings for new applications",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.9,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "convert policies from Skywalker format",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "implement agentless vulnerability scanning",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.9,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "create container image trust groups",
+    "ai_results": {
+      "is_match": true,
+      "confidence": 0.9,
+      "matched_task": {
+        "task": "Create Trusted Images group for container security",
+        "description": "Establish trust groups for approved container images to enable trust-based security policies",
+        "status": "To Do",
+        "employee": "Matias Keib",
+        "date": "2025-03-24",
+        "category": "Container Security"
+      },
+      "explanation": "This task aligns closely with the new task as both involve establishing groups for managing container security."
+    }
+  },
+  {
+    "new_task": "setup ticket creation in ServiceNow for security alerts",
+    "ai_results": {
+      "is_match": true,
+      "confidence": 0.9,
+      "matched_task": {
+        "task": "Implement SNOW integration for alert notifications",
+        "description": "Set up ServiceNow integration to automatically create tickets for critical and high severity alerts",
+        "status": "In Progress",
+        "employee": "William Mora",
+        "date": "2025-03-17",
+        "category": "Integration"
+      },
+      "explanation": "Task 8 is similar to the new task as it involves implementing ServiceNow integration for alert notifications, aligning with the objective of setting up ticket creation in ServiceNow for security alerts."
+    }
+  },
+  {
+    "new_task": "investigate database performance issues",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 1.0,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "create CI pipeline for container scanning",
+    "ai_results": {
+      "is_match": true,
+      "confidence": 0.9,
+      "matched_task": {
+        "task": "Develop GitHub Actions pipeline for image scanning",
+        "description": "Create CI/CD pipeline in GitHub Actions to scan container images using twistcli before deployment",
+        "status": "To Do",
+        "employee": "Daniel Vela",
+        "date": "2025-03-25",
+        "category": "DevOps"
+      },
+      "explanation": "Both tasks involve creating a pipeline for scanning images, with the existing task using GitHub Actions specifically for image scanning, whereas the new task is more general in terms of the CI pipeline."
+    }
+  },
+  {
+    "new_task": "email integration for security findings",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "document steps to fix common cloud security issues",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "transfer AppSec policies to new system",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.9,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "help setting up Jira for security issues",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "troubleshoot missing flow logs from Google Cloud",
+    "ai_results": {
+      "is_match": true,
+      "confidence": 0.9,
+      "matched_task": {
+        "task": "Investigate GCP flow logs configuration issues",
+        "description": "Troubleshoot missing flow logs from Google Cloud Platform VPCs to ensure proper anomaly detection",
+        "status": "In Progress",
+        "employee": "William Mora",
+        "date": "2025-03-25",
+        "category": "Troubleshooting"
+      },
+      "explanation": "This task is very similar to the new task as both involve investigating configuration issues related to flow logs in Google Cloud."
+    }
+  },
+  {
+    "new_task": "writing weekly updates for enterprise engagement",
+    "ai_results": {
+      "is_match": true,
+      "confidence": 1.0,
+      "matched_task": {
+        "task": "Create weekly status report for Enterprise Engagement",
+        "description": "Compile weekly status report highlighting achievements, challenges, and next steps for customer",
+        "status": "Recurring",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-22",
+        "category": "Reporting"
+      },
+      "explanation": "Both tasks involve preparing regular reports or updates for enterprise engagement, focusing on communication and information sharing."
+    }
+  },
+  {
+    "new_task": "configure runtime detection for malware",
+    "ai_results": {
+      "is_match": true,
+      "confidence": 0.9,
+      "matched_task": {
+        "task": "Implement runtime policy for malware detection",
+        "description": "Configure runtime security policy to detect malware activity in containerized environments",
+        "status": "To Do",
+        "employee": "Matias Keib",
+        "date": "2025-03-20",
+        "category": "Security"
+      },
+      "explanation": "This task is very similar to the new task as both involve setting up policies for detecting and responding to malware at runtime within a system."
+    }
+  },
+  {
+    "new_task": "analyze high priority security vulnerabilities",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "create scanner reporting tool",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.9,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "relate pentest results to cloud security alerts",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.9,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "need migration assistance to new module",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "help with drift detection setup",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "implement checkov for IaC scanning",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "create Cloud Security Assessment report",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "assistance with image scanning in a sandbox environment",
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    }
+  }
+]

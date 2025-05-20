@@ -1,0 +1,125 @@
+{
+  "timestamp": "20250519_150828",
+  "input_text": "From: Amy Johnson <ajohnson@company.com>\nDate: 2024-03-22\n\nToday's work:\n- Fixed user authentication problems for TechStart\n- Updated software dependencies\n- Attended meeting about upcoming feature releases for MegaCorp\n- Reviewed pull requests from team members\n- Investigated performance issues in checkout process for E-commerce client\n- Wrote technical documentation\n- Tested mobile application on various devices\n- Analyzed server logs for error patterns for Banking client\n- Created backup of production database",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Amy Johnson <ajohnson@company.com>\nDate: 2024-03-22\n\nToday's work:\n- Fixed user authentication problems for TechStart\n- Updated software dependencies\n- Attended meeting about upcoming feature releases for MegaCorp\n- Reviewed pull requests from team members\n- Investigated performance issues in checkout process for E-commerce client\n- Wrote technical documentation\n- Tested mobile application on various devices\n- Analyzed server logs for error patterns for Banking client\n- Created backup of production database\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Fixed user authentication problems for TechStart\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Technical\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Updated software dependencies\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Technical\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Attended meeting about upcoming feature releases for MegaCorp\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Meeting\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed pull requests from team members\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Code Review\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Investigated performance issues in checkout process for E-commerce client\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Technical\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Wrote technical documentation\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Documentation\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Tested mobile application on various devices\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Testing\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Analyzed server logs for error patterns for Banking client\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Technical\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Created backup of production database\",\n        \"status\": \"Completed\",\n        \"employee\": \"Amy Johnson\",\n        \"date\": \"2024-03-22\",\n        \"category\": \"Technical\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Fixed user authentication problems for TechStart",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "TechStart",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Updated software dependencies",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Attended meeting about upcoming feature releases for MegaCorp",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "MegaCorp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed pull requests from team members",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated performance issues in checkout process for E-commerce client",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "E-commerce",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrote technical documentation",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tested mobile application on various devices",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Analyzed server logs for error patterns for Banking client",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "Banking",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Created backup of production database",
+      "status": "Completed",
+      "employee": "Amy Johnson",
+      "date": "2024-03-22",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+## TEST CASE: Basic task similarity with clear matches
+## DESCRIPTION: Tests basic task similarity with tasks that have clear semantic matches but different wording
+
+## EXISTING TASKS:
+existing_tasks = [
+    {
+        "task": "Implement user authentication system",
+        "description": "Create a secure authentication system with email verification and password reset functionality",
+        "status": "In Progress",
+        "employee": "John Smith",
+        "date": "2024-03-15",
+        "category": "Security"
+    },
+    {
+        "task": "Set up CI/CD pipeline",
+        "description": "Configure automated testing and deployment pipeline using GitHub Actions",
+        "status": "To Do",
+        "employee": "Sarah Johnson",
+        "date": "2024-03-14",
+        "category": "DevOps"
+    },
+    {
+        "task": "Create API documentation",
+        "description": "Write comprehensive API documentation with examples and authentication details",
+        "status": "To Do",
+        "employee": "Mike Brown",
+        "date": "2024-03-13",
+        "category": "Documentation"
+    },
+    {
+        "task": "Optimize database queries",
+        "description": "Review and optimize slow database queries in the reporting module",
+        "status": "In Progress",
+        "employee": "Lisa Chen",
+        "date": "2024-03-12",
+        "category": "Performance"
+    },
+    {
+        "task": "Update frontend components",
+        "description": "Refactor React components to improve reusability and performance",
+        "status": "To Do",
+        "employee": "Alex Rodriguez",
+        "date": "2024-03-11",
+        "category": "Frontend"
+    }
+]
+
+## NEW TASKS TO TEST:
+new_tasks = [
+    {
+        "task": "need to build a login system with email verification",
+        "description": "Create authentication system with email verification",
+        "status": "To Do",
+        "employee": "John Smith",
+        "date": "2024-03-15",
+        "category": "Security"
+    },
+    {
+        "task": "can someone help set up automated testing?",
+        "description": "Looking for assistance with CI/CD setup",
+        "status": "To Do",
+        "employee": "Sarah Johnson",
+        "date": "2024-03-14",
+        "category": "DevOps"
+    },
+    {
+        "task": "document our API endpoints",
+        "description": "Write documentation for our API",
+        "status": "To Do",
+        "employee": "Mike Brown",
+        "date": "2024-03-13",
+        "category": "Documentation"
+    },
+    {
+        "task": "database is running slow, need to fix queries",
+        "description": "Optimize slow database queries",
+        "status": "To Do",
+        "employee": "Lisa Chen",
+        "date": "2024-03-12",
+        "category": "Performance"
+    },
+    {
+        "task": "refactor the UI components",
+        "description": "Update and improve frontend components",
+        "status": "To Do",
+        "employee": "Alex Rodriguez",
+        "date": "2024-03-11",
+        "category": "Frontend"
+    }
+] 

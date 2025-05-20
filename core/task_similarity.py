@@ -101,32 +101,56 @@ def find_similar_tasks(new_task: Dict[str, Any], existing_tasks: List[Dict[str, 
 
 def check_task_similarity_ai(new_task: Dict[str, Any], existing_tasks: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Check task similarity using AI model.
-    
-    Args:
-        new_task: The new task to check
-        existing_tasks: List of existing tasks to check against
-        
-    Returns:
-        Dict with similarity results
+    Check task similarity using AI model with enhanced semantic understanding.
     """
     try:
-        # Create prompt for the AI model
+        # Create a complete representation of the new task with all attributes
+        new_task_full = f"Task: {new_task['task']}"
+        if new_task.get('description'):
+            new_task_full += f"\nDescription: {new_task['description']}"
+        
+        # Create detailed representations of existing tasks
+        existing_tasks_full = []
+        for i, task in enumerate(existing_tasks):
+            task_full = f"{i+1}. {task['task']}"
+            if task.get('description'):
+                task_full += f"\n   Description: {task['description']}"
+            existing_tasks_full.append(task_full)
+        
+        # Create the prompt
         prompt = f"""You are a task comparison expert. Your job is to compare tasks and determine if they are similar.
 
 NEW TASK:
 {new_task['task']}
+Description: {new_task.get('description', 'Not provided')}
 
 EXISTING TASKS:
-{chr(10).join([f"{i+1}. {task['task']}" for i, task in enumerate(existing_tasks)])}
+{chr(10).join(existing_tasks_full)}
 
 INSTRUCTIONS:
 1. Compare the new task with each existing task
-2. For each comparison, determine:
+2. Consider these aspects when determining similarity:
+   - Core objective/purpose of the task
+   - Technical domain (e.g., frontend, backend, database)
+   - Specific components being worked on
+   - Level of detail and scope
+
+3. Look beyond exact wording and identify tasks with the same functional purpose. Examples of similar tasks:
+   - "Set up user authentication" ≈ "Implement login system"
+   - "Fix database performance" ≈ "Optimize slow queries" ≈ "Investigate database issues"
+   - "Update frontend components" ≈ "Refactor UI code"
+   - "Write API documentation" ≈ "Document endpoints"
+   - "Set up automated testing" ≈ "Implement CI/CD pipeline"
+   - "Fix slow database" ≈ "Optimize database queries"
+   - "Implement" ≈ "Setup" ≈ "Configure" ≈ "Create"
+   - "ServiceNow" ≈ "SNOW"
+
+4. For each comparison, determine:
    - Are they similar? (yes/no)
    - How confident are you? (0-1)
    - Why are they similar or different? (brief explanation)
-3. Return your analysis in this exact format:
+
+5. Return your analysis in this exact format:
    TASK 1: [task text]
    SIMILAR: [yes/no]
    CONFIDENCE: [0-1]
@@ -137,7 +161,9 @@ INSTRUCTIONS:
    CONFIDENCE: [0-1]
    EXPLANATION: [your explanation]
    ---
-   [and so on for each task]"""
+   [and so on for each task]
+
+IMPORTANT: Be flexible in matching tasks. Look for the same functional purpose even when expressed differently."""
 
         # Use TaskAnalyzer to get AI response
         analyzer = TaskAnalyzer()

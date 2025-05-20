@@ -1,0 +1,100 @@
+[
+  {
+    "new_task": "need to build a login system with email verification",
+    "embedding_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "Failed to generate embeddings"
+    },
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    },
+    "hybrid_results": {
+      "is_match": false,
+      "confidence": 0.9,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "can someone help set up automated testing?",
+    "embedding_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "Failed to generate embeddings"
+    },
+    "ai_results": {
+      "is_match": true,
+      "confidence": 0.9,
+      "matched_task": {
+        "task": "Set up CI/CD pipeline",
+        "description": "Configure automated testing and deployment pipeline using GitHub Actions",
+        "status": "To Do",
+        "employee": "Sarah Johnson",
+        "date": "2024-03-14",
+        "category": "DevOps"
+      },
+      "explanation": "Both tasks involve setting up automated processes to streamline development workflows. Automated testing is often integrated into the CI/CD pipeline."
+    },
+    "hybrid_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "document our API endpoints",
+    "embedding_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "Failed to generate embeddings"
+    },
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    },
+    "hybrid_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "database is running slow, need to fix queries",
+    "embedding_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "Failed to generate embeddings"
+    },
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.8,
+      "explanation": "No similar tasks found"
+    },
+    "hybrid_results": {
+      "is_match": false,
+      "confidence": 0.9,
+      "explanation": "No similar tasks found"
+    }
+  },
+  {
+    "new_task": "refactor the UI components",
+    "embedding_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "Failed to generate embeddings"
+    },
+    "ai_results": {
+      "is_match": false,
+      "confidence": 0.0,
+      "explanation": "No similar tasks found"
+    },
+    "hybrid_results": {
+      "is_match": false,
+      "confidence": 1.0,
+      "explanation": "No similar tasks found"
+    }
+  }
+]

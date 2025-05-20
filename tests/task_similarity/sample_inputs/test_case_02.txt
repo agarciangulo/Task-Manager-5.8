@@ -1,0 +1,370 @@
+## TEST CASE: Comprehensive task similarity testing with varied match levels
+## DESCRIPTION: Tests task similarity matching across different domains, wording patterns, and similarity levels
+
+## EXISTING TASKS:
+existing_tasks = [
+    {
+        "task": "Deploy Kubernetes admission controller for Runtime Security",
+        "description": "Set up admission controller in OpenShift clusters to enforce security policies during resource creation",
+        "status": "To Do",
+        "employee": "Daniel Vela",
+        "date": "2025-03-15",
+        "category": "Security"
+    },
+    {
+        "task": "Create custom CSPM dashboard for compliance standards",
+        "description": "Build a dashboard showing compliance status for NIST 800-53, Azure Security Benchmark, and CIS",
+        "status": "In Progress",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-18",
+        "category": "Compliance"
+    },
+    {
+        "task": "Develop automation script for tenant creation",
+        "description": "Create script to automate tenant creation with API integration and policy assignment",
+        "status": "In Progress",
+        "employee": "Juan Navarrete",
+        "date": "2025-03-20",
+        "category": "Automation"
+    },
+    {
+        "task": "Troubleshoot WAAS configuration for production applications",
+        "description": "Review and fix Web Application and API Security settings for customer applications moving to production",
+        "status": "In Progress",
+        "employee": "William Mora",
+        "date": "2025-03-22",
+        "category": "Security"
+    },
+    {
+        "task": "Map RQL policies to Skywalker migration",
+        "description": "Convert existing Skywalker policies to corresponding RQL-based policies in Prisma Cloud",
+        "status": "To Do",
+        "employee": "Matias Keib",
+        "date": "2025-03-19",
+        "category": "Policy Management"
+    },
+    {
+        "task": "Setup agentless scanning for cloud workloads",
+        "description": "Configure agentless scanning to identify vulnerabilities in cloud workloads without requiring defender deployment",
+        "status": "To Do",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-21",
+        "category": "Vulnerability Management"
+    },
+    {
+        "task": "Create Trusted Images group for container security",
+        "description": "Establish trust groups for approved container images to enable trust-based security policies",
+        "status": "To Do",
+        "employee": "Matias Keib",
+        "date": "2025-03-24",
+        "category": "Container Security"
+    },
+    {
+        "task": "Implement SNOW integration for alert notifications",
+        "description": "Set up ServiceNow integration to automatically create tickets for critical and high severity alerts",
+        "status": "In Progress",
+        "employee": "William Mora",
+        "date": "2025-03-17",
+        "category": "Integration"
+    },
+    {
+        "task": "Develop GitHub Actions pipeline for image scanning",
+        "description": "Create CI/CD pipeline in GitHub Actions to scan container images using twistcli before deployment",
+        "status": "To Do",
+        "employee": "Daniel Vela",
+        "date": "2025-03-25",
+        "category": "DevOps"
+    },
+    {
+        "task": "Setup email alert forwarding for malware findings",
+        "description": "Configure alert forwarding rules to send email notifications for malware detection events",
+        "status": "In Progress",
+        "employee": "Matias Keib",
+        "date": "2025-03-26",
+        "category": "Alerts"
+    },
+    {
+        "task": "Create remediation runbooks for CSPM alerts",
+        "description": "Develop detailed runbooks for remediating common CSPM alerts with step-by-step instructions",
+        "status": "In Progress",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-23",
+        "category": "Documentation"
+    },
+    {
+        "task": "Migrate AppSec policies from Prisma to Cortex",
+        "description": "Transform enforcement rules, developer suppressions, and secrets validation to AppSec policies in Cortex",
+        "status": "To Do",
+        "employee": "Daniel Vela",
+        "date": "2025-03-26",
+        "category": "Migration"
+    },
+    {
+        "task": "Optimize database queries for reporting module",
+        "description": "Review and enhance database query performance for the reporting functionality",
+        "status": "To Do",
+        "employee": "Juan Navarrete",
+        "date": "2025-03-12",
+        "category": "Performance"
+    },
+    {
+        "task": "Setup Jira integration for vulnerability tracking",
+        "description": "Configure Jira integration to create tickets for critical vulnerabilities requiring remediation",
+        "status": "To Do",
+        "employee": "Daniel Vela",
+        "date": "2025-03-19",
+        "category": "Integration"
+    },
+    {
+        "task": "Investigate GCP flow logs configuration issues",
+        "description": "Troubleshoot missing flow logs from Google Cloud Platform VPCs to ensure proper anomaly detection",
+        "status": "In Progress",
+        "employee": "William Mora",
+        "date": "2025-03-25",
+        "category": "Troubleshooting"
+    },
+    {
+        "task": "Create weekly status report for Enterprise Engagement",
+        "description": "Compile weekly status report highlighting achievements, challenges, and next steps for customer",
+        "status": "Recurring",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-22",
+        "category": "Reporting"
+    },
+    {
+        "task": "Implement runtime policy for malware detection",
+        "description": "Configure runtime security policy to detect malware activity in containerized environments",
+        "status": "To Do",
+        "employee": "Matias Keib",
+        "date": "2025-03-20",
+        "category": "Security"
+    },
+    {
+        "task": "Review critical and high severity CVEs",
+        "description": "Analyze critical and high severity vulnerabilities to prioritize remediation efforts",
+        "status": "In Progress",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-18",
+        "category": "Vulnerability Management"
+    },
+    {
+        "task": "Develop script for agentless scanning reports",
+        "description": "Create a script to generate detailed reports from agentless scanning results with remediation recommendations",
+        "status": "In Progress",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-19",
+        "category": "Automation"
+    },
+    {
+        "task": "Map pentest findings to Prisma Cloud alerts",
+        "description": "Correlate penetration testing results with corresponding Prisma Cloud alerts for comprehensive security validation",
+        "status": "In Progress",
+        "employee": "Xavier Noboa",
+        "date": "2025-03-21",
+        "category": "Security"
+    }
+]
+
+## NEW TASKS TO TEST:
+new_tasks = [
+    {
+        "task": "need to set up Kubernetes admission control for container security",
+        "description": "Help required to implement admission controller in our Kubernetes clusters",
+        "status": "To Do",
+        "employee": "Kamrul Hassan",
+        "date": "2025-03-28",
+        "category": "Security"
+    },
+    {
+        "task": "building a dashboard for compliance tracking",
+        "description": "Create dashboard to monitor compliance standards status",
+        "status": "To Do",
+        "employee": "Andrew Estabrooks",
+        "date": "2025-03-29",
+        "category": "Compliance"
+    },
+    {
+        "task": "script for automated tenant provisioning",
+        "description": "Automation to create new tenants with proper policies",
+        "status": "To Do",
+        "employee": "Juan Navarrete",
+        "date": "2025-03-30",
+        "category": "Automation"
+    },
+    {
+        "task": "fix WAAS settings for new applications",
+        "description": "Need to troubleshoot and configure WAAS for applications",
+        "status": "To Do",
+        "employee": "Tyson Team",
+        "date": "2025-03-27",
+        "category": "Security"
+    },
+    {
+        "task": "convert policies from Skywalker format",
+        "description": "Transform existing policies to new format",
+        "status": "To Do",
+        "employee": "Vitaliy",
+        "date": "2025-03-28",
+        "category": "Policy Management"
+    },
+    {
+        "task": "implement agentless vulnerability scanning",
+        "description": "Set up scanning without requiring agents deployed",
+        "status": "To Do",
+        "employee": "Khalid",
+        "date": "2025-03-29",
+        "category": "Vulnerability Management"
+    },
+    {
+        "task": "create container image trust groups",
+        "description": "Set up trusted image groups for container security",
+        "status": "To Do",
+        "employee": "California HEERS Team",
+        "date": "2025-03-27",
+        "category": "Container Security"
+    },
+    {
+        "task": "setup ticket creation in ServiceNow for security alerts",
+        "description": "Configure integration to create SNOW tickets from alerts",
+        "status": "To Do",
+        "employee": "CPKC Team",
+        "date": "2025-03-29",
+        "category": "Integration"
+    },
+    {
+        "task": "investigate database performance issues",
+        "description": "Database queries are running slow in reporting module",
+        "status": "To Do",
+        "employee": "Lisa Chen",
+        "date": "2025-03-30",
+        "category": "Performance"
+    },
+    {
+        "task": "create CI pipeline for container scanning",
+        "description": "Need automated image scanning in our build pipeline",
+        "status": "To Do",
+        "employee": "Boston Consulting Group",
+        "date": "2025-03-28",
+        "category": "DevOps"
+    },
+    {
+        "task": "email integration for security findings",
+        "description": "Configure system to send alert emails",
+        "status": "To Do",
+        "employee": "California HEERS Team",
+        "date": "2025-03-29",
+        "category": "Alerts"
+    },
+    {
+        "task": "document steps to fix common cloud security issues",
+        "description": "Create documentation for remediating security findings",
+        "status": "To Do",
+        "employee": "Advocate Team",
+        "date": "2025-03-26",
+        "category": "Documentation"
+    },
+    {
+        "task": "transfer AppSec policies to new system",
+        "description": "Need to migrate policies between platforms",
+        "status": "To Do",
+        "employee": "Netanel",
+        "date": "2025-03-30",
+        "category": "Migration"
+    },
+    {
+        "task": "help setting up Jira for security issues",
+        "description": "Configure Jira integration for tracking security findings",
+        "status": "To Do",
+        "employee": "Rafael",
+        "date": "2025-03-29",
+        "category": "Integration"
+    },
+    {
+        "task": "troubleshoot missing flow logs from Google Cloud",
+        "description": "Flow logs not appearing for some GCP virtual networks",
+        "status": "To Do",
+        "employee": "Tyson Team",
+        "date": "2025-03-27",
+        "category": "Troubleshooting"
+    },
+    {
+        "task": "writing weekly updates for enterprise engagement",
+        "description": "Need to prepare regular status updates",
+        "status": "To Do",
+        "employee": "Account Team",
+        "date": "2025-03-30",
+        "category": "Reporting"
+    },
+    {
+        "task": "configure runtime detection for malware",
+        "description": "Set up policies to identify malware in running containers",
+        "status": "To Do",
+        "employee": "Khalid",
+        "date": "2025-03-28",
+        "category": "Security"
+    },
+    {
+        "task": "analyze high priority security vulnerabilities",
+        "description": "Need to review and prioritize critical CVEs",
+        "status": "To Do",
+        "employee": "Advocate Team",
+        "date": "2025-03-30",
+        "category": "Vulnerability Management"
+    },
+    {
+        "task": "create scanner reporting tool",
+        "description": "Build automation for scanner result reports",
+        "status": "To Do",
+        "employee": "Dominion Energy",
+        "date": "2025-03-29",
+        "category": "Automation"
+    },
+    {
+        "task": "relate pentest results to cloud security alerts",
+        "description": "Map external pentest findings to existing alerts",
+        "status": "To Do",
+        "employee": "Marriott Team",
+        "date": "2025-03-30",
+        "category": "Security"
+    },
+    {
+        "task": "need migration assistance to new module",
+        "description": "Help moving data to new Prisma Cloud module",
+        "status": "To Do",
+        "employee": "M&T Bank",
+        "date": "2025-03-29",
+        "category": "Implementation"
+    },
+    {
+        "task": "help with drift detection setup",
+        "description": "Configure system to detect infrastructure drift",
+        "status": "To Do",
+        "employee": "Liferay Team",
+        "date": "2025-03-28",
+        "category": "Configuration"
+    },
+    {
+        "task": "implement checkov for IaC scanning",
+        "description": "Setup Infrastructure-as-Code scanning with Checkov",
+        "status": "To Do",
+        "employee": "Tyson Team",
+        "date": "2025-03-30",
+        "category": "DevSecOps"
+    },
+    {
+        "task": "create Cloud Security Assessment report",
+        "description": "Generate comprehensive security assessment report",
+        "status": "To Do",
+        "employee": "Liferay Team",
+        "date": "2025-03-26",
+        "category": "Reporting"
+    },
+    {
+        "task": "assistance with image scanning in a sandbox environment",
+        "description": "Need to analyze container images in sandbox before deployment",
+        "status": "To Do",
+        "employee": "Renato",
+        "date": "2025-03-29",
+        "category": "Container Security"
+    }
+]

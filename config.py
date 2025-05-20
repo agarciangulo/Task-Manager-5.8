@@ -16,7 +16,7 @@ NOTION_FEEDBACK_DB_ID = os.getenv('NOTION_FEEDBACK_DB_ID')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Application Settings
-SIMILARITY_THRESHOLD = float(os.getenv('SIMILARITY_THRESHOLD', '0.85'))
+SIMILARITY_THRESHOLD = float(os.getenv('SIMILARITY_THRESHOLD', '0.70'))
 ENABLE_TASK_VALIDATION = os.getenv('ENABLE_TASK_VALIDATION', 'True').lower() == 'true'
 ENABLE_CHAT_VERIFICATION = os.getenv('ENABLE_CHAT_VERIFICATION', 'True').lower() == 'true'
 MIN_TASK_LENGTH = int(os.getenv('MIN_TASK_LENGTH', '3'))

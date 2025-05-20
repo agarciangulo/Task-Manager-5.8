@@ -12,6 +12,11 @@ import time
 import random
 import numpy as np
 import httpx
+import json
+import logging
+from typing import List, Dict, Any, Optional
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from config import (
     OPENAI_API_KEY, 
@@ -28,77 +33,72 @@ from config import (
 if AI_PROVIDER == 'openai':
     from openai import OpenAI
 
+logger = logging.getLogger(__name__)
+
 # OPTIMIZATION: Enhanced OpenAI client with retries and rate limiting
 class EnhancedOpenAIClient:
     """OpenAI client with retries, rate limiting, and concurrency control."""
     
-    def __init__(self, api_key=None, max_retries=3, min_seconds_between_calls=0.5):
-        """
-        Initialize the enhanced OpenAI client.
+    def __init__(self):
+        """Initialize the OpenAI client with rate limiting and retries."""
+        self.max_retries = 3
+        self.rate_limit_delay = 1.0
+        self.last_request_time = 0
+        self.vectorizer = TfidfVectorizer(
+            max_features=1000,  # Limit vocabulary size
+            min_df=1,  # Include terms that appear in at least 1 document
+            max_df=1.0,  # Include terms that appear in at most 100% of documents
+            norm='l2'  # Normalize vectors to unit length
+        )
+        if AI_PROVIDER == 'openai':
+            self.client = OpenAI(api_key=OPENAI_API_KEY)
+        else:
+            self.client = None
         
-        Args:
-            api_key: OpenAI API key. If None, uses value from config.
-            max_retries: Maximum number of retries for API calls.
-            min_seconds_between_calls: Minimum seconds between API calls.
-        """
-        if AI_PROVIDER != 'openai':
-            raise ValueError("EnhancedOpenAIClient can only be used when AI_PROVIDER is 'openai'")
-            
-        self.api_key = api_key or OPENAI_API_KEY
-        if not self.api_key:
-            raise ValueError("OpenAI API key is required when using OpenAI provider")
-            
-        # Create a custom httpx client without proxies
-        http_client = httpx.Client(
-            base_url="https://api.openai.com/v1",
-            headers={"Authorization": f"Bearer {self.api_key}"}
-        )
-        # Initialize OpenAI client with our custom http client
-        self.client = OpenAI(
-            api_key=self.api_key,
-            http_client=http_client
-        )
-        self.max_retries = max_retries
-        self.min_seconds_between_calls = min_seconds_between_calls
-        self.last_call_time = 0
+        self.embeddings_cache = {}
         
     def _wait_if_needed(self):
         """Wait if needed to respect rate limits."""
         now = time.time()
-        elapsed = now - self.last_call_time
+        elapsed = now - self.last_request_time
         
-        if elapsed < self.min_seconds_between_calls:
-            sleep_time = self.min_seconds_between_calls - elapsed
+        if elapsed < self.rate_limit_delay:
+            sleep_time = self.rate_limit_delay - elapsed
             if DEBUG_MODE:
                 print(f"Rate limiting: Waiting {sleep_time:.2f}s")
             time.sleep(sleep_time)
             
-        self.last_call_time = time.time()
+        self.last_request_time = time.time()
         
-    def embeddings_create(self, **kwargs):
-        """Create embeddings with retries and rate limiting."""
-        for attempt in range(self.max_retries + 1):
-            try:
-                self._wait_if_needed()
-                return self.client.embeddings.create(**kwargs)
+    def embeddings_create(self, text: str) -> List[float]:
+        """Create embeddings using TF-IDF vectorizer."""
+        try:
+            # Transform the text into TF-IDF vector
+            vector = self.vectorizer.fit_transform([text])
+            # Convert to dense array and normalize
+            embedding = vector.toarray()[0]
+            # Ensure the vector has the correct length
+            if len(embedding) < 1000:
+                embedding = np.pad(embedding, (0, 1000 - len(embedding)))
+            return embedding.tolist()
+        except Exception as e:
+            logger.error(f"Error creating embedding: {str(e)}")
+            return [0.0] * 1000  # Return zero vector as fallback
+            
+    def embeddings_create_batch(self, texts: List[str]) -> List[List[float]]:
+        """Create embeddings for a batch of texts."""
+        try:
+            # Transform all texts at once
+            vectors = self.vectorizer.fit_transform(texts)
+            # Convert to dense arrays and normalize
+            embeddings = vectors.toarray()
+            # Normalize each vector
+            norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+            embeddings = np.divide(embeddings, norms, where=norms>0)
+            return embeddings.tolist()
             except Exception as e:
-                if "rate_limit" in str(e).lower() and attempt < self.max_retries:
-                    # Rate limit error - implement exponential backoff
-                    sleep_time = (2 ** attempt) + random.random()
-                    if DEBUG_MODE:
-                        print(f"Rate limited on attempt {attempt+1}. Retrying in {sleep_time:.2f}s")
-                    time.sleep(sleep_time)
-                    continue
-                elif attempt < self.max_retries:
-                    # Other error - retry with shorter backoff
-                    sleep_time = (attempt + 1) + random.random()
-                    if DEBUG_MODE:
-                        print(f"API error on attempt {attempt+1}: {e}. Retrying in {sleep_time:.2f}s")
-                    time.sleep(sleep_time) 
-                    continue
-                else:
-                    # Max retries exceeded
-                    raise
+            logger.error(f"Error creating batch embeddings: {str(e)}")
+            return [[0.0] * 1000] * len(texts)  # Return zero vectors as fallback
                     
     def chat_completions_create(self, **kwargs):
         """Create chat completions with retries and rate limiting."""
@@ -128,6 +128,14 @@ class EnhancedOpenAIClient:
     def completions_create(self, **kwargs):
         """Create completions with retries and rate limiting."""
         return self.chat_completions_create(**kwargs)
+
+    def get_embedding(self, text: str) -> np.ndarray:
+        embedding = self.embeddings_create(text)
+        return np.array(embedding)
+
+    def get_batch_embeddings(self, texts: List[str]) -> List[np.ndarray]:
+        embeddings = self.embeddings_create_batch(texts)
+        return [np.array(e) for e in embeddings]
 
 # Initialize enhanced OpenAI client only if using OpenAI
 client = EnhancedOpenAIClient() if AI_PROVIDER == 'openai' else None
@@ -196,10 +204,9 @@ def get_cached_embedding(text):
     # Cache miss - get from OpenAI
     try:
         response = client.embeddings_create(
-            input=[text],
-            model=EMBEDDING_MODEL
+            text=text
         )
-        embedding = response.data[0].embedding
+        embedding = response
         
         # Store in cache
         cursor.execute(
@@ -294,16 +301,12 @@ def get_batch_embeddings(texts, force_refresh=False):
                 batch_hashes = text_hashes_to_request[i:i+batch_size]
 
                 print(f"Processing batch {i//batch_size + 1} with {len(batch)} texts")
-                response = client.embeddings_create(
-                    input=batch,
-                    model=EMBEDDING_MODEL
-                )
+                batch_embeddings = client.embeddings_create_batch(batch)
 
                 # Store new embeddings in cache and results
-                for j, embedding_data in enumerate(response.data):
+                for j, embedding in enumerate(batch_embeddings):
                     text_hash = batch_hashes[j]
                     text = batch[j]
-                    embedding = embedding_data.embedding
                     
                     cursor.execute(
                         'INSERT OR REPLACE INTO embeddings (text_hash, text, embedding, last_used) VALUES (?, ?, ?, ?)',

@@ -1,0 +1,93 @@
+project_name: Project Alpha
+task: Working on Project Alpha's security features
+category: Project Alpha
+description: Implementing new security measures for Project Alpha
+text: The Project Alpha team needs to review the security implementation.
+
+project_name: Beta Initiative
+task: Completed the Beta Initiative dashboard
+category: Beta Initiative
+description: Created monitoring dashboard for Beta Initiative metrics
+text: The Beta Initiative team has requested additional features.
+
+project_name: Gamma System
+task: Fixed bugs in Gamma System
+category: Gamma System
+description: Resolved critical issues in Gamma System's authentication
+text: The Gamma System deployment was successful.
+
+project_name: Delta Project
+task: Started work on Delta Project integration
+category: Delta Project
+description: Beginning integration of Delta Project with existing systems
+text: The Delta Project team needs to coordinate with other teams.
+
+project_name: Epsilon Program
+task: Reviewed Epsilon Program documentation
+category: Epsilon Program
+description: Updated technical documentation for Epsilon Program
+text: The Epsilon Program documentation needs to be shared with stakeholders.
+
+description: Short task description
+content: Implement new security feature for API authentication
+type: task
+max_tokens: 100
+
+description: Medium task with details
+content: Create a new monitoring dashboard that shows:
+1. System performance metrics
+2. User activity logs
+3. Security alerts
+4. Resource utilization
+The dashboard should be accessible to all team members and update in real-time.
+type: task
+max_tokens: 200
+
+description: Long task with extensive details
+content: Develop a comprehensive security solution that includes:
+1. Multi-factor authentication
+   - Support for SMS, email, and authenticator apps
+   - Customizable security policies
+   - Session management
+2. Role-based access control
+   - User group management
+   - Permission templates
+   - Audit logging
+3. API security
+   - Rate limiting
+   - Request validation
+   - Token management
+4. Monitoring and alerts
+   - Real-time threat detection
+   - Custom alert rules
+   - Notification channels
+The solution should be scalable and integrate with existing systems.
+type: task
+max_tokens: 400
+
+description: Task with code snippets
+content: Implement the following security checks in the authentication module:
+```python
+def verify_token(token):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise AuthenticationError('Token has expired')
+    except jwt.InvalidTokenError:
+        raise AuthenticationError('Invalid token')
+```
+The function should handle various edge cases and provide detailed error messages.
+type: task
+max_tokens: 300
+
+description: Task with mixed content
+content: Create a security assessment report that includes:
+1. Current security posture
+2. Identified vulnerabilities
+3. Recommended actions
+4. Implementation timeline
+5. Resource requirements
+The report should be comprehensive yet concise, with clear action items.
+type: task
+max_tokens: 250 

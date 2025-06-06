@@ -96,7 +96,7 @@ class EnhancedOpenAIClient:
             norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
             embeddings = np.divide(embeddings, norms, where=norms>0)
             return embeddings.tolist()
-            except Exception as e:
+        except Exception as e:
             logger.error(f"Error creating batch embeddings: {str(e)}")
             return [[0.0] * 1000] * len(texts)  # Return zero vectors as fallback
                     

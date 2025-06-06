@@ -1,0 +1,216 @@
+{
+  "timestamp": "20250605_115750",
+  "input_text": "Date: Sun, 01 Jun 2025 07:37:19\nFrom: Roger Long <justinrodriguez@branch-wright.com>\nSubject: Carry law road\nTo: Cody Lawrence <cmckenzie@werner.net>\nPlanned Activities:\nData Warehouse Migration\n    - Revised error handling strategy in Data Warehouse Migration to support fallback flows.\n    - Investigated slow response times in the Data Warehouse Migration component.\n    - Refactored the Data Warehouse Migration module to improve clarity and maintainability.\n    - Resolved a blocking bug in the Data Warehouse Migration flow.\n    - Created unit tests for Data Warehouse Migration edge cases.\n\nMobile App Performance\n    - Implemented logging improvements for Mobile App Performance.\n    - Created unit tests for Mobile App Performance edge cases.\n    - Documented changes related to the Mobile App Performance rollout.\n\nUser Onboarding Redesign\n    - Resolved a blocking bug in the User Onboarding Redesign flow.\n    - Implemented logging improvements for User Onboarding Redesign.\n\nCompleted Activities:\nContent Management Refactor\n    - Resolved a blocking bug in the Content Management Refactor flow.\n    - Coordinated with the design team to review the Content Management Refactor feature flow.\n    - Finalized the analytics hooks related to Content Management Refactor.\n    - Refactored the Content Management Refactor module to improve clarity and maintainability.\n    - Revised error handling strategy in Content Management Refactor to support fallback flows.\n\nMobile App Performance\n    - Investigated slow response times in the Mobile App Performance component.\n    - Implemented logging improvements for Mobile App Performance.\n    - Refactored the Mobile App Performance module to improve clarity and maintainability.\n\nInternal API Cleanup\n    - Finalized the analytics hooks related to Internal API Cleanup.\n    - Resolved a blocking bug in the Internal API Cleanup flow.\n    - Coordinated with the design team to review the Internal API Cleanup feature flow.\n    - Revised error handling strategy in Internal API Cleanup to support fallback flows.\n    - Investigated slow response times in the Internal API Cleanup component.\n\nCustomer Feedback Analysis\n    - Coordinated with the design team to review the Customer Feedback Analysis feature flow.\n    - Documented changes related to the Customer Feedback Analysis rollout.\n    - Resolved a blocking bug in the Customer Feedback Analysis flow.\n    - Created unit tests for Customer Feedback Analysis edge cases.\n    - Finalized the analytics hooks related to Customer Feedback Analysis.\n\nData Warehouse Migration\n    - Conducted peer review for pull requests affecting Data Warehouse Migration.\n    - Created unit tests for Data Warehouse Migration edge cases.\n    - Refactored the Data Warehouse Migration module to improve clarity and maintainability.\n    - Revised error handling strategy in Data Warehouse Migration to support fallback flows.\n    - Documented changes related to the Data Warehouse Migration rollout.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nDate: Sun, 01 Jun 2025 07:37:19\nFrom: Roger Long <justinrodriguez@branch-wright.com>\nSubject: Carry law road\nTo: Cody Lawrence <cmckenzie@werner.net>\nPlanned Activities:\nData Warehouse Migration\n    - Revised error handling strategy in Data Warehouse Migration to support fallback flows.\n    - Investigated slow response times in the Data Warehouse Migration component.\n    - Refactored the Data Warehouse Migration module to improve clarity and maintainability.\n    - Resolved a blocking bug in the Data Warehouse Migration flow.\n    - Created unit tests for Data Warehouse Migration edge cases.\n\nMobile App Performance\n    - Implemented logging improvements for Mobile App Performance.\n    - Created unit tests for Mobile App Performance edge cases.\n    - Documented changes related to the Mobile App Performance rollout.\n\nUser Onboarding Redesign\n    - Resolved a blocking bug in the User Onboarding Redesign flow.\n    - Implemented logging improvements for User Onboarding Redesign.\n\nCompleted Activities:\nContent Management Refactor\n    - Resolved a blocking bug in the Content Management Refactor flow.\n    - Coordinated with the design team to review the Content Management Refactor feature flow.\n    - Finalized the analytics hooks related to Content Management Refactor.\n    - Refactored the Content Management Refactor module to improve clarity and maintainability.\n    - Revised error handling strategy in Content Management Refactor to support fallback flows.\n\nMobile App Performance\n    - Investigated slow response times in the Mobile App Performance component.\n    - Implemented logging improvements for Mobile App Performance.\n    - Refactored the Mobile App Performance module to improve clarity and maintainability.\n\nInternal API Cleanup\n    - Finalized the analytics hooks related to Internal API Cleanup.\n    - Resolved a blocking bug in the Internal API Cleanup flow.\n    - Coordinated with the design team to review the Internal API Cleanup feature flow.\n    - Revised error handling strategy in Internal API Cleanup to support fallback flows.\n    - Investigated slow response times in the Internal API Cleanup component.\n\nCustomer Feedback Analysis\n    - Coordinated with the design team to review the Customer Feedback Analysis feature flow.\n    - Documented changes related to the Customer Feedback Analysis rollout.\n    - Resolved a blocking bug in the Customer Feedback Analysis flow.\n    - Created unit tests for Customer Feedback Analysis edge cases.\n    - Finalized the analytics hooks related to Customer Feedback Analysis.\n\nData Warehouse Migration\n    - Conducted peer review for pull requests affecting Data Warehouse Migration.\n    - Created unit tests for Data Warehouse Migration edge cases.\n    - Refactored the Data Warehouse Migration module to improve clarity and maintainability.\n    - Revised error handling strategy in Data Warehouse Migration to support fallback flows.\n    - Documented changes related to the Data Warehouse Migration rollout.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Revised error handling strategy in Data Warehouse Migration to support fallback flows.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Investigated slow response times in the Data Warehouse Migration component.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Refactored the Data Warehouse Migration module to improve clarity and maintainability.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Resolved a blocking bug in the Data Warehouse Migration flow.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Created unit tests for Data Warehouse Migration edge cases.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Implemented logging improvements for Mobile App Performance.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Created unit tests for Mobile App Performance edge cases.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Documented changes related to the Mobile App Performance rollout.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Resolved a blocking bug in the User Onboarding Redesign flow.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Implemented logging improvements for User Onboarding Redesign.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Roger Long\",\n        \"date\": \"2025-06-01\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Revised error handling strategy in Data Warehouse Migration to support fallback flows.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the Data Warehouse Migration component.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Data Warehouse Migration module to improve clarity and maintainability.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Resolved a blocking bug in the Data Warehouse Migration flow.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Created unit tests for Data Warehouse Migration edge cases.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Implemented logging improvements for Mobile App Performance.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Created unit tests for Mobile App Performance edge cases.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Documented changes related to the Mobile App Performance rollout.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Resolved a blocking bug in the User Onboarding Redesign flow.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Implemented logging improvements for User Onboarding Redesign.",
+      "status": "Planned",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the Mobile App Performance component.",
+      "status": "Completed",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Mobile App Performance module to improve clarity and maintainability.",
+      "status": "Completed",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finalized the analytics hooks related to Content Management Refactor.",
+      "status": "Completed",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Coordinated with the design team to review the Content Management Refactor feature flow.",
+      "status": "Completed",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Conducted peer review for pull requests affecting Data Warehouse Migration.",
+      "status": "Completed",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Documented changes related to the Data Warehouse Migration rollout.",
+      "status": "Completed",
+      "employee": "Roger Long",
+      "date": "2025-06-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

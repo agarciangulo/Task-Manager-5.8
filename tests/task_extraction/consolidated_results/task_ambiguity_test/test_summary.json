@@ -1,0 +1,85 @@
+{
+  "timestamp": "20250605_133739",
+  "tests_run": [
+    {
+      "input_file": "task_ambiguity_10.txt",
+      "output_file": "test_result_20250605_132923.json"
+    },
+    {
+      "input_file": "task_ambiguity_11.txt",
+      "output_file": "test_result_20250605_132933.json"
+    },
+    {
+      "input_file": "task_ambiguity_13.txt",
+      "output_file": "test_result_20250605_133002.json"
+    },
+    {
+      "input_file": "task_ambiguity_12.txt",
+      "output_file": "test_result_20250605_133016.json"
+    },
+    {
+      "input_file": "task_ambiguity_16.txt",
+      "output_file": "test_result_20250605_133104.json"
+    },
+    {
+      "input_file": "task_ambiguity_17.txt",
+      "output_file": "test_result_20250605_133137.json"
+    },
+    {
+      "input_file": "task_ambiguity_15.txt",
+      "output_file": "test_result_20250605_133148.json"
+    },
+    {
+      "input_file": "task_ambiguity_14.txt",
+      "output_file": "test_result_20250605_133230.json"
+    },
+    {
+      "input_file": "task_ambiguity_4.txt",
+      "output_file": "test_result_20250605_133250.json"
+    },
+    {
+      "input_file": "task_ambiguity_5.txt",
+      "output_file": "test_result_20250605_133324.json"
+    },
+    {
+      "input_file": "task_ambiguity_7.txt",
+      "output_file": "test_result_20250605_133415.json"
+    },
+    {
+      "input_file": "task_ambiguity_6.txt",
+      "output_file": "test_result_20250605_133517.json"
+    },
+    {
+      "input_file": "task_ambiguity_2.txt",
+      "output_file": "test_result_20250605_133531.json"
+    },
+    {
+      "input_file": "task_ambiguity_3.txt",
+      "output_file": "test_result_20250605_133559.json"
+    },
+    {
+      "input_file": "task_ambiguity_1.txt",
+      "output_file": "test_result_20250605_133624.json"
+    },
+    {
+      "input_file": "task_ambiguity_8.txt",
+      "output_file": "test_result_20250605_133642.json"
+    },
+    {
+      "input_file": "task_ambiguity_9.txt",
+      "output_file": "test_result_20250605_133657.json"
+    },
+    {
+      "input_file": "task_ambiguity_19.txt",
+      "output_file": "test_result_20250605_133707.json"
+    },
+    {
+      "input_file": "task_ambiguity_18.txt",
+      "output_file": "test_result_20250605_133717.json"
+    },
+    {
+      "input_file": "task_ambiguity_20.txt",
+      "output_file": "test_result_20250605_133739.json"
+    }
+  ]
+}

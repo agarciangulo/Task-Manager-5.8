@@ -1,0 +1,203 @@
+{
+  "timestamp": "20250605_125652",
+  "input_text": "From: Miguel Rasmussen <walkerkeith@yahoo.com>\nTo: Dominique Anderson <banksjasmine@hotmail.com>\nDate: 2025-01-23 07:48:21\nSubject: Daily Work Summary\n\nPlanned Activities:\nMobile App Performance\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the mobile app performance process.\n    - Wrapped up loose ends and took care of several items for the mobile app performance initiative.\n    - Handled a number of miscellaneous updates, one involving the mobile app performance workflows.\n    - Wrapped up loose ends and took care of several items for the mobile app performance initiative.\n\nMarketing Dashboard\n    - Handled a number of miscellaneous updates, one involving the marketing dashboard workflows.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the marketing dashboard process.\n\nInternal API Cleanup\n    - There was also some back and forth that led to progress with the internal api cleanup team.\n    - General work done that included coordination on internal api cleanup, among other things.\n\nCI/CD Pipeline Update\n    - Wrapped up loose ends and took care of several items for the ci/cd pipeline update initiative.\n    - Wrapped up loose ends and took care of several items for the ci/cd pipeline update initiative.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the ci/cd pipeline update process.\n    - Handled a number of miscellaneous updates, one involving the ci/cd pipeline update workflows.\n\nData Warehouse Migration\n    - Handled a number of miscellaneous updates, one involving the data warehouse migration workflows.\n    - General work done that included coordination on data warehouse migration, among other things.\n    - General work done that included coordination on data warehouse migration, among other things.\n    - Wrapped up loose ends and took care of several items for the data warehouse migration initiative.\n    - Wrapped up loose ends and took care of several items for the data warehouse migration initiative.\n\nCompleted Activities:\nCI/CD Pipeline Update\n    - General work done that included coordination on ci/cd pipeline update, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the ci/cd pipeline update process.\n    - There was also some back and forth that led to progress with the ci/cd pipeline update team.\n\nData Warehouse Migration\n    - Handled a number of miscellaneous updates, one involving the data warehouse migration workflows.\n    - There was also some back and forth that led to progress with the data warehouse migration team.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the data warehouse migration process.\n    - General work done that included coordination on data warehouse migration, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the data warehouse migration process.\n\nInternal API Cleanup\n    - General work done that included coordination on internal api cleanup, among other things.\n    - Handled a number of miscellaneous updates, one involving the internal api cleanup workflows.\n    - Wrapped up loose ends and took care of several items for the internal api cleanup initiative.\n\nMarketing Dashboard\n    - General work done that included coordination on marketing dashboard, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the marketing dashboard process.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the marketing dashboard process.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Miguel Rasmussen <walkerkeith@yahoo.com>\nTo: Dominique Anderson <banksjasmine@hotmail.com>\nDate: 2025-01-23 07:48:21\nSubject: Daily Work Summary\n\nPlanned Activities:\nMobile App Performance\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the mobile app performance process.\n    - Wrapped up loose ends and took care of several items for the mobile app performance initiative.\n    - Handled a number of miscellaneous updates, one involving the mobile app performance workflows.\n    - Wrapped up loose ends and took care of several items for the mobile app performance initiative.\n\nMarketing Dashboard\n    - Handled a number of miscellaneous updates, one involving the marketing dashboard workflows.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the marketing dashboard process.\n\nInternal API Cleanup\n    - There was also some back and forth that led to progress with the internal api cleanup team.\n    - General work done that included coordination on internal api cleanup, among other things.\n\nCI/CD Pipeline Update\n    - Wrapped up loose ends and took care of several items for the ci/cd pipeline update initiative.\n    - Wrapped up loose ends and took care of several items for the ci/cd pipeline update initiative.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the ci/cd pipeline update process.\n    - Handled a number of miscellaneous updates, one involving the ci/cd pipeline update workflows.\n\nData Warehouse Migration\n    - Handled a number of miscellaneous updates, one involving the data warehouse migration workflows.\n    - General work done that included coordination on data warehouse migration, among other things.\n    - General work done that included coordination on data warehouse migration, among other things.\n    - Wrapped up loose ends and took care of several items for the data warehouse migration initiative.\n    - Wrapped up loose ends and took care of several items for the data warehouse migration initiative.\n\nCompleted Activities:\nCI/CD Pipeline Update\n    - General work done that included coordination on ci/cd pipeline update, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the ci/cd pipeline update process.\n    - There was also some back and forth that led to progress with the ci/cd pipeline update team.\n\nData Warehouse Migration\n    - Handled a number of miscellaneous updates, one involving the data warehouse migration workflows.\n    - There was also some back and forth that led to progress with the data warehouse migration team.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the data warehouse migration process.\n    - General work done that included coordination on data warehouse migration, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the data warehouse migration process.\n\nInternal API Cleanup\n    - General work done that included coordination on internal api cleanup, among other things.\n    - Handled a number of miscellaneous updates, one involving the internal api cleanup workflows.\n    - Wrapped up loose ends and took care of several items for the internal api cleanup initiative.\n\nMarketing Dashboard\n    - General work done that included coordination on marketing dashboard, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the marketing dashboard process.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the marketing dashboard process.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Tweaked some settings, reviewed a few docs, and ensured alignment for the mobile app performance process\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Wrapped up loose ends and took care of several items for the mobile app performance initiative\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the mobile app performance workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the marketing dashboard workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the internal api cleanup team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"General work done that included coordination on internal api cleanup, among other things\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Wrapped up loose ends and took care of several items for the ci/cd pipeline update initiative\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the ci/cd pipeline update workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the data warehouse migration workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"General work done that included coordination on data warehouse migration, among other things\",\n        \"status\": \"Pending\",\n        \"employee\": \"Miguel Rasmussen\",\n        \"date\": \"2025-01-23\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Tweaked some settings, reviewed a few docs, and ensured alignment for the mobile app performance process",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up loose ends and took care of several items for the mobile app performance initiative",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the mobile app performance workflows",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the marketing dashboard workflows",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the internal api cleanup team",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Internal API Cleanup",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on internal api cleanup, among other things",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Internal API Cleanup",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up loose ends and took care of several items for the ci/cd pipeline update initiative",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the ci/cd pipeline update workflows",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the data warehouse migration workflows",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on data warehouse migration, among other things",
+      "status": "Pending",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on ci/cd pipeline update, among other things",
+      "status": "Completed",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the data warehouse migration workflows",
+      "status": "Completed",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the data warehouse migration team",
+      "status": "Completed",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on data warehouse migration, among other things",
+      "status": "Completed",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on internal api cleanup, among other things",
+      "status": "Completed",
+      "employee": "Miguel Rasmussen",
+      "date": "2025-01-23",
+      "category": "Internal API Cleanup",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

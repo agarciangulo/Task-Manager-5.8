@@ -1,0 +1,86 @@
+{
+  "timestamp": "20250605_115048",
+  "input_text": "From: Heather Meyer <kristymiller@pearson.net>\nTo: Ashley Mitchell <morrisjeanette@yahoo.com>\nDate: 2025-02-05 18:30:10\nSubject: Daily Work Summary\n\nPlanned Activities:\nCI/CD Pipeline Update\n    - On another note, I finally tried that new coffee place. Coordinated with the design team to review the CI/CD Pipeline Update feature flow.\n    - On another note, I finally tried that new coffee place. Refactored the CI/CD Pipeline Update module to improve clarity and maintainability.\n    - Finalized the analytics hooks related to CI/CD Pipeline Update. On another note, I finally tried that new coffee place.\n\nMarketing Dashboard\n    - Coordinated with the design team to review the Marketing Dashboard feature flow. Not related, but I saw a cool article on tech trends.\n    - P.S. It was raining heavily all morning. Created unit tests for Marketing Dashboard edge cases.\n    - Implemented logging improvements for Marketing Dashboard. On another note, I finally tried that new coffee place.\n\nInternal API Cleanup\n    - Fun fact: Friday is Hawaiian shirt day. Investigated slow response times in the Internal API Cleanup component.\n    - Resolved a blocking bug in the Internal API Cleanup flow. As a side note, my cat jumped on my keyboard mid-call.\n    - Refactored the Internal API Cleanup module to improve clarity and maintainability. On another note, I finally tried that new coffee place.\n\nData Warehouse Migration\n    - By the way, lunch options today were surprisingly good. Coordinated with the design team to review the Data Warehouse Migration feature flow.\n    - Resolved a blocking bug in the Data Warehouse Migration flow. Fun fact: Friday is Hawaiian shirt day.\n    - Fun fact: Friday is Hawaiian shirt day. Coordinated with the design team to review the Data Warehouse Migration feature flow.\n\nCompleted Activities:\nAuthentication Revamp\n    - Resolved a blocking bug in the Authentication Revamp flow. P.S. It was raining heavily all morning.\n    - Not related, but I saw a cool article on tech trends. Revised error handling strategy in Authentication Revamp to support fallback flows.\n    - Refactored the Authentication Revamp module to improve clarity and maintainability. Not related, but I saw a cool article on tech trends.\n\nCustomer Feedback Analysis\n    - Fun fact: Friday is Hawaiian shirt day. Created unit tests for Customer Feedback Analysis edge cases.\n    - Refactored the Customer Feedback Analysis module to improve clarity and maintainability. On another note, I finally tried that new coffee place.\n\nCI/CD Pipeline Update\n    - By the way, lunch options today were surprisingly good. Revised error handling strategy in CI/CD Pipeline Update to support fallback flows.\n    - Refactored the CI/CD Pipeline Update module to improve clarity and maintainability. P.S. It was raining heavily all morning.\n    - Investigated slow response times in the CI/CD Pipeline Update component. P.S. It was raining heavily all morning.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Heather Meyer <kristymiller@pearson.net>\nTo: Ashley Mitchell <morrisjeanette@yahoo.com>\nDate: 2025-02-05 18:30:10\nSubject: Daily Work Summary\n\nPlanned Activities:\nCI/CD Pipeline Update\n    - On another note, I finally tried that new coffee place. Coordinated with the design team to review the CI/CD Pipeline Update feature flow.\n    - On another note, I finally tried that new coffee place. Refactored the CI/CD Pipeline Update module to improve clarity and maintainability.\n    - Finalized the analytics hooks related to CI/CD Pipeline Update. On another note, I finally tried that new coffee place.\n\nMarketing Dashboard\n    - Coordinated with the design team to review the Marketing Dashboard feature flow. Not related, but I saw a cool article on tech trends.\n    - P.S. It was raining heavily all morning. Created unit tests for Marketing Dashboard edge cases.\n    - Implemented logging improvements for Marketing Dashboard. On another note, I finally tried that new coffee place.\n\nInternal API Cleanup\n    - Fun fact: Friday is Hawaiian shirt day. Investigated slow response times in the Internal API Cleanup component.\n    - Resolved a blocking bug in the Internal API Cleanup flow. As a side note, my cat jumped on my keyboard mid-call.\n    - Refactored the Internal API Cleanup module to improve clarity and maintainability. On another note, I finally tried that new coffee place.\n\nData Warehouse Migration\n    - By the way, lunch options today were surprisingly good. Coordinated with the design team to review the Data Warehouse Migration feature flow.\n    - Resolved a blocking bug in the Data Warehouse Migration flow. Fun fact: Friday is Hawaiian shirt day.\n    - Fun fact: Friday is Hawaiian shirt day. Coordinated with the design team to review the Data Warehouse Migration feature flow.\n\nCompleted Activities:\nAuthentication Revamp\n    - Resolved a blocking bug in the Authentication Revamp flow. P.S. It was raining heavily all morning.\n    - Not related, but I saw a cool article on tech trends. Revised error handling strategy in Authentication Revamp to support fallback flows.\n    - Refactored the Authentication Revamp module to improve clarity and maintainability. Not related, but I saw a cool article on tech trends.\n\nCustomer Feedback Analysis\n    - Fun fact: Friday is Hawaiian shirt day. Created unit tests for Customer Feedback Analysis edge cases.\n    - Refactored the Customer Feedback Analysis module to improve clarity and maintainability. On another note, I finally tried that new coffee place.\n\nCI/CD Pipeline Update\n    - By the way, lunch options today were surprisingly good. Revised error handling strategy in CI/CD Pipeline Update to support fallback flows.\n    - Refactored the CI/CD Pipeline Update module to improve clarity and maintainability. P.S. It was raining heavily all morning.\n    - Investigated slow response times in the CI/CD Pipeline Update component. P.S. It was raining heavily all morning.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"CI/CD Pipeline Update\",\n        \"status\": \"Completed\",\n        \"employee\": \"Heather Meyer\",\n        \"date\": \"2025-02-05\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Marketing Dashboard\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Heather Meyer\",\n        \"date\": \"2025-02-05\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Internal API Cleanup\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Heather Meyer\",\n        \"date\": \"2025-02-05\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Data Warehouse Migration\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Heather Meyer\",\n        \"date\": \"2025-02-05\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Authentication Revamp\",\n        \"status\": \"Completed\",\n        \"employee\": \"Heather Meyer\",\n        \"date\": \"2025-02-05\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Customer Feedback Analysis\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Heather Meyer\",\n        \"date\": \"2025-02-05\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "CI/CD Pipeline Update",
+      "status": "Completed",
+      "employee": "Heather Meyer",
+      "date": "2025-02-05",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Marketing Dashboard",
+      "status": "In Progress",
+      "employee": "Heather Meyer",
+      "date": "2025-02-05",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to the Marketing Dashboard? (e.g., created unit tests, implemented logging improvements, etc.)",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup",
+      "status": "In Progress",
+      "employee": "Heather Meyer",
+      "date": "2025-02-05",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Data Warehouse Migration",
+      "status": "In Progress",
+      "employee": "Heather Meyer",
+      "date": "2025-02-05",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to the Data Warehouse Migration? (e.g., coordinated with design team, resolved blocking bug, etc.)",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp",
+      "status": "Completed",
+      "employee": "Heather Meyer",
+      "date": "2025-02-05",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis",
+      "status": "In Progress",
+      "employee": "Heather Meyer",
+      "date": "2025-02-05",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to Customer Feedback Analysis? (e.g., created unit tests, refactored module, etc.)",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

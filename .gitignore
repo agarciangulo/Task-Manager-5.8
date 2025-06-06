@@ -1,7 +1,6 @@
-# Virtual Environment
-venv/
-env/
-.env
+# Environment variables
+.env*
+!.env.example
 
 # Python
 __pycache__/
@@ -9,6 +8,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -25,19 +25,29 @@ wheels/
 .installed.cfg
 *.egg
 
+# Virtual Environment
+venv/
+ENV/
+
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
 
+# Docker
+.docker/
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+__pycache__/
+
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
 # Project specific
@@ -47,7 +57,6 @@ Thumbs.db
 
 # Security
 security_tokens.json
-.env
 *.pem
 *.key
 *.cert 

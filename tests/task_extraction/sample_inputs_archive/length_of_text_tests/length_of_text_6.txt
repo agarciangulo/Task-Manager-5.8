@@ -1,0 +1,9 @@
+From: Julie Mitchell <julie.mitchell@example.com>
+Date: Sun, Jan 12, 2025 at 12:00 AM
+Subject: Re: Daily Update - 01/12/2025
+To: samuel@example.com, james@example.com
+
+Planned Activities:
+California HEERS:
+- Deploy hotfix to production servers
+- Review open support tickets

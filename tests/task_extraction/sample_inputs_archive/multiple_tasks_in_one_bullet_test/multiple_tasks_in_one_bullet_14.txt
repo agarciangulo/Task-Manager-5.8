@@ -1,0 +1,34 @@
+From: Monica Williams <knixon@gmail.com>
+To: Suzanne Williams <andrew15@riley.com>
+Date: 2025-03-31 00:40:23
+Subject: Daily Work Summary
+
+Planned Activities:
+Mobile App Performance
+    - discussed the requirements, updated the feedback, and clarified the data issues for the mobile app performance project.
+    - finalized the requirements, tested the feedback, and clarified the user stories for the mobile app performance project.
+
+Internal API Cleanup
+    - Reviewed the deployment steps, updated the feedback, and documented the feedback for the internal api cleanup project.
+    - Reviewed the feedback, documented the deployment steps, and clarified the UI changes for the internal api cleanup project.
+    - clarified the UI changes, finalized the user stories, and tested the deployment steps for the internal api cleanup project.
+
+Marketing Dashboard
+    - documented the UI changes, Reviewed the deployment steps, and discussed the UI changes for the marketing dashboard project.
+    - tested the UI changes, finalized the feedback, and coordinated the requirements for the marketing dashboard project.
+    - discussed the requirements, clarified the data issues, and documented the data issues for the marketing dashboard project.
+    - documented the user stories, discussed the UI changes, and coordinated the UI changes for the marketing dashboard project.
+    - coordinated the feedback, coordinated the data issues, and Reviewed the UI changes for the marketing dashboard project.
+
+Completed Activities:
+Marketing Dashboard
+    - documented the UI changes, updated the data issues, and updated the user stories for the marketing dashboard project.
+    - discussed the UI changes, Reviewed the feedback, and coordinated the UI changes for the marketing dashboard project.
+    - documented the UI changes, finalized the feedback, and tested the feedback for the marketing dashboard project.
+
+CI/CD Pipeline Update
+    - discussed the user stories, discussed the requirements, and Reviewed the requirements for the ci/cd pipeline update project.
+    - Reviewed the feedback, updated the deployment steps, and coordinated the data issues for the ci/cd pipeline update project.
+    - finalized the deployment steps, documented the user stories, and documented the data issues for the ci/cd pipeline update project.
+    - updated the feedback, updated the UI changes, and coordinated the feedback for the ci/cd pipeline update project.
+    - coordinated the requirements, updated the deployment steps, and documented the data issues for the ci/cd pipeline update project.

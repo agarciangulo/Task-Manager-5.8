@@ -1,0 +1,86 @@
+{
+  "timestamp": "20250605_134604",
+  "input_text": "From: Kayla Jackson <zpierce@gmail.com>\nTo: Carol Adams <hunderwood@willis-walsh.com>\nDate: 2025-02-23 14:06:38\nSubject: Daily Work Summary\n\nPlanned Activities:\nContent Management Refactor\n    - Blocked by external dependency on Content Management Refactor.\n    - Successfully completed all subtasks related to Content Management Refactor.\n    - Did not begin working on Content Management Refactor due to time constraints.\n\nMobile App Performance\n    - Successfully completed all subtasks related to Mobile App Performance.\n    - Waiting for feedback on the latest update for Mobile App Performance.\n    - Finished implementing the core features of Mobile App Performance.\n    - Did not begin working on Mobile App Performance due to time constraints.\n    - Reviewed progress of Mobile App Performance, awaiting stakeholder approval.\n\nInternal API Cleanup\n    - Finished implementing the core features of Internal API Cleanup.\n    - Did not begin working on Internal API Cleanup due to time constraints.\n    - Blocked by external dependency on Internal API Cleanup.\n\nData Warehouse Migration\n    - Successfully completed all subtasks related to Data Warehouse Migration.\n    - Reviewed progress of Data Warehouse Migration, awaiting stakeholder approval.\n    - Waiting for feedback on the latest update for Data Warehouse Migration.\n    - Finished implementing the core features of Data Warehouse Migration.\n\nCompleted Activities:\nAuthentication Revamp\n    - Started working on Authentication Revamp but still in progress.\n    - Reviewed progress of Authentication Revamp, awaiting stakeholder approval.\n    - Successfully completed all subtasks related to Authentication Revamp.\n    - Did not begin working on Authentication Revamp due to time constraints.\n    - Waiting for feedback on the latest update for Authentication Revamp.\n\nMarketing Dashboard\n    - Finished implementing the core features of Marketing Dashboard.\n    - Successfully completed all subtasks related to Marketing Dashboard.\n    - Did not begin working on Marketing Dashboard due to time constraints.\n    - Started working on Marketing Dashboard but still in progress.\n\nContent Management Refactor\n    - Successfully completed all subtasks related to Content Management Refactor.\n    - Did not begin working on Content Management Refactor due to time constraints.\n    - Finished implementing the core features of Content Management Refactor.\n    - Started working on Content Management Refactor but still in progress.\n\nInternal API Cleanup\n    - Waiting for feedback on the latest update for Internal API Cleanup.\n    - Successfully completed all subtasks related to Internal API Cleanup.\n\nMobile App Performance\n    - Started working on Mobile App Performance but still in progress.\n    - Waiting for feedback on the latest update for Mobile App Performance.\n    - Blocked by external dependency on Mobile App Performance.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Kayla Jackson <zpierce@gmail.com>\nTo: Carol Adams <hunderwood@willis-walsh.com>\nDate: 2025-02-23 14:06:38\nSubject: Daily Work Summary\n\nPlanned Activities:\nContent Management Refactor\n    - Blocked by external dependency on Content Management Refactor.\n    - Successfully completed all subtasks related to Content Management Refactor.\n    - Did not begin working on Content Management Refactor due to time constraints.\n\nMobile App Performance\n    - Successfully completed all subtasks related to Mobile App Performance.\n    - Waiting for feedback on the latest update for Mobile App Performance.\n    - Finished implementing the core features of Mobile App Performance.\n    - Did not begin working on Mobile App Performance due to time constraints.\n    - Reviewed progress of Mobile App Performance, awaiting stakeholder approval.\n\nInternal API Cleanup\n    - Finished implementing the core features of Internal API Cleanup.\n    - Did not begin working on Internal API Cleanup due to time constraints.\n    - Blocked by external dependency on Internal API Cleanup.\n\nData Warehouse Migration\n    - Successfully completed all subtasks related to Data Warehouse Migration.\n    - Reviewed progress of Data Warehouse Migration, awaiting stakeholder approval.\n    - Waiting for feedback on the latest update for Data Warehouse Migration.\n    - Finished implementing the core features of Data Warehouse Migration.\n\nCompleted Activities:\nAuthentication Revamp\n    - Started working on Authentication Revamp but still in progress.\n    - Reviewed progress of Authentication Revamp, awaiting stakeholder approval.\n    - Successfully completed all subtasks related to Authentication Revamp.\n    - Did not begin working on Authentication Revamp due to time constraints.\n    - Waiting for feedback on the latest update for Authentication Revamp.\n\nMarketing Dashboard\n    - Finished implementing the core features of Marketing Dashboard.\n    - Successfully completed all subtasks related to Marketing Dashboard.\n    - Did not begin working on Marketing Dashboard due to time constraints.\n    - Started working on Marketing Dashboard but still in progress.\n\nContent Management Refactor\n    - Successfully completed all subtasks related to Content Management Refactor.\n    - Did not begin working on Content Management Refactor due to time constraints.\n    - Finished implementing the core features of Content Management Refactor.\n    - Started working on Content Management Refactor but still in progress.\n\nInternal API Cleanup\n    - Waiting for feedback on the latest update for Internal API Cleanup.\n    - Successfully completed all subtasks related to Internal API Cleanup.\n\nMobile App Performance\n    - Started working on Mobile App Performance but still in progress.\n    - Waiting for feedback on the latest update for Mobile App Performance.\n    - Blocked by external dependency on Mobile App Performance.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Content Management Refactor\",\n        \"status\": \"Pending\",\n        \"employee\": \"Kayla Jackson\",\n        \"date\": \"2025-02-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the tasks related to Content Management Refactor?\"\n    },\n    {\n        \"task\": \"Mobile App Performance\",\n        \"status\": \"Pending\",\n        \"employee\": \"Kayla Jackson\",\n        \"date\": \"2025-02-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the tasks related to Mobile App Performance?\"\n    },\n    {\n        \"task\": \"Internal API Cleanup\",\n        \"status\": \"Pending\",\n        \"employee\": \"Kayla Jackson\",\n        \"date\": \"2025-02-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the tasks related to Internal API Cleanup?\"\n    },\n    {\n        \"task\": \"Data Warehouse Migration\",\n        \"status\": \"Pending\",\n        \"employee\": \"Kayla Jackson\",\n        \"date\": \"2025-02-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the tasks related to Data Warehouse Migration?\"\n    },\n    {\n        \"task\": \"Authentication Revamp\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Kayla Jackson\",\n        \"date\": \"2025-02-23\",\n        \"category\": \"General\"\n    },\n    {\n        \"task\": \"Marketing Dashboard\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Kayla Jackson\",\n        \"date\": \"2025-02-23\",\n        \"category\": \"General\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Content Management Refactor",
+      "status": "Pending",
+      "employee": "Kayla Jackson",
+      "date": "2025-02-23",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to Content Management Refactor?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Mobile App Performance",
+      "status": "Pending",
+      "employee": "Kayla Jackson",
+      "date": "2025-02-23",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to Mobile App Performance?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup",
+      "status": "Pending",
+      "employee": "Kayla Jackson",
+      "date": "2025-02-23",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Data Warehouse Migration",
+      "status": "Pending",
+      "employee": "Kayla Jackson",
+      "date": "2025-02-23",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to Data Warehouse Migration?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp",
+      "status": "In Progress",
+      "employee": "Kayla Jackson",
+      "date": "2025-02-23",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to Authentication Revamp?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Marketing Dashboard",
+      "status": "In Progress",
+      "employee": "Kayla Jackson",
+      "date": "2025-02-23",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific work did you do related to Marketing Dashboard?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

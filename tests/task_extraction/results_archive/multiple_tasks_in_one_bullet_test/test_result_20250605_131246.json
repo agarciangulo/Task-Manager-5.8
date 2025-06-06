@@ -1,0 +1,294 @@
+{
+  "timestamp": "20250605_131246",
+  "input_text": "From: Jade Mcdonald MD <mhenry@martinez.com>\nTo: Tracy Baker <lbates@hotmail.com>\nDate: 2025-01-31 20:33:00\nSubject: Daily Work Summary\n\nPlanned Activities:\nCI/CD Pipeline Update\n    - discussed the feedback, updated the user stories, and discussed the feedback for the ci/cd pipeline update project.\n    - discussed the user stories, documented the data issues, and clarified the feedback for the ci/cd pipeline update project.\n    - discussed the data issues, Reviewed the deployment steps, and finalized the UI changes for the ci/cd pipeline update project.\n    - updated the data issues, finalized the deployment steps, and documented the feedback for the ci/cd pipeline update project.\n    - Reviewed the data issues, clarified the requirements, and finalized the UI changes for the ci/cd pipeline update project.\n\nContent Management Refactor\n    - discussed the requirements, Reviewed the requirements, and coordinated the feedback for the content management refactor project.\n    - coordinated the deployment steps, updated the data issues, and clarified the deployment steps for the content management refactor project.\n\nMarketing Dashboard\n    - clarified the UI changes, documented the data issues, and discussed the user stories for the marketing dashboard project.\n    - coordinated the deployment steps, Reviewed the UI changes, and discussed the data issues for the marketing dashboard project.\n    - finalized the user stories, coordinated the UI changes, and finalized the feedback for the marketing dashboard project.\n    - tested the requirements, clarified the feedback, and clarified the requirements for the marketing dashboard project.\n\nCompleted Activities:\nMobile App Performance\n    - updated the requirements, documented the deployment steps, and clarified the deployment steps for the mobile app performance project.\n    - tested the requirements, documented the feedback, and Reviewed the deployment steps for the mobile app performance project.\n\nCustomer Feedback Analysis\n    - coordinated the requirements, coordinated the user stories, and finalized the data issues for the customer feedback analysis project.\n    - clarified the UI changes, coordinated the feedback, and clarified the requirements for the customer feedback analysis project.\n    - documented the data issues, Reviewed the UI changes, and tested the data issues for the customer feedback analysis project.\n    - documented the deployment steps, finalized the deployment steps, and clarified the UI changes for the customer feedback analysis project.\n    - updated the data issues, coordinated the deployment steps, and discussed the requirements for the customer feedback analysis project.\n\nAuthentication Revamp\n    - finalized the UI changes, discussed the deployment steps, and tested the deployment steps for the authentication revamp project.\n    - discussed the deployment steps, updated the user stories, and tested the requirements for the authentication revamp project.\n    - updated the deployment steps, updated the UI changes, and clarified the data issues for the authentication revamp project.\n    - discussed the feedback, updated the data issues, and documented the requirements for the authentication revamp project.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Jade Mcdonald MD <mhenry@martinez.com>\nTo: Tracy Baker <lbates@hotmail.com>\nDate: 2025-01-31 20:33:00\nSubject: Daily Work Summary\n\nPlanned Activities:\nCI/CD Pipeline Update\n    - discussed the feedback, updated the user stories, and discussed the feedback for the ci/cd pipeline update project.\n    - discussed the user stories, documented the data issues, and clarified the feedback for the ci/cd pipeline update project.\n    - discussed the data issues, Reviewed the deployment steps, and finalized the UI changes for the ci/cd pipeline update project.\n    - updated the data issues, finalized the deployment steps, and documented the feedback for the ci/cd pipeline update project.\n    - Reviewed the data issues, clarified the requirements, and finalized the UI changes for the ci/cd pipeline update project.\n\nContent Management Refactor\n    - discussed the requirements, Reviewed the requirements, and coordinated the feedback for the content management refactor project.\n    - coordinated the deployment steps, updated the data issues, and clarified the deployment steps for the content management refactor project.\n\nMarketing Dashboard\n    - clarified the UI changes, documented the data issues, and discussed the user stories for the marketing dashboard project.\n    - coordinated the deployment steps, Reviewed the UI changes, and discussed the data issues for the marketing dashboard project.\n    - finalized the user stories, coordinated the UI changes, and finalized the feedback for the marketing dashboard project.\n    - tested the requirements, clarified the feedback, and clarified the requirements for the marketing dashboard project.\n\nCompleted Activities:\nMobile App Performance\n    - updated the requirements, documented the deployment steps, and clarified the deployment steps for the mobile app performance project.\n    - tested the requirements, documented the feedback, and Reviewed the deployment steps for the mobile app performance project.\n\nCustomer Feedback Analysis\n    - coordinated the requirements, coordinated the user stories, and finalized the data issues for the customer feedback analysis project.\n    - clarified the UI changes, coordinated the feedback, and clarified the requirements for the customer feedback analysis project.\n    - documented the data issues, Reviewed the UI changes, and tested the data issues for the customer feedback analysis project.\n    - documented the deployment steps, finalized the deployment steps, and clarified the UI changes for the customer feedback analysis project.\n    - updated the data issues, coordinated the deployment steps, and discussed the requirements for the customer feedback analysis project.\n\nAuthentication Revamp\n    - finalized the UI changes, discussed the deployment steps, and tested the deployment steps for the authentication revamp project.\n    - discussed the deployment steps, updated the user stories, and tested the requirements for the authentication revamp project.\n    - updated the deployment steps, updated the UI changes, and clarified the data issues for the authentication revamp project.\n    - discussed the feedback, updated the data issues, and documented the requirements for the authentication revamp project.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"discussed the feedback, updated the user stories, and discussed the feedback for the ci/cd pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the user stories, documented the data issues, and clarified the feedback for the ci/cd pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the data issues, Reviewed the deployment steps, and finalized the UI changes for the ci/cd pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the data issues, finalized the deployment steps, and documented the feedback for the ci/cd pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the data issues, clarified the requirements, and finalized the UI changes for the ci/cd pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the requirements, Reviewed the requirements, and coordinated the feedback for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the deployment steps, updated the data issues, and clarified the deployment steps for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"clarified the UI changes, documented the data issues, and discussed the user stories for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the deployment steps, Reviewed the UI changes, and discussed the data issues for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"finalized the user stories, coordinated the UI changes, and finalized the feedback for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"tested the requirements, clarified the feedback, and clarified the requirements for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the requirements, documented the deployment steps, and clarified the deployment steps for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"tested the requirements, documented the feedback, and Reviewed the deployment steps for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the requirements, coordinated the user stories, and finalized the data issues for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"clarified the UI changes, coordinated the feedback, and clarified the requirements for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the data issues, Reviewed the UI changes, and tested the data issues for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the deployment steps, finalized the deployment steps, and clarified the UI changes for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the data issues, coordinated the deployment steps, and discussed the requirements for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"finalized the UI changes, discussed the deployment steps, and tested the deployment steps for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the deployment steps, updated the user stories, and tested the requirements for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the deployment steps, updated the UI changes, and clarified the data issues for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the feedback, updated the data issues, and documented the requirements for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jade Mcdonald MD\",\n        \"date\": \"2025-01-31\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "CI/CD Pipeline Update - discussed the feedback, updated the user stories, and discussed the feedback for the ci/cd pipeline update project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "CI/CD Pipeline Update - discussed the user stories, documented the data issues, and clarified the feedback for the ci/cd pipeline update project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "CI/CD Pipeline Update - discussed the data issues, Reviewed the deployment steps, and finalized the UI changes for the ci/cd pipeline update project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "CI/CD Pipeline Update - updated the data issues, finalized the deployment steps, and documented the feedback for the ci/cd pipeline update project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "CI/CD Pipeline Update - Reviewed the data issues, clarified the requirements, and finalized the UI changes for the ci/cd pipeline update project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Content Management Refactor - discussed the requirements, Reviewed the requirements, and coordinated the feedback for the content management refactor project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Content Management Refactor - coordinated the deployment steps, updated the data issues, and clarified the deployment steps for the content management refactor project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Marketing Dashboard - clarified the UI changes, documented the data issues, and discussed the user stories for the marketing dashboard project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Marketing Dashboard - coordinated the deployment steps, Reviewed the UI changes, and discussed the data issues for the marketing dashboard project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Marketing Dashboard - finalized the user stories, coordinated the UI changes, and finalized the feedback for the marketing dashboard project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Marketing Dashboard - tested the requirements, clarified the feedback, and clarified the requirements for the marketing dashboard project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Mobile App Performance - updated the requirements, documented the deployment steps, and clarified the deployment steps for the mobile app performance project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Mobile App Performance - tested the requirements, documented the feedback, and Reviewed the deployment steps for the mobile app performance project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis - coordinated the requirements, coordinated the user stories, and finalized the data issues for the customer feedback analysis project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis - clarified the UI changes, coordinated the feedback, and clarified the requirements for the customer feedback analysis project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis - documented the data issues, Reviewed the UI changes, and tested the data issues for the customer feedback analysis project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis - documented the deployment steps, finalized the deployment steps, and clarified the UI changes for the customer feedback analysis project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis - updated the data issues, coordinated the deployment steps, and discussed the requirements for the customer feedback analysis project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - finalized the UI changes, discussed the deployment steps, and tested the deployment steps for the authentication revamp project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - discussed the deployment steps, updated the user stories, and tested the requirements for the authentication revamp project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - updated the deployment steps, updated the UI changes, and clarified the data issues for the authentication revamp project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - discussed the feedback, updated the data issues, and documented the requirements for the authentication revamp project.",
+      "status": "Pending",
+      "employee": "Jade Mcdonald MD",
+      "date": "2025-01-31",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

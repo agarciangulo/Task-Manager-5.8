@@ -1,0 +1,372 @@
+{
+  "timestamp": "20250605_125947",
+  "input_text": "From: Paul Morris <carlymitchell@yahoo.com>\nTo: Kayla Benson <wilsonshannon@yahoo.com>\nDate: 2025-02-19 13:40:06\nSubject: Daily Work Summary\n\nPlanned Activities:\nUser Onboarding Redesign\n    - Handled a number of miscellaneous updates, one involving the user onboarding redesign workflows.\n    - Wrapped up loose ends and took care of several items for the user onboarding redesign initiative.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the user onboarding redesign process.\n    - General work done that included coordination on user onboarding redesign, among other things.\n    - There was also some back and forth that led to progress with the user onboarding redesign team.\n\nAuthentication Revamp\n    - Wrapped up loose ends and took care of several items for the authentication revamp initiative.\n    - Handled a number of miscellaneous updates, one involving the authentication revamp workflows.\n    - There was also some back and forth that led to progress with the authentication revamp team.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the authentication revamp process.\n    - There was also some back and forth that led to progress with the authentication revamp team.\n\nData Warehouse Migration\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the data warehouse migration process.\n    - Handled a number of miscellaneous updates, one involving the data warehouse migration workflows.\n\nCustomer Feedback Analysis\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the customer feedback analysis process.\n    - There was also some back and forth that led to progress with the customer feedback analysis team.\n    - Wrapped up loose ends and took care of several items for the customer feedback analysis initiative.\n\nContent Management Refactor\n    - General work done that included coordination on content management refactor, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the content management refactor process.\n\nCompleted Activities:\nInternal API Cleanup\n    - There was also some back and forth that led to progress with the internal api cleanup team.\n    - Wrapped up loose ends and took care of several items for the internal api cleanup initiative.\n    - There was also some back and forth that led to progress with the internal api cleanup team.\n    - Handled a number of miscellaneous updates, one involving the internal api cleanup workflows.\n\nCI/CD Pipeline Update\n    - Handled a number of miscellaneous updates, one involving the ci/cd pipeline update workflows.\n    - There was also some back and forth that led to progress with the ci/cd pipeline update team.\n    - General work done that included coordination on ci/cd pipeline update, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the ci/cd pipeline update process.\n\nPayment Gateway Integration\n    - Handled a number of miscellaneous updates, one involving the payment gateway integration workflows.\n    - There was also some back and forth that led to progress with the payment gateway integration team.\n    - General work done that included coordination on payment gateway integration, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the payment gateway integration process.\n\nMobile App Performance\n    - Handled a number of miscellaneous updates, one involving the mobile app performance workflows.\n    - There was also some back and forth that led to progress with the mobile app performance team.\n    - There was also some back and forth that led to progress with the mobile app performance team.\n    - There was also some back and forth that led to progress with the mobile app performance team.\n    - General work done that included coordination on mobile app performance, among other things.\n\nContent Management Refactor\n    - General work done that included coordination on content management refactor, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the content management refactor process.\n    - There was also some back and forth that led to progress with the content management refactor team.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Paul Morris <carlymitchell@yahoo.com>\nTo: Kayla Benson <wilsonshannon@yahoo.com>\nDate: 2025-02-19 13:40:06\nSubject: Daily Work Summary\n\nPlanned Activities:\nUser Onboarding Redesign\n    - Handled a number of miscellaneous updates, one involving the user onboarding redesign workflows.\n    - Wrapped up loose ends and took care of several items for the user onboarding redesign initiative.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the user onboarding redesign process.\n    - General work done that included coordination on user onboarding redesign, among other things.\n    - There was also some back and forth that led to progress with the user onboarding redesign team.\n\nAuthentication Revamp\n    - Wrapped up loose ends and took care of several items for the authentication revamp initiative.\n    - Handled a number of miscellaneous updates, one involving the authentication revamp workflows.\n    - There was also some back and forth that led to progress with the authentication revamp team.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the authentication revamp process.\n    - There was also some back and forth that led to progress with the authentication revamp team.\n\nData Warehouse Migration\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the data warehouse migration process.\n    - Handled a number of miscellaneous updates, one involving the data warehouse migration workflows.\n\nCustomer Feedback Analysis\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the customer feedback analysis process.\n    - There was also some back and forth that led to progress with the customer feedback analysis team.\n    - Wrapped up loose ends and took care of several items for the customer feedback analysis initiative.\n\nContent Management Refactor\n    - General work done that included coordination on content management refactor, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the content management refactor process.\n\nCompleted Activities:\nInternal API Cleanup\n    - There was also some back and forth that led to progress with the internal api cleanup team.\n    - Wrapped up loose ends and took care of several items for the internal api cleanup initiative.\n    - There was also some back and forth that led to progress with the internal api cleanup team.\n    - Handled a number of miscellaneous updates, one involving the internal api cleanup workflows.\n\nCI/CD Pipeline Update\n    - Handled a number of miscellaneous updates, one involving the ci/cd pipeline update workflows.\n    - There was also some back and forth that led to progress with the ci/cd pipeline update team.\n    - General work done that included coordination on ci/cd pipeline update, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the ci/cd pipeline update process.\n\nPayment Gateway Integration\n    - Handled a number of miscellaneous updates, one involving the payment gateway integration workflows.\n    - There was also some back and forth that led to progress with the payment gateway integration team.\n    - General work done that included coordination on payment gateway integration, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the payment gateway integration process.\n\nMobile App Performance\n    - Handled a number of miscellaneous updates, one involving the mobile app performance workflows.\n    - There was also some back and forth that led to progress with the mobile app performance team.\n    - There was also some back and forth that led to progress with the mobile app performance team.\n    - There was also some back and forth that led to progress with the mobile app performance team.\n    - General work done that included coordination on mobile app performance, among other things.\n\nContent Management Refactor\n    - General work done that included coordination on content management refactor, among other things.\n    - Tweaked some settings, reviewed a few docs, and ensured alignment for the content management refactor process.\n    - There was also some back and forth that led to progress with the content management refactor team.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the user onboarding redesign workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the updates made for the user onboarding redesign workflows?\"\n    },\n    {\n        \"task\": \"Wrapped up loose ends and took care of several items for the user onboarding redesign initiative\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific items were taken care of in the user onboarding redesign initiative?\"\n    },\n    {\n        \"task\": \"Tweaked some settings, reviewed a few docs, and ensured alignment for the user onboarding redesign process\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the settings tweaked and documents reviewed for the user onboarding redesign process?\"\n    },\n    {\n        \"task\": \"General work done that included coordination on user onboarding redesign, among other things\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific coordination tasks were completed for the user onboarding redesign?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the user onboarding redesign team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the user onboarding redesign team?\"\n    },\n    {\n        \"task\": \"Wrapped up loose ends and took care of several items for the authentication revamp initiative\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific items were taken care of in the authentication revamp initiative?\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the authentication revamp workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the updates made for the authentication revamp workflows?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the authentication revamp team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the authentication revamp team?\"\n    },\n    {\n        \"task\": \"Tweaked some settings, reviewed a few docs, and ensured alignment for the authentication revamp process\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the settings tweaked and documents reviewed for the authentication revamp process?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the authentication revamp team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the authentication revamp team?\"\n    },\n    {\n        \"task\": \"Tweaked some settings, reviewed a few docs, and ensured alignment for the data warehouse migration process\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the settings tweaked and documents reviewed for the data warehouse migration process?\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the data warehouse migration workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the updates made for the data warehouse migration workflows?\"\n    },\n    {\n        \"task\": \"Tweaked some settings, reviewed a few docs, and ensured alignment for the customer feedback analysis process\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the settings tweaked and documents reviewed for the customer feedback analysis process?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the customer feedback analysis team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the customer feedback analysis team?\"\n    },\n    {\n        \"task\": \"Wrapped up loose ends and took care of several items for the customer feedback analysis initiative\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific items were taken care of in the customer feedback analysis initiative?\"\n    },\n    {\n        \"task\": \"General work done that included coordination on content management refactor, among other things\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific coordination tasks were completed for the content management refactor?\"\n    },\n    {\n        \"task\": \"Tweaked some settings, reviewed a few docs, and ensured alignment for the content management refactor process\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the settings tweaked and documents reviewed for the content management refactor process?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the content management refactor team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the content management refactor team?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the internal api cleanup team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the internal api cleanup team?\"\n    },\n    {\n        \"task\": \"Wrapped up loose ends and took care of several items for the internal api cleanup initiative\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific items were taken care of in the internal api cleanup initiative?\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the internal api cleanup workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the updates made for the internal api cleanup workflows?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the ci/cd pipeline update team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the ci/cd pipeline update team?\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the ci/cd pipeline update workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the updates made for the ci/cd pipeline update workflows?\"\n    },\n    {\n        \"task\": \"General work done that included coordination on ci/cd pipeline update, among other things\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific coordination tasks were completed for the ci/cd pipeline update?\"\n    },\n    {\n        \"task\": \"Tweaked some settings, reviewed a few docs, and ensured alignment for the ci/cd pipeline update process\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the settings tweaked and documents reviewed for the ci/cd pipeline update process?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the payment gateway integration team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the payment gateway integration team?\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the payment gateway integration workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the updates made for the payment gateway integration workflows?\"\n    },\n    {\n        \"task\": \"General work done that included coordination on payment gateway integration, among other things\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific coordination tasks were completed for the payment gateway integration?\"\n    },\n    {\n        \"task\": \"Tweaked some settings, reviewed a few docs, and ensured alignment for the payment gateway integration process\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the settings tweaked and documents reviewed for the payment gateway integration process?\"\n    },\n    {\n        \"task\": \"There was also some back and forth that led to progress with the mobile app performance team\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What discussions or decisions were made during the back and forth with the mobile app performance team?\"\n    },\n    {\n        \"task\": \"Handled a number of miscellaneous updates, one involving the mobile app performance workflows\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the updates made for the mobile app performance workflows?\"\n    },\n    {\n        \"task\": \"General work done that included coordination on mobile app performance, among other things\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific coordination tasks were completed for the mobile app performance?\"\n    },\n    {\n        \"task\": \"General work done that included coordination on content management refactor, among other things\",\n        \"status\": \"Pending\",\n        \"employee\": \"Paul Morris\",\n        \"date\": \"2025-02-19\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific coordination tasks were completed for the content management refactor?\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the user onboarding redesign workflows.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details about the updates and the specific tasks completed for the user onboarding redesign workflows?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up loose ends and took care of several items for the user onboarding redesign initiative.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What specific items were taken care of and what loose ends were wrapped up for the user onboarding redesign initiative?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tweaked some settings, reviewed a few docs, and ensured alignment for the user onboarding redesign process.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details about the settings tweaked, documents reviewed, and the alignment ensured for the user onboarding redesign process?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on user onboarding redesign, among other things.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What specific coordination tasks were completed for the user onboarding redesign, and what other tasks were included in the general work done?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the user onboarding redesign team.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What specific progress was made with the user onboarding redesign team during the back and forth discussions?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up loose ends and took care of several items for the authentication revamp initiative.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What specific items were taken care of and what loose ends were wrapped up for the authentication revamp initiative?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the authentication revamp workflows.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details about the miscellaneous updates handled and the specific tasks completed for the authentication revamp workflows?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the authentication revamp team.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What specific progress was made with the authentication revamp team during the back and forth discussions?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tweaked some settings, reviewed a few docs, and ensured alignment for the authentication revamp process.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details about the settings tweaked, documents reviewed, and the alignment ensured for the authentication revamp process?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tweaked some settings, reviewed a few docs, and ensured alignment for the data warehouse migration process.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Data Warehouse Migration",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details about the settings tweaked, documents reviewed, and the alignment ensured for the data warehouse migration process?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the data warehouse migration workflows.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Data Warehouse Migration",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details about the miscellaneous updates handled and the specific tasks completed for the data warehouse migration workflows?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tweaked some settings, reviewed a few docs, and ensured alignment for the customer feedback analysis process.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Customer Feedback Analysis",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details about the settings tweaked, documents reviewed, and the alignment ensured for the customer feedback analysis process?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the customer feedback analysis team.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Customer Feedback Analysis",
+      "needs_description": true,
+      "suggested_question": "What specific progress was made with the customer feedback analysis team during the back and forth discussions?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up loose ends and took care of several items for the customer feedback analysis initiative.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Customer Feedback Analysis",
+      "needs_description": true,
+      "suggested_question": "What specific items were taken care of and what loose ends were wrapped up for the customer feedback analysis initiative?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on content management refactor, among other things.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Content Management Refactor",
+      "needs_description": true,
+      "suggested_question": "What specific coordination tasks were completed for the content management refactor, and what other tasks were included in the general work done?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the internal api cleanup team.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific progress was made with the internal api cleanup team during the back and forth discussions?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up loose ends and took care of several items for the internal api cleanup initiative.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific items were taken care of and what loose ends were wrapped up for the internal api cleanup initiative?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the internal api cleanup workflows.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details about the miscellaneous updates handled and the specific tasks completed for the internal api cleanup workflows?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the ci/cd pipeline update workflows.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details about the miscellaneous updates handled and the specific tasks completed for the ci/cd pipeline update workflows?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the ci/cd pipeline update team.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": true,
+      "suggested_question": "What specific progress was made with the ci/cd pipeline update team during the back and forth discussions?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on ci/cd pipeline update, among other things.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": true,
+      "suggested_question": "What specific coordination tasks were completed for the ci/cd pipeline update, and what other tasks were included in the general work done?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the payment gateway integration workflows.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Payment Gateway Integration",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details about the miscellaneous updates handled and the specific tasks completed for the payment gateway integration workflows?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the payment gateway integration team.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Payment Gateway Integration",
+      "needs_description": true,
+      "suggested_question": "What specific progress was made with the payment gateway integration team during the back and forth discussions?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on payment gateway integration, among other things.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Payment Gateway Integration",
+      "needs_description": true,
+      "suggested_question": "What specific coordination tasks were completed for the payment gateway integration, and what other tasks were included in the general work done?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled a number of miscellaneous updates, one involving the mobile app performance workflows.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details about the miscellaneous updates handled and the specific tasks completed for the mobile app performance workflows?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "There was also some back and forth that led to progress with the mobile app performance team.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What specific progress was made with the mobile app performance team during the back and forth discussions?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on mobile app performance, among other things.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What specific coordination tasks were completed for the mobile app performance, and what other tasks were included in the general work done?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "General work done that included coordination on content management refactor, among other things.",
+      "status": "Pending",
+      "employee": "Paul Morris",
+      "date": "2025-02-19",
+      "category": "Content Management Refactor",
+      "needs_description": true,
+      "suggested_question": "What specific coordination tasks were completed for the content management refactor, and what other tasks were included in the general work done?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

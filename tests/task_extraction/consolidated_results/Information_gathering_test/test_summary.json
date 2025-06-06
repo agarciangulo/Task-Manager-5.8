@@ -1,0 +1,85 @@
+{
+  "timestamp": "20250605_120700",
+  "tests_run": [
+    {
+      "input_file": "Information_gathering_6.txt",
+      "output_file": "test_result_20250605_115445.json"
+    },
+    {
+      "input_file": "Information_gathering_16.txt",
+      "output_file": "test_result_20250605_115556.json"
+    },
+    {
+      "input_file": "Information_gathering_17.txt",
+      "output_file": "test_result_20250605_115621.json"
+    },
+    {
+      "input_file": "Information_gathering_7.txt",
+      "output_file": "test_result_20250605_115657.json"
+    },
+    {
+      "input_file": "Information_gathering_5.txt",
+      "output_file": "test_result_20250605_115720.json"
+    },
+    {
+      "input_file": "Information_gathering_15.txt",
+      "output_file": "test_result_20250605_115750.json"
+    },
+    {
+      "input_file": "Information_gathering_14.txt",
+      "output_file": "test_result_20250605_115812.json"
+    },
+    {
+      "input_file": "Information_gathering_4.txt",
+      "output_file": "test_result_20250605_115846.json"
+    },
+    {
+      "input_file": "Information_gathering_10.txt",
+      "output_file": "test_result_20250605_115924.json"
+    },
+    {
+      "input_file": "Information_gathering_11.txt",
+      "output_file": "test_result_20250605_115950.json"
+    },
+    {
+      "input_file": "Information_gathering_1.txt",
+      "output_file": "test_result_20250605_120029.json"
+    },
+    {
+      "input_file": "Information_gathering_3.txt",
+      "output_file": "test_result_20250605_120128.json"
+    },
+    {
+      "input_file": "Information_gathering_13.txt",
+      "output_file": "test_result_20250605_120219.json"
+    },
+    {
+      "input_file": "Information_gathering_12.txt",
+      "output_file": "test_result_20250605_120312.json"
+    },
+    {
+      "input_file": "Information_gathering_2.txt",
+      "output_file": "test_result_20250605_120403.json"
+    },
+    {
+      "input_file": "Information_gathering_20.txt",
+      "output_file": "test_result_20250605_120429.json"
+    },
+    {
+      "input_file": "Information_gathering_9.txt",
+      "output_file": "test_result_20250605_120507.json"
+    },
+    {
+      "input_file": "Information_gathering_19.txt",
+      "output_file": "test_result_20250605_120551.json"
+    },
+    {
+      "input_file": "Information_gathering_18.txt",
+      "output_file": "test_result_20250605_120632.json"
+    },
+    {
+      "input_file": "Information_gathering_8.txt",
+      "output_file": "test_result_20250605_120700.json"
+    }
+  ]
+}

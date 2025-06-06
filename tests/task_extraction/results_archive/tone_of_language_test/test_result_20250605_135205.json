@@ -1,0 +1,138 @@
+{
+  "timestamp": "20250605_135205",
+  "input_text": "tone_of_language_19.txt\nFrom: Jason Vasquez <autumnbryant@yahoo.com>\nTo: Thomas Lewis <glucero@martin.com>\nDate: 2025-02-06 16:26:50\nSubject: Daily Work Summary\n\nPlanned Activities:\nCI/CD Pipeline Update\n    - Completed integration tests for the CI/CD Pipeline Update module to ensure compliance with specifications.\n    - Monitored the deployment of CI/CD Pipeline Update in the staging environment.\n\nContent Management Refactor\n    - Completed integration tests for the Content Management Refactor module to ensure compliance with specifications.\n    - Completed integration tests for the Content Management Refactor module to ensure compliance with specifications.\n    - Completed integration tests for the Content Management Refactor module to ensure compliance with specifications.\n    - Completed integration tests for the Content Management Refactor module to ensure compliance with specifications.\n    - Reviewed and refactored code for the Content Management Refactor pipeline.\n\nMobile App Performance\n    - Monitored the deployment of Mobile App Performance in the staging environment.\n    - Completed integration tests for the Mobile App Performance module to ensure compliance with specifications.\n    - Completed integration tests for the Mobile App Performance module to ensure compliance with specifications.\n    - Completed integration tests for the Mobile App Performance module to ensure compliance with specifications.\n    - Monitored the deployment of Mobile App Performance in the staging environment.\n\nMarketing Dashboard\n    - Monitored the deployment of Marketing Dashboard in the staging environment.\n    - Monitored the deployment of Marketing Dashboard in the staging environment.\n    - Coordinated with stakeholders to align expectations for Marketing Dashboard.\n    - Documented changes made to the Marketing Dashboard process thoroughly.\n    - Monitored the deployment of Marketing Dashboard in the staging environment.\n\nCompleted Activities:\nMarketing Dashboard\n    - Completed integration tests for the Marketing Dashboard module to ensure compliance with specifications.\n    - Monitored the deployment of Marketing Dashboard in the staging environment.\n\nCustomer Feedback Analysis\n    - Completed integration tests for the Customer Feedback Analysis module to ensure compliance with specifications.\n    - Documented changes made to the Customer Feedback Analysis process thoroughly.\n\nMobile App Performance\n    - Monitored the deployment of Mobile App Performance in the staging environment.\n    - Coordinated with stakeholders to align expectations for Mobile App Performance.\n    - Coordinated with stakeholders to align expectations for Mobile App Performance.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\ntone_of_language_19.txt\nFrom: Jason Vasquez <autumnbryant@yahoo.com>\nTo: Thomas Lewis <glucero@martin.com>\nDate: 2025-02-06 16:26:50\nSubject: Daily Work Summary\n\nPlanned Activities:\nCI/CD Pipeline Update\n    - Completed integration tests for the CI/CD Pipeline Update module to ensure compliance with specifications.\n    - Monitored the deployment of CI/CD Pipeline Update in the staging environment.\n\nContent Management Refactor\n    - Completed integration tests for the Content Management Refactor module to ensure compliance with specifications.\n    - Completed integration tests for the Content Management Refactor module to ensure compliance with specifications.\n    - Completed integration tests for the Content Management Refactor module to ensure compliance with specifications.\n    - Completed integration tests for the Content Management Refactor module to ensure compliance with specifications.\n    - Reviewed and refactored code for the Content Management Refactor pipeline.\n\nMobile App Performance\n    - Monitored the deployment of Mobile App Performance in the staging environment.\n    - Completed integration tests for the Mobile App Performance module to ensure compliance with specifications.\n    - Completed integration tests for the Mobile App Performance module to ensure compliance with specifications.\n    - Completed integration tests for the Mobile App Performance module to ensure compliance with specifications.\n    - Monitored the deployment of Mobile App Performance in the staging environment.\n\nMarketing Dashboard\n    - Monitored the deployment of Marketing Dashboard in the staging environment.\n    - Monitored the deployment of Marketing Dashboard in the staging environment.\n    - Coordinated with stakeholders to align expectations for Marketing Dashboard.\n    - Documented changes made to the Marketing Dashboard process thoroughly.\n    - Monitored the deployment of Marketing Dashboard in the staging environment.\n\nCompleted Activities:\nMarketing Dashboard\n    - Completed integration tests for the Marketing Dashboard module to ensure compliance with specifications.\n    - Monitored the deployment of Marketing Dashboard in the staging environment.\n\nCustomer Feedback Analysis\n    - Completed integration tests for the Customer Feedback Analysis module to ensure compliance with specifications.\n    - Documented changes made to the Customer Feedback Analysis process thoroughly.\n\nMobile App Performance\n    - Monitored the deployment of Mobile App Performance in the staging environment.\n    - Coordinated with stakeholders to align expectations for Mobile App Performance.\n    - Coordinated with stakeholders to align expectations for Mobile App Performance.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"CI/CD Pipeline Update integration tests\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"CI/CD Pipeline Update deployment monitoring\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Content Management Refactor integration tests\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Content Management Refactor code review and refactoring\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Mobile App Performance deployment monitoring\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Mobile App Performance integration tests\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Marketing Dashboard integration tests\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Marketing Dashboard deployment monitoring\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Customer Feedback Analysis integration tests\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Customer Feedback Analysis documentation\",\n        \"status\": \"Completed\",\n        \"employee\": \"Jason Vasquez\",\n        \"date\": \"2025-02-06\",\n        \"category\": \"General\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "CI/CD Pipeline Update integration tests",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "CI/CD Pipeline Update deployment monitoring",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Content Management Refactor integration tests",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Content Management Refactor code review and refactoring",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Mobile App Performance deployment monitoring",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Mobile App Performance integration tests",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Marketing Dashboard integration tests",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Marketing Dashboard deployment monitoring",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis integration tests",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis documentation",
+      "status": "Completed",
+      "employee": "Jason Vasquez",
+      "date": "2025-02-06",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

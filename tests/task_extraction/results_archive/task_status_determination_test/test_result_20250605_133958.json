@@ -1,0 +1,294 @@
+{
+  "timestamp": "20250605_133958",
+  "input_text": "From: Samantha Morgan <darryljohnson@brown.net>\nTo: Jacob Dyer <barnesjeff@bray.com>\nDate: 2025-04-06 02:56:14\nSubject: Daily Work Summary\n\nPlanned Activities:\nMarketing Dashboard\n    - Successfully completed all subtasks related to Marketing Dashboard.\n    - Reviewed progress of Marketing Dashboard, awaiting stakeholder approval.\n\nInternal API Cleanup\n    - Waiting for feedback on the latest update for Internal API Cleanup.\n    - Successfully completed all subtasks related to Internal API Cleanup.\n    - Reviewed progress of Internal API Cleanup, awaiting stakeholder approval.\n    - Finished implementing the core features of Internal API Cleanup.\n\nCustomer Feedback Analysis\n    - Did not begin working on Customer Feedback Analysis due to time constraints.\n    - Started working on Customer Feedback Analysis but still in progress.\n    - Reviewed progress of Customer Feedback Analysis, awaiting stakeholder approval.\n    - Finished implementing the core features of Customer Feedback Analysis.\n\nUser Onboarding Redesign\n    - Reviewed progress of User Onboarding Redesign, awaiting stakeholder approval.\n    - Waiting for feedback on the latest update for User Onboarding Redesign.\n    - Finished implementing the core features of User Onboarding Redesign.\n    - Did not begin working on User Onboarding Redesign due to time constraints.\n    - Successfully completed all subtasks related to User Onboarding Redesign.\n\nCI/CD Pipeline Update\n    - Started working on CI/CD Pipeline Update but still in progress.\n    - Blocked by external dependency on CI/CD Pipeline Update.\n\nCompleted Activities:\nCI/CD Pipeline Update\n    - Finished implementing the core features of CI/CD Pipeline Update.\n    - Waiting for feedback on the latest update for CI/CD Pipeline Update.\n    - Reviewed progress of CI/CD Pipeline Update, awaiting stakeholder approval.\n    - Started working on CI/CD Pipeline Update but still in progress.\n\nUser Onboarding Redesign\n    - Blocked by external dependency on User Onboarding Redesign.\n    - Successfully completed all subtasks related to User Onboarding Redesign.\n    - Reviewed progress of User Onboarding Redesign, awaiting stakeholder approval.\n\nPayment Gateway Integration\n    - Blocked by external dependency on Payment Gateway Integration.\n    - Did not begin working on Payment Gateway Integration due to time constraints.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Samantha Morgan <darryljohnson@brown.net>\nTo: Jacob Dyer <barnesjeff@bray.com>\nDate: 2025-04-06 02:56:14\nSubject: Daily Work Summary\n\nPlanned Activities:\nMarketing Dashboard\n    - Successfully completed all subtasks related to Marketing Dashboard.\n    - Reviewed progress of Marketing Dashboard, awaiting stakeholder approval.\n\nInternal API Cleanup\n    - Waiting for feedback on the latest update for Internal API Cleanup.\n    - Successfully completed all subtasks related to Internal API Cleanup.\n    - Reviewed progress of Internal API Cleanup, awaiting stakeholder approval.\n    - Finished implementing the core features of Internal API Cleanup.\n\nCustomer Feedback Analysis\n    - Did not begin working on Customer Feedback Analysis due to time constraints.\n    - Started working on Customer Feedback Analysis but still in progress.\n    - Reviewed progress of Customer Feedback Analysis, awaiting stakeholder approval.\n    - Finished implementing the core features of Customer Feedback Analysis.\n\nUser Onboarding Redesign\n    - Reviewed progress of User Onboarding Redesign, awaiting stakeholder approval.\n    - Waiting for feedback on the latest update for User Onboarding Redesign.\n    - Finished implementing the core features of User Onboarding Redesign.\n    - Did not begin working on User Onboarding Redesign due to time constraints.\n    - Successfully completed all subtasks related to User Onboarding Redesign.\n\nCI/CD Pipeline Update\n    - Started working on CI/CD Pipeline Update but still in progress.\n    - Blocked by external dependency on CI/CD Pipeline Update.\n\nCompleted Activities:\nCI/CD Pipeline Update\n    - Finished implementing the core features of CI/CD Pipeline Update.\n    - Waiting for feedback on the latest update for CI/CD Pipeline Update.\n    - Reviewed progress of CI/CD Pipeline Update, awaiting stakeholder approval.\n    - Started working on CI/CD Pipeline Update but still in progress.\n\nUser Onboarding Redesign\n    - Blocked by external dependency on User Onboarding Redesign.\n    - Successfully completed all subtasks related to User Onboarding Redesign.\n    - Reviewed progress of User Onboarding Redesign, awaiting stakeholder approval.\n\nPayment Gateway Integration\n    - Blocked by external dependency on Payment Gateway Integration.\n    - Did not begin working on Payment Gateway Integration due to time constraints.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Successfully completed all subtasks related to Marketing Dashboard.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Marketing\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed progress of Marketing Dashboard, awaiting stakeholder approval.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Marketing\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Waiting for feedback on the latest update for Internal API Cleanup.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"API\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Successfully completed all subtasks related to Internal API Cleanup.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"API\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed progress of Internal API Cleanup, awaiting stakeholder approval.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"API\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finished implementing the core features of Internal API Cleanup.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"API\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Did not begin working on Customer Feedback Analysis due to time constraints.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Customer Feedback\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific work was planned for Customer Feedback Analysis?\"\n    },\n    {\n        \"task\": \"Started working on Customer Feedback Analysis but still in progress.\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Customer Feedback\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What progress has been made on Customer Feedback Analysis?\"\n    },\n    {\n        \"task\": \"Reviewed progress of Customer Feedback Analysis, awaiting stakeholder approval.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Customer Feedback\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finished implementing the core features of Customer Feedback Analysis.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Customer Feedback\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed progress of User Onboarding Redesign, awaiting stakeholder approval.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"User Onboarding\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Waiting for feedback on the latest update for User Onboarding Redesign.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"User Onboarding\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finished implementing the core features of User Onboarding Redesign.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"User Onboarding\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Did not begin working on User Onboarding Redesign due to time constraints.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"User Onboarding\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific work was planned for User Onboarding Redesign?\"\n    },\n    {\n        \"task\": \"Successfully completed all subtasks related to User Onboarding Redesign.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"User Onboarding\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Started working on CI/CD Pipeline Update but still in progress.\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What progress has been made on CI/CD Pipeline Update?\"\n    },\n    {\n        \"task\": \"Blocked by external dependency on CI/CD Pipeline Update.\",\n        \"status\": \"Blocked\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finished implementing the core features of CI/CD Pipeline Update.\",\n        \"status\": \"Completed\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Waiting for feedback on the latest update for CI/CD Pipeline Update.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Blocked by external dependency on User Onboarding Redesign.\",\n        \"status\": \"Blocked\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"User Onboarding\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Blocked by external dependency on Payment Gateway Integration.\",\n        \"status\": \"Blocked\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Payment Gateway\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Did not begin working on Payment Gateway Integration due to time constraints.\",\n        \"status\": \"Pending\",\n        \"employee\": \"Samantha Morgan\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Payment Gateway\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific work was planned for Payment Gateway Integration?\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Successfully completed all subtasks related to Marketing Dashboard.",
+      "status": "Completed",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "Marketing",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed progress of Marketing Dashboard, awaiting stakeholder approval.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "Marketing",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Waiting for feedback on the latest update for Internal API Cleanup.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "API",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Successfully completed all subtasks related to Internal API Cleanup.",
+      "status": "Completed",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "API",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed progress of Internal API Cleanup, awaiting stakeholder approval.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "API",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finished implementing the core features of Internal API Cleanup.",
+      "status": "Completed",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "API",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Did not begin working on Customer Feedback Analysis due to time constraints.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "Customer Feedback",
+      "needs_description": true,
+      "suggested_question": "What specific work needs to be done for Customer Feedback Analysis?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Started working on Customer Feedback Analysis but still in progress.",
+      "status": "In Progress",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "Customer Feedback",
+      "needs_description": true,
+      "suggested_question": "What progress has been made on Customer Feedback Analysis?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed progress of Customer Feedback Analysis, awaiting stakeholder approval.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "Customer Feedback",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finished implementing the core features of Customer Feedback Analysis.",
+      "status": "Completed",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "Customer Feedback",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed progress of User Onboarding Redesign, awaiting stakeholder approval.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "User Onboarding",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Waiting for feedback on the latest update for User Onboarding Redesign.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "User Onboarding",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finished implementing the core features of User Onboarding Redesign.",
+      "status": "Completed",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "User Onboarding",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Did not begin working on User Onboarding Redesign due to time constraints.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "User Onboarding",
+      "needs_description": true,
+      "suggested_question": "What specific work needs to be done for User Onboarding Redesign?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Successfully completed all subtasks related to User Onboarding Redesign.",
+      "status": "Completed",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "User Onboarding",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Started working on CI/CD Pipeline Update but still in progress.",
+      "status": "In Progress",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline",
+      "needs_description": true,
+      "suggested_question": "What progress has been made on CI/CD Pipeline Update?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Blocked by external dependency on CI/CD Pipeline Update.",
+      "status": "Blocked",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finished implementing the core features of CI/CD Pipeline Update.",
+      "status": "Completed",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Waiting for feedback on the latest update for CI/CD Pipeline Update.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Blocked by external dependency on User Onboarding Redesign.",
+      "status": "Blocked",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "User Onboarding",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Blocked by external dependency on Payment Gateway Integration.",
+      "status": "Blocked",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "Payment Gateway",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Did not begin working on Payment Gateway Integration due to time constraints.",
+      "status": "Pending",
+      "employee": "Samantha Morgan",
+      "date": "2025-04-06",
+      "category": "Payment Gateway",
+      "needs_description": true,
+      "suggested_question": "What specific work needs to be done for Payment Gateway Integration?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

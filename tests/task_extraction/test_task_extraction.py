@@ -59,7 +59,7 @@ def save_results(input_text, prompt, raw_response, processed_tasks, output_dir):
     print(f"\nResults saved to: {output_file}")
     return output_file
 
-def test_task_extraction(sample_text=None, save_output=True):
+def test_task_extraction(sample_text=None, save_output=True, results_dir="tests/task_extraction/results"):
     # If no sample text provided, use default
     if sample_text is None:
         sample_text = """
@@ -103,7 +103,7 @@ def test_task_extraction(sample_text=None, save_output=True):
     
     # Save results if requested
     if save_output:
-        return save_results(sample_text, prompt, raw_response, tasks, "tests/task_extraction/results")
+        return save_results(sample_text, prompt, raw_response, tasks, results_dir)
     return None
 
 def process_sample_files(input_dir, output_dir):
@@ -123,7 +123,7 @@ def process_sample_files(input_dir, output_dir):
                 sample_text = f.read()
             
             # Run test and save results
-            output_file = test_task_extraction(sample_text, save_output=True)
+            output_file = test_task_extraction(sample_text, save_output=True, results_dir=output_dir)
             if output_file:
                 results.append({
                     "input_file": filename,
@@ -153,11 +153,24 @@ def main():
     args = parser.parse_args()
     
     if args.split:
+        # Infer test_case from master file name
+        test_case = os.path.splitext(os.path.basename(args.split))[0]
+        # Set up organized output directories
+        split_dir = f"tests/task_extraction/sample_inputs_archive/{test_case}"
+        results_dir = f"tests/task_extraction/results_archive/{test_case}"
+        consolidated_dir = f"tests/task_extraction/consolidated_results/{test_case}"
+        os.makedirs(split_dir, exist_ok=True)
+        os.makedirs(results_dir, exist_ok=True)
+        os.makedirs(consolidated_dir, exist_ok=True)
         # Split the master file and then process the split files
-        split_files = split_test_files(args.split, "tests/task_extraction/sample_inputs")
+        split_files = split_test_files(args.split, split_dir)
         if split_files:
             print("\nRunning tests on split files...")
-            process_sample_files("tests/task_extraction/sample_inputs", "tests/task_extraction/results")
+            process_sample_files(split_dir, results_dir)
+            # Move summary to consolidated dir
+            summary_file = os.path.join(results_dir, "test_summary.json")
+            if os.path.exists(summary_file):
+                os.rename(summary_file, os.path.join(consolidated_dir, "test_summary.json"))
     elif args.dir:
         process_sample_files(args.dir, "tests/task_extraction/results")
     elif args.file:

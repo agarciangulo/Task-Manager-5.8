@@ -1,0 +1,294 @@
+{
+  "timestamp": "20250605_132142",
+  "input_text": "From: Christine Shields <vvasquez@gmail.com>\nTo: Cory Gutierrez <matthew94@hale.info>\nDate: 2025-03-22 23:01:03\nSubject: Daily Work Summary\n\nPlanned Activities:\nMarketing Dashboard\n    - As a side note, my cat jumped on my keyboard mid-call. Documented changes related to the Marketing Dashboard rollout.\n    - By the way, lunch options today were surprisingly good. Refactored the Marketing Dashboard module to improve clarity and maintainability.\n    - As a side note, my cat jumped on my keyboard mid-call. Revised error handling strategy in Marketing Dashboard to support fallback flows.\n    - Investigated slow response times in the Marketing Dashboard component. Not related, but I saw a cool article on tech trends.\n\nPayment Gateway Integration\n    - Finalized the analytics hooks related to Payment Gateway Integration. As a side note, my cat jumped on my keyboard mid-call.\n    - Investigated slow response times in the Payment Gateway Integration component. On another note, I finally tried that new coffee place.\n    - Coordinated with the design team to review the Payment Gateway Integration feature flow. P.S. It was raining heavily all morning.\n    - Refactored the Payment Gateway Integration module to improve clarity and maintainability. As a side note, my cat jumped on my keyboard mid-call.\n\nCI/CD Pipeline Update\n    - Investigated slow response times in the CI/CD Pipeline Update component. By the way, lunch options today were surprisingly good.\n    - Created unit tests for CI/CD Pipeline Update edge cases. Fun fact: Friday is Hawaiian shirt day.\n    - Finalized the analytics hooks related to CI/CD Pipeline Update. P.S. It was raining heavily all morning.\n    - By the way, lunch options today were surprisingly good. Resolved a blocking bug in the CI/CD Pipeline Update flow.\n\nCompleted Activities:\nCustomer Feedback Analysis\n    - Refactored the Customer Feedback Analysis module to improve clarity and maintainability. Fun fact: Friday is Hawaiian shirt day.\n    - On another note, I finally tried that new coffee place. Coordinated with the design team to review the Customer Feedback Analysis feature flow.\n    - By the way, lunch options today were surprisingly good. Refactored the Customer Feedback Analysis module to improve clarity and maintainability.\n    - Investigated slow response times in the Customer Feedback Analysis component. As a side note, my cat jumped on my keyboard mid-call.\n    - Not related, but I saw a cool article on tech trends. Resolved a blocking bug in the Customer Feedback Analysis flow.\n\nMarketing Dashboard\n    - Implemented logging improvements for Marketing Dashboard. Not related, but I saw a cool article on tech trends.\n    - Fun fact: Friday is Hawaiian shirt day. Conducted peer review for pull requests affecting Marketing Dashboard.\n    - Investigated slow response times in the Marketing Dashboard component. Not related, but I saw a cool article on tech trends.\n\nContent Management Refactor\n    - Refactored the Content Management Refactor module to improve clarity and maintainability. On another note, I finally tried that new coffee place.\n    - On another note, I finally tried that new coffee place. Finalized the analytics hooks related to Content Management Refactor.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Christine Shields <vvasquez@gmail.com>\nTo: Cory Gutierrez <matthew94@hale.info>\nDate: 2025-03-22 23:01:03\nSubject: Daily Work Summary\n\nPlanned Activities:\nMarketing Dashboard\n    - As a side note, my cat jumped on my keyboard mid-call. Documented changes related to the Marketing Dashboard rollout.\n    - By the way, lunch options today were surprisingly good. Refactored the Marketing Dashboard module to improve clarity and maintainability.\n    - As a side note, my cat jumped on my keyboard mid-call. Revised error handling strategy in Marketing Dashboard to support fallback flows.\n    - Investigated slow response times in the Marketing Dashboard component. Not related, but I saw a cool article on tech trends.\n\nPayment Gateway Integration\n    - Finalized the analytics hooks related to Payment Gateway Integration. As a side note, my cat jumped on my keyboard mid-call.\n    - Investigated slow response times in the Payment Gateway Integration component. On another note, I finally tried that new coffee place.\n    - Coordinated with the design team to review the Payment Gateway Integration feature flow. P.S. It was raining heavily all morning.\n    - Refactored the Payment Gateway Integration module to improve clarity and maintainability. As a side note, my cat jumped on my keyboard mid-call.\n\nCI/CD Pipeline Update\n    - Investigated slow response times in the CI/CD Pipeline Update component. By the way, lunch options today were surprisingly good.\n    - Created unit tests for CI/CD Pipeline Update edge cases. Fun fact: Friday is Hawaiian shirt day.\n    - Finalized the analytics hooks related to CI/CD Pipeline Update. P.S. It was raining heavily all morning.\n    - By the way, lunch options today were surprisingly good. Resolved a blocking bug in the CI/CD Pipeline Update flow.\n\nCompleted Activities:\nCustomer Feedback Analysis\n    - Refactored the Customer Feedback Analysis module to improve clarity and maintainability. Fun fact: Friday is Hawaiian shirt day.\n    - On another note, I finally tried that new coffee place. Coordinated with the design team to review the Customer Feedback Analysis feature flow.\n    - By the way, lunch options today were surprisingly good. Refactored the Customer Feedback Analysis module to improve clarity and maintainability.\n    - Investigated slow response times in the Customer Feedback Analysis component. As a side note, my cat jumped on my keyboard mid-call.\n    - Not related, but I saw a cool article on tech trends. Resolved a blocking bug in the Customer Feedback Analysis flow.\n\nMarketing Dashboard\n    - Implemented logging improvements for Marketing Dashboard. Not related, but I saw a cool article on tech trends.\n    - Fun fact: Friday is Hawaiian shirt day. Conducted peer review for pull requests affecting Marketing Dashboard.\n    - Investigated slow response times in the Marketing Dashboard component. Not related, but I saw a cool article on tech trends.\n\nContent Management Refactor\n    - Refactored the Content Management Refactor module to improve clarity and maintainability. On another note, I finally tried that new coffee place.\n    - On another note, I finally tried that new coffee place. Finalized the analytics hooks related to Content Management Refactor.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Documented changes related to the Marketing Dashboard rollout\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Refactored the Marketing Dashboard module to improve clarity and maintainability\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Revised error handling strategy in Marketing Dashboard to support fallback flows\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Investigated slow response times in the Marketing Dashboard component\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finalized the analytics hooks related to Payment Gateway Integration\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Investigated slow response times in the Payment Gateway Integration component\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated with the design team to review the Payment Gateway Integration feature flow\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Refactored the Payment Gateway Integration module to improve clarity and maintainability\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Investigated slow response times in the CI/CD Pipeline Update component\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Created unit tests for CI/CD Pipeline Update edge cases\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finalized the analytics hooks related to CI/CD Pipeline Update\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Resolved a blocking bug in the CI/CD Pipeline Update flow\",\n        \"status\": \"Planned\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Refactored the Customer Feedback Analysis module to improve clarity and maintainability\",\n        \"status\": \"Completed\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated with the design team to review the Customer Feedback Analysis feature flow\",\n        \"status\": \"Completed\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Refactored the Customer Feedback Analysis module to improve clarity and maintainability\",\n        \"status\": \"Completed\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Investigated slow response times in the Customer Feedback Analysis component\",\n        \"status\": \"Completed\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Resolved a blocking bug in the Customer Feedback Analysis flow\",\n        \"status\": \"Completed\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Implemented logging improvements for Marketing Dashboard\",\n        \"status\": \"Completed\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Conducted peer review for pull requests affecting Marketing Dashboard\",\n        \"status\": \"Completed\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Refactored the Content Management Refactor module to improve clarity and maintainability\",\n        \"status\": \"Completed\",\n        \"employee\": \"Christine Shields\",\n        \"date\": \"2025-03-22\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Documented changes related to the Marketing Dashboard rollout",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Marketing Dashboard module to improve clarity and maintainability",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Revised error handling strategy in Marketing Dashboard to support fallback flows",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the Marketing Dashboard component",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finalized the analytics hooks related to Payment Gateway Integration",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the Payment Gateway Integration component",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Coordinated with the design team to review the Payment Gateway Integration feature flow",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Payment Gateway Integration module to improve clarity and maintainability",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the CI/CD Pipeline Update component",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Created unit tests for CI/CD Pipeline Update edge cases",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finalized the analytics hooks related to CI/CD Pipeline Update",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Resolved a blocking bug in the CI/CD Pipeline Update flow",
+      "status": "Planned",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Customer Feedback Analysis module to improve clarity and maintainability",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Customer Feedback Analysis",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Coordinated with the design team to review the Customer Feedback Analysis feature flow",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Customer Feedback Analysis",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Customer Feedback Analysis module to improve clarity and maintainability",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Customer Feedback Analysis",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the Customer Feedback Analysis component",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Customer Feedback Analysis",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Resolved a blocking bug in the Customer Feedback Analysis flow",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Customer Feedback Analysis",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Implemented logging improvements for Marketing Dashboard",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Conducted peer review for pull requests affecting Marketing Dashboard",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the Marketing Dashboard component",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Content Management Refactor module to improve clarity and maintainability",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finalized the analytics hooks related to Content Management Refactor",
+      "status": "Completed",
+      "employee": "Christine Shields",
+      "date": "2025-03-22",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

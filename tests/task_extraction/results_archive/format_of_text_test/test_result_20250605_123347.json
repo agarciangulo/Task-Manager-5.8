@@ -1,0 +1,242 @@
+{
+  "timestamp": "20250605_123347",
+  "input_text": "From: Kyle Owens <anita91@hudson-davis.org>\nTo: Kim Morgan <laura71@hotmail.com>\nDate: 2025-04-01 18:29:12\nSubject: Daily Work Summary\n\nPlanned Activities:\nCI/CD Pipeline Update\n    - Created unit tests for CI/CD Pipeline Update edge cases.\n    - Finalized the analytics hooks related to CI/CD Pipeline Update.\n    - Documented changes related to the CI/CD Pipeline Update rollout.\n\nUser Onboarding Redesign\n    - Coordinated with the design team to review the User Onboarding Redesign feature flow.\n    - Finalized the analytics hooks related to User Onboarding Redesign.\n    - Investigated slow response times in the User Onboarding Redesign component.\n    - Revised error handling strategy in User Onboarding Redesign to support fallback flows.\n\nMobile App Performance\n    - Revised error handling strategy in Mobile App Performance to support fallback flows.\n    - Implemented logging improvements for Mobile App Performance.\n    - Finalized the analytics hooks related to Mobile App Performance.\n    - Investigated slow response times in the Mobile App Performance component.\n    - Refactored the Mobile App Performance module to improve clarity and maintainability.\n\nCompleted Activities:\nMarketing Dashboard\n    - Conducted peer review for pull requests affecting Marketing Dashboard.\n    - Finalized the analytics hooks related to Marketing Dashboard.\n\nMobile App Performance\n    - Implemented logging improvements for Mobile App Performance.\n    - Conducted peer review for pull requests affecting Mobile App Performance.\n\nInternal API Cleanup\n    - Created unit tests for Internal API Cleanup edge cases.\n    - Resolved a blocking bug in the Internal API Cleanup flow.\n\nData Warehouse Migration\n    - Implemented logging improvements for Data Warehouse Migration.\n    - Documented changes related to the Data Warehouse Migration rollout.\n    - Revised error handling strategy in Data Warehouse Migration to support fallback flows.\n    - Refactored the Data Warehouse Migration module to improve clarity and maintainability.\n    - Resolved a blocking bug in the Data Warehouse Migration flow.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Kyle Owens <anita91@hudson-davis.org>\nTo: Kim Morgan <laura71@hotmail.com>\nDate: 2025-04-01 18:29:12\nSubject: Daily Work Summary\n\nPlanned Activities:\nCI/CD Pipeline Update\n    - Created unit tests for CI/CD Pipeline Update edge cases.\n    - Finalized the analytics hooks related to CI/CD Pipeline Update.\n    - Documented changes related to the CI/CD Pipeline Update rollout.\n\nUser Onboarding Redesign\n    - Coordinated with the design team to review the User Onboarding Redesign feature flow.\n    - Finalized the analytics hooks related to User Onboarding Redesign.\n    - Investigated slow response times in the User Onboarding Redesign component.\n    - Revised error handling strategy in User Onboarding Redesign to support fallback flows.\n\nMobile App Performance\n    - Revised error handling strategy in Mobile App Performance to support fallback flows.\n    - Implemented logging improvements for Mobile App Performance.\n    - Finalized the analytics hooks related to Mobile App Performance.\n    - Investigated slow response times in the Mobile App Performance component.\n    - Refactored the Mobile App Performance module to improve clarity and maintainability.\n\nCompleted Activities:\nMarketing Dashboard\n    - Conducted peer review for pull requests affecting Marketing Dashboard.\n    - Finalized the analytics hooks related to Marketing Dashboard.\n\nMobile App Performance\n    - Implemented logging improvements for Mobile App Performance.\n    - Conducted peer review for pull requests affecting Mobile App Performance.\n\nInternal API Cleanup\n    - Created unit tests for Internal API Cleanup edge cases.\n    - Resolved a blocking bug in the Internal API Cleanup flow.\n\nData Warehouse Migration\n    - Implemented logging improvements for Data Warehouse Migration.\n    - Documented changes related to the Data Warehouse Migration rollout.\n    - Revised error handling strategy in Data Warehouse Migration to support fallback flows.\n    - Refactored the Data Warehouse Migration module to improve clarity and maintainability.\n    - Resolved a blocking bug in the Data Warehouse Migration flow.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Created unit tests for CI/CD Pipeline Update edge cases\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finalized the analytics hooks related to CI/CD Pipeline Update\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Documented changes related to the CI/CD Pipeline Update rollout\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated with the design team to review the User Onboarding Redesign feature flow\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finalized the analytics hooks related to User Onboarding Redesign\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Investigated slow response times in the User Onboarding Redesign component\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Revised error handling strategy in User Onboarding Redesign to support fallback flows\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Revised error handling strategy in Mobile App Performance to support fallback flows\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Implemented logging improvements for Mobile App Performance\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finalized the analytics hooks related to Mobile App Performance\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Investigated slow response times in the Mobile App Performance component\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Refactored the Mobile App Performance module to improve clarity and maintainability\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Conducted peer review for pull requests affecting Marketing Dashboard\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Implemented logging improvements for Data Warehouse Migration\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Documented changes related to the Data Warehouse Migration rollout\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Revised error handling strategy in Data Warehouse Migration to support fallback flows\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Refactored the Data Warehouse Migration module to improve clarity and maintainability\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Resolved a blocking bug in the Data Warehouse Migration flow\",\n        \"status\": \"Completed\",\n        \"employee\": \"Kyle Owens\",\n        \"date\": \"2025-04-01\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Created unit tests for CI/CD Pipeline Update edge cases",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finalized the analytics hooks related to CI/CD Pipeline Update",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Documented changes related to the CI/CD Pipeline Update rollout",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Coordinated with the design team to review the User Onboarding Redesign feature flow",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finalized the analytics hooks related to User Onboarding Redesign",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the User Onboarding Redesign component",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Revised error handling strategy in User Onboarding Redesign to support fallback flows",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Revised error handling strategy in Mobile App Performance to support fallback flows",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Implemented logging improvements for Mobile App Performance",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finalized the analytics hooks related to Mobile App Performance",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Investigated slow response times in the Mobile App Performance component",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Mobile App Performance module to improve clarity and maintainability",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Conducted peer review for pull requests affecting Marketing Dashboard",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Implemented logging improvements for Data Warehouse Migration",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Documented changes related to the Data Warehouse Migration rollout",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Revised error handling strategy in Data Warehouse Migration to support fallback flows",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Refactored the Data Warehouse Migration module to improve clarity and maintainability",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Resolved a blocking bug in the Data Warehouse Migration flow",
+      "status": "Completed",
+      "employee": "Kyle Owens",
+      "date": "2025-04-01",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

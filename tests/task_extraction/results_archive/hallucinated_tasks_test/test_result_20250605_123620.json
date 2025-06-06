@@ -1,0 +1,73 @@
+{
+  "timestamp": "20250605_123620",
+  "input_text": "From: Sandra Ramirez <zwarren@hotmail.com>\nTo: Jessica Gonzales <serranorebecca@ruiz.net>\nDate: 2025-04-23 07:26:24\nSubject: Daily Work Summary\n\nPlanned Activities:\nAuthentication Revamp\n    - There\u2019s a lot of excitement surrounding authentication revamp, but nothing concrete to report yet.\n    - We are looking forward to seeing what happens next with authentication revamp.\n\nInternal API Cleanup\n    - The internal api cleanup project has been a topic of conversation lately.\n    - Various things were discussed, and we remain optimistic about internal api cleanup.\n\nCI/CD Pipeline Update\n    - We are looking forward to seeing what happens next with ci/cd pipeline update.\n    - The ci/cd pipeline update project has been a topic of conversation lately.\n\nCustomer Feedback Analysis\n    - There\u2019s a lot of excitement surrounding customer feedback analysis, but nothing concrete to report yet.\n    - There\u2019s a lot of excitement surrounding customer feedback analysis, but nothing concrete to report yet.\n    - The customer feedback analysis project has been a topic of conversation lately.\n    - There\u2019s a lot of excitement surrounding customer feedback analysis, but nothing concrete to report yet.\n    - The customer feedback analysis project has been a topic of conversation lately.\n\nCompleted Activities:\nContent Management Refactor\n    - Some brainstorming occurred around the content management refactor effort.\n    - We are looking forward to seeing what happens next with content management refactor.\n\nCI/CD Pipeline Update\n    - Some brainstorming occurred around the ci/cd pipeline update effort.\n    - Some brainstorming occurred around the ci/cd pipeline update effort.\n    - We are looking forward to seeing what happens next with ci/cd pipeline update.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Sandra Ramirez <zwarren@hotmail.com>\nTo: Jessica Gonzales <serranorebecca@ruiz.net>\nDate: 2025-04-23 07:26:24\nSubject: Daily Work Summary\n\nPlanned Activities:\nAuthentication Revamp\n    - There\u2019s a lot of excitement surrounding authentication revamp, but nothing concrete to report yet.\n    - We are looking forward to seeing what happens next with authentication revamp.\n\nInternal API Cleanup\n    - The internal api cleanup project has been a topic of conversation lately.\n    - Various things were discussed, and we remain optimistic about internal api cleanup.\n\nCI/CD Pipeline Update\n    - We are looking forward to seeing what happens next with ci/cd pipeline update.\n    - The ci/cd pipeline update project has been a topic of conversation lately.\n\nCustomer Feedback Analysis\n    - There\u2019s a lot of excitement surrounding customer feedback analysis, but nothing concrete to report yet.\n    - There\u2019s a lot of excitement surrounding customer feedback analysis, but nothing concrete to report yet.\n    - The customer feedback analysis project has been a topic of conversation lately.\n    - There\u2019s a lot of excitement surrounding customer feedback analysis, but nothing concrete to report yet.\n    - The customer feedback analysis project has been a topic of conversation lately.\n\nCompleted Activities:\nContent Management Refactor\n    - Some brainstorming occurred around the content management refactor effort.\n    - We are looking forward to seeing what happens next with content management refactor.\n\nCI/CD Pipeline Update\n    - Some brainstorming occurred around the ci/cd pipeline update effort.\n    - Some brainstorming occurred around the ci/cd pipeline update effort.\n    - We are looking forward to seeing what happens next with ci/cd pipeline update.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Authentication Revamp\",\n        \"status\": \"Pending\",\n        \"employee\": \"Sandra Ramirez\",\n        \"date\": \"2025-04-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the progress of the authentication revamp project?\"\n    },\n    {\n        \"task\": \"Internal API Cleanup\",\n        \"status\": \"Pending\",\n        \"employee\": \"Sandra Ramirez\",\n        \"date\": \"2025-04-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific actions have been taken for the internal API cleanup project?\"\n    },\n    {\n        \"task\": \"CI/CD Pipeline Update\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Sandra Ramirez\",\n        \"date\": \"2025-04-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What progress has been made on the CI/CD pipeline update project?\"\n    },\n    {\n        \"task\": \"Customer Feedback Analysis\",\n        \"status\": \"Pending\",\n        \"employee\": \"Sandra Ramirez\",\n        \"date\": \"2025-04-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the customer feedback analysis project?\"\n    },\n    {\n        \"task\": \"Content Management Refactor\",\n        \"status\": \"Pending\",\n        \"employee\": \"Sandra Ramirez\",\n        \"date\": \"2025-04-23\",\n        \"category\": \"General\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific actions were taken during the content management refactor brainstorming?\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Authentication Revamp",
+      "status": "Pending",
+      "employee": "Sandra Ramirez",
+      "date": "2025-04-23",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup",
+      "status": "Pending",
+      "employee": "Sandra Ramirez",
+      "date": "2025-04-23",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "CI/CD Pipeline Update",
+      "status": "Pending",
+      "employee": "Sandra Ramirez",
+      "date": "2025-04-23",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis",
+      "status": "Pending",
+      "employee": "Sandra Ramirez",
+      "date": "2025-04-23",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Content Management Refactor",
+      "status": "Pending",
+      "employee": "Sandra Ramirez",
+      "date": "2025-04-23",
+      "category": "General",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

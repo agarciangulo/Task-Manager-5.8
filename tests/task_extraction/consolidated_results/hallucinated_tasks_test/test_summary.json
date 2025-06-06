@@ -1,0 +1,85 @@
+{
+  "timestamp": "20250605_123720",
+  "tests_run": [
+    {
+      "input_file": "hallucinated_tasks_20.txt",
+      "output_file": "test_result_20250605_123401.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_19.txt",
+      "output_file": "test_result_20250605_123416.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_18.txt",
+      "output_file": "test_result_20250605_123428.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_8.txt",
+      "output_file": "test_result_20250605_123434.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_9.txt",
+      "output_file": "test_result_20250605_123440.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_2.txt",
+      "output_file": "test_result_20250605_123452.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_3.txt",
+      "output_file": "test_result_20250605_123503.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_1.txt",
+      "output_file": "test_result_20250605_123511.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_4.txt",
+      "output_file": "test_result_20250605_123523.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_5.txt",
+      "output_file": "test_result_20250605_123533.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_7.txt",
+      "output_file": "test_result_20250605_123549.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_6.txt",
+      "output_file": "test_result_20250605_123557.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_15.txt",
+      "output_file": "test_result_20250605_123605.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_14.txt",
+      "output_file": "test_result_20250605_123610.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_16.txt",
+      "output_file": "test_result_20250605_123620.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_17.txt",
+      "output_file": "test_result_20250605_123637.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_13.txt",
+      "output_file": "test_result_20250605_123644.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_12.txt",
+      "output_file": "test_result_20250605_123658.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_10.txt",
+      "output_file": "test_result_20250605_123709.json"
+    },
+    {
+      "input_file": "hallucinated_tasks_11.txt",
+      "output_file": "test_result_20250605_123720.json"
+    }
+  ]
+}

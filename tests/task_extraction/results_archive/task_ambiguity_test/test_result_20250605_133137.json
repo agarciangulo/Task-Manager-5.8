@@ -1,0 +1,411 @@
+{
+  "timestamp": "20250605_133137",
+  "input_text": "From: Joseph Powell <williamsjohn@stevens.com>\nTo: Paul Smith <jrichardson@byrd.info>\nDate: 2025-05-18 11:36:19\nSubject: Daily Work Summary\n\nPlanned Activities:\nMobile App Performance\n    - Handled multiple things for Mobile App Performance.\n    - Continued efforts around Mobile App Performance.\n    - Wrapped up some aspects of Mobile App Performance.\n    - Followed up on the earlier discussion about Mobile App Performance.\n\nMarketing Dashboard\n    - Handled multiple things for Marketing Dashboard.\n    - Addressed concerns mentioned in the last meeting about Marketing Dashboard.\n\nInternal API Cleanup\n    - Looked into the open issues related to Internal API Cleanup.\n    - Synchronized with team on updates related to Internal API Cleanup.\n    - Handled multiple things for Internal API Cleanup.\n    - Wrapped up some aspects of Internal API Cleanup.\n\nAuthentication Revamp\n    - Handled multiple things for Authentication Revamp.\n    - Followed up on the earlier discussion about Authentication Revamp.\n    - Ongoing collaboration with other teams on Authentication Revamp.\n    - Looked into the open issues related to Authentication Revamp.\n    - Continued efforts around Authentication Revamp.\n\nCompleted Activities:\nCI/CD Pipeline Update\n    - Continued efforts around CI/CD Pipeline Update.\n    - Addressed concerns mentioned in the last meeting about CI/CD Pipeline Update.\n    - Ongoing collaboration with other teams on CI/CD Pipeline Update.\n\nMobile App Performance\n    - Looked into the open issues related to Mobile App Performance.\n    - Synchronized with team on updates related to Mobile App Performance.\n\nInternal API Cleanup\n    - Looked into the open issues related to Internal API Cleanup.\n    - Wrapped up some aspects of Internal API Cleanup.\n    - Continued efforts around Internal API Cleanup.\n    - Followed up on the earlier discussion about Internal API Cleanup.\n    - Worked on various subtasks of Internal API Cleanup.\n\nUser Onboarding Redesign\n    - Synchronized with team on updates related to User Onboarding Redesign.\n    - Made some progress regarding User Onboarding Redesign.\n    - Worked on various subtasks of User Onboarding Redesign.\n    - Handled multiple things for User Onboarding Redesign.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Joseph Powell <williamsjohn@stevens.com>\nTo: Paul Smith <jrichardson@byrd.info>\nDate: 2025-05-18 11:36:19\nSubject: Daily Work Summary\n\nPlanned Activities:\nMobile App Performance\n    - Handled multiple things for Mobile App Performance.\n    - Continued efforts around Mobile App Performance.\n    - Wrapped up some aspects of Mobile App Performance.\n    - Followed up on the earlier discussion about Mobile App Performance.\n\nMarketing Dashboard\n    - Handled multiple things for Marketing Dashboard.\n    - Addressed concerns mentioned in the last meeting about Marketing Dashboard.\n\nInternal API Cleanup\n    - Looked into the open issues related to Internal API Cleanup.\n    - Synchronized with team on updates related to Internal API Cleanup.\n    - Handled multiple things for Internal API Cleanup.\n    - Wrapped up some aspects of Internal API Cleanup.\n\nAuthentication Revamp\n    - Handled multiple things for Authentication Revamp.\n    - Followed up on the earlier discussion about Authentication Revamp.\n    - Ongoing collaboration with other teams on Authentication Revamp.\n    - Looked into the open issues related to Authentication Revamp.\n    - Continued efforts around Authentication Revamp.\n\nCompleted Activities:\nCI/CD Pipeline Update\n    - Continued efforts around CI/CD Pipeline Update.\n    - Addressed concerns mentioned in the last meeting about CI/CD Pipeline Update.\n    - Ongoing collaboration with other teams on CI/CD Pipeline Update.\n\nMobile App Performance\n    - Looked into the open issues related to Mobile App Performance.\n    - Synchronized with team on updates related to Mobile App Performance.\n\nInternal API Cleanup\n    - Looked into the open issues related to Internal API Cleanup.\n    - Wrapped up some aspects of Internal API Cleanup.\n    - Continued efforts around Internal API Cleanup.\n    - Followed up on the earlier discussion about Internal API Cleanup.\n    - Worked on various subtasks of Internal API Cleanup.\n\nUser Onboarding Redesign\n    - Synchronized with team on updates related to User Onboarding Redesign.\n    - Made some progress regarding User Onboarding Redesign.\n    - Worked on various subtasks of User Onboarding Redesign.\n    - Handled multiple things for User Onboarding Redesign.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Handled multiple things for Mobile App Performance\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Continued efforts around Mobile App Performance\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Wrapped up some aspects of Mobile App Performance\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Followed up on the earlier discussion about Mobile App Performance\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Handled multiple things for Marketing Dashboard\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Addressed concerns mentioned in the last meeting about Marketing Dashboard\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Looked into the open issues related to Internal API Cleanup\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Synchronized with team on updates related to Internal API Cleanup\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Wrapped up some aspects of Internal API Cleanup\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Handled multiple things for Internal API Cleanup\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Handled multiple things for Authentication Revamp\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Followed up on the earlier discussion about Authentication Revamp\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Ongoing collaboration with other teams on Authentication Revamp\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Looked into the open issues related to Authentication Revamp\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Continued efforts around Authentication Revamp\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Continued efforts around CI/CD Pipeline Update\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Addressed concerns mentioned in the last meeting about CI/CD Pipeline Update\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Synchronized with team on updates related to User Onboarding Redesign\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Made some progress regarding User Onboarding Redesign\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Worked on various subtasks of User Onboarding Redesign\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Handled multiple things for User Onboarding Redesign\",\n        \"status\": \"Completed\",\n        \"employee\": \"Joseph Powell\",\n        \"date\": \"2025-05-18\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Handled multiple things for Mobile App Performance",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "Could you specify what tasks specifically you handled for Mobile App Performance?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Continued efforts around Mobile App Performance",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What specific work have you done recently for Mobile App Performance?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up some aspects of Mobile App Performance",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What specific aspects did you wrap up for Mobile App Performance?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Followed up on the earlier discussion about Mobile App Performance",
+      "status": "Pending",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What were the outcomes or decisions from the earlier discussion about Mobile App Performance?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled multiple things for Marketing Dashboard",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Marketing Dashboard",
+      "needs_description": true,
+      "suggested_question": "Could you specify what tasks specifically you handled for Marketing Dashboard?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Addressed concerns mentioned in the last meeting about Marketing Dashboard",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Marketing Dashboard",
+      "needs_description": true,
+      "suggested_question": "What concerns were addressed from the last meeting about Marketing Dashboard?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Looked into the open issues related to Internal API Cleanup",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What were the findings or updates on the open issues related to Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Synchronized with team on updates related to Internal API Cleanup",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What updates were shared with the team regarding Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up some aspects of Internal API Cleanup",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific aspects did you wrap up for Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled multiple things for Internal API Cleanup",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "Could you specify what tasks specifically you handled for Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Followed up on the earlier discussion about Internal API Cleanup",
+      "status": "Pending",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What were the outcomes or decisions from the earlier discussion about Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Worked on various subtasks of Internal API Cleanup",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific subtasks have you been working on for Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled multiple things for Authentication Revamp",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "Could you specify what tasks specifically you handled for Authentication Revamp?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Followed up on the earlier discussion about Authentication Revamp",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What were the outcomes or decisions from the earlier discussion about Authentication Revamp?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Ongoing collaboration with other teams on Authentication Revamp",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What specific collaboration efforts are ongoing with other teams for Authentication Revamp?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Looked into the open issues related to Authentication Revamp",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What were the findings or updates on the open issues related to Authentication Revamp?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Continued efforts around Authentication Revamp",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What specific work have you done recently for Authentication Revamp?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Continued efforts around CI/CD Pipeline Update",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": true,
+      "suggested_question": "What specific work have you done recently for CI/CD Pipeline Update?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Addressed concerns mentioned in the last meeting about CI/CD Pipeline Update",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": true,
+      "suggested_question": "What concerns were addressed from the last meeting about CI/CD Pipeline Update?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Ongoing collaboration with other teams on CI/CD Pipeline Update",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": true,
+      "suggested_question": "What specific collaboration efforts are ongoing with other teams for CI/CD Pipeline Update?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Looked into the open issues related to Mobile App Performance",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What were the findings or updates on the open issues related to Mobile App Performance?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Synchronized with team on updates related to Mobile App Performance",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What updates were shared with the team regarding Mobile App Performance?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Looked into the open issues related to Internal API Cleanup",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What were the findings or updates on the open issues related to Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Wrapped up some aspects of Internal API Cleanup",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific aspects did you wrap up for Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Continued efforts around Internal API Cleanup",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific work have you done recently for Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Followed up on the earlier discussion about Internal API Cleanup",
+      "status": "Pending",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What were the outcomes or decisions from the earlier discussion about Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Worked on various subtasks of Internal API Cleanup",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific subtasks have you been working on for Internal API Cleanup?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Synchronized with team on updates related to User Onboarding Redesign",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What updates were shared with the team regarding User Onboarding Redesign?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Made some progress regarding User Onboarding Redesign",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What specific progress have you made regarding User Onboarding Redesign?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Worked on various subtasks of User Onboarding Redesign",
+      "status": "In Progress",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What specific subtasks have you been working on for User Onboarding Redesign?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Handled multiple things for User Onboarding Redesign",
+      "status": "Completed",
+      "employee": "Joseph Powell",
+      "date": "2025-05-18",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "Could you specify what tasks specifically you handled for User Onboarding Redesign?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

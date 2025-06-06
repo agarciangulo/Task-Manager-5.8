@@ -1,9 +1,9 @@
 import json
 import os
+import argparse
 from datetime import datetime
 
-def consolidate_results():
-    results_dir = "tests/task_extraction/results"
+def consolidate_results(results_dir):
     consolidated = {
         "consolidated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "results": []
@@ -35,4 +35,7 @@ def consolidate_results():
     print("Summary file (test_summary.json) was left unchanged.")
 
 if __name__ == "__main__":
-    consolidate_results() 
+    parser = argparse.ArgumentParser(description='Consolidate JSON result files into a single file.')
+    parser.add_argument('--input_dir', type=str, default="tests/task_extraction/results", help='Directory containing JSON result files')
+    args = parser.parse_args()
+    consolidate_results(args.input_dir) 

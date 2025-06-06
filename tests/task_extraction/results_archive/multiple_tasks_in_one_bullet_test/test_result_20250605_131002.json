@@ -1,0 +1,489 @@
+{
+  "timestamp": "20250605_131002",
+  "input_text": "From: Maria Morales <ohughes@yahoo.com>\nTo: Karl Wilson <tracy63@wright.net>\nDate: 2025-02-21 21:35:52\nSubject: Daily Work Summary\n\nPlanned Activities:\nUser Onboarding Redesign\n    - coordinated the user stories, finalized the deployment steps, and clarified the user stories for the user onboarding redesign project.\n    - finalized the feedback, coordinated the requirements, and clarified the feedback for the user onboarding redesign project.\n\nMarketing Dashboard\n    - documented the requirements, finalized the feedback, and clarified the UI changes for the marketing dashboard project.\n    - documented the data issues, Reviewed the UI changes, and documented the UI changes for the marketing dashboard project.\n    - updated the UI changes, tested the feedback, and Reviewed the feedback for the marketing dashboard project.\n    - documented the data issues, clarified the deployment steps, and documented the user stories for the marketing dashboard project.\n\nCI/CD Pipeline Update\n    - documented the deployment steps, coordinated the UI changes, and discussed the user stories for the ci/cd pipeline update project.\n    - finalized the user stories, documented the data issues, and Reviewed the user stories for the ci/cd pipeline update project.\n    - discussed the requirements, clarified the user stories, and finalized the requirements for the ci/cd pipeline update project.\n    - updated the requirements, tested the deployment steps, and clarified the feedback for the ci/cd pipeline update project.\n    - clarified the feedback, discussed the feedback, and clarified the deployment steps for the ci/cd pipeline update project.\n\nAuthentication Revamp\n    - discussed the user stories, documented the UI changes, and coordinated the data issues for the authentication revamp project.\n    - documented the UI changes, finalized the data issues, and discussed the deployment steps for the authentication revamp project.\n    - finalized the feedback, clarified the requirements, and updated the data issues for the authentication revamp project.\n    - updated the deployment steps, discussed the user stories, and documented the user stories for the authentication revamp project.\n\nPayment Gateway Integration\n    - updated the data issues, finalized the data issues, and Reviewed the requirements for the payment gateway integration project.\n    - documented the requirements, updated the data issues, and discussed the requirements for the payment gateway integration project.\n    - updated the user stories, finalized the requirements, and tested the data issues for the payment gateway integration project.\n    - Reviewed the feedback, tested the user stories, and updated the requirements for the payment gateway integration project.\n    - tested the user stories, discussed the data issues, and updated the requirements for the payment gateway integration project.\n\nCompleted Activities:\nMobile App Performance\n    - Reviewed the feedback, documented the data issues, and Reviewed the UI changes for the mobile app performance project.\n    - updated the feedback, clarified the UI changes, and clarified the deployment steps for the mobile app performance project.\n    - documented the deployment steps, Reviewed the deployment steps, and finalized the data issues for the mobile app performance project.\n\nMarketing Dashboard\n    - updated the requirements, updated the user stories, and updated the feedback for the marketing dashboard project.\n    - Reviewed the data issues, documented the user stories, and documented the requirements for the marketing dashboard project.\n    - Reviewed the feedback, updated the feedback, and tested the data issues for the marketing dashboard project.\n    - clarified the user stories, documented the requirements, and documented the data issues for the marketing dashboard project.\n    - Reviewed the data issues, documented the requirements, and documented the deployment steps for the marketing dashboard project.\n\nAuthentication Revamp\n    - discussed the user stories, Reviewed the deployment steps, and finalized the data issues for the authentication revamp project.\n    - documented the requirements, updated the feedback, and Reviewed the feedback for the authentication revamp project.\n    - coordinated the data issues, tested the requirements, and documented the requirements for the authentication revamp project.\n\nUser Onboarding Redesign\n    - coordinated the requirements, discussed the feedback, and updated the requirements for the user onboarding redesign project.\n    - documented the deployment steps, Reviewed the user stories, and coordinated the user stories for the user onboarding redesign project.\n    - discussed the feedback, tested the requirements, and Reviewed the data issues for the user onboarding redesign project.\n\nContent Management Refactor\n    - tested the feedback, discussed the user stories, and Reviewed the requirements for the content management refactor project.\n    - discussed the requirements, tested the UI changes, and updated the user stories for the content management refactor project.\n    - Reviewed the data issues, updated the feedback, and tested the data issues for the content management refactor project.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Maria Morales <ohughes@yahoo.com>\nTo: Karl Wilson <tracy63@wright.net>\nDate: 2025-02-21 21:35:52\nSubject: Daily Work Summary\n\nPlanned Activities:\nUser Onboarding Redesign\n    - coordinated the user stories, finalized the deployment steps, and clarified the user stories for the user onboarding redesign project.\n    - finalized the feedback, coordinated the requirements, and clarified the feedback for the user onboarding redesign project.\n\nMarketing Dashboard\n    - documented the requirements, finalized the feedback, and clarified the UI changes for the marketing dashboard project.\n    - documented the data issues, Reviewed the UI changes, and documented the UI changes for the marketing dashboard project.\n    - updated the UI changes, tested the feedback, and Reviewed the feedback for the marketing dashboard project.\n    - documented the data issues, clarified the deployment steps, and documented the user stories for the marketing dashboard project.\n\nCI/CD Pipeline Update\n    - documented the deployment steps, coordinated the UI changes, and discussed the user stories for the ci/cd pipeline update project.\n    - finalized the user stories, documented the data issues, and Reviewed the user stories for the ci/cd pipeline update project.\n    - discussed the requirements, clarified the user stories, and finalized the requirements for the ci/cd pipeline update project.\n    - updated the requirements, tested the deployment steps, and clarified the feedback for the ci/cd pipeline update project.\n    - clarified the feedback, discussed the feedback, and clarified the deployment steps for the ci/cd pipeline update project.\n\nAuthentication Revamp\n    - discussed the user stories, documented the UI changes, and coordinated the data issues for the authentication revamp project.\n    - documented the UI changes, finalized the data issues, and discussed the deployment steps for the authentication revamp project.\n    - finalized the feedback, clarified the requirements, and updated the data issues for the authentication revamp project.\n    - updated the deployment steps, discussed the user stories, and documented the user stories for the authentication revamp project.\n\nPayment Gateway Integration\n    - updated the data issues, finalized the data issues, and Reviewed the requirements for the payment gateway integration project.\n    - documented the requirements, updated the data issues, and discussed the requirements for the payment gateway integration project.\n    - updated the user stories, finalized the requirements, and tested the data issues for the payment gateway integration project.\n    - Reviewed the feedback, tested the user stories, and updated the requirements for the payment gateway integration project.\n    - tested the user stories, discussed the data issues, and updated the requirements for the payment gateway integration project.\n\nCompleted Activities:\nMobile App Performance\n    - Reviewed the feedback, documented the data issues, and Reviewed the UI changes for the mobile app performance project.\n    - updated the feedback, clarified the UI changes, and clarified the deployment steps for the mobile app performance project.\n    - documented the deployment steps, Reviewed the deployment steps, and finalized the data issues for the mobile app performance project.\n\nMarketing Dashboard\n    - updated the requirements, updated the user stories, and updated the feedback for the marketing dashboard project.\n    - Reviewed the data issues, documented the user stories, and documented the requirements for the marketing dashboard project.\n    - Reviewed the feedback, updated the feedback, and tested the data issues for the marketing dashboard project.\n    - clarified the user stories, documented the requirements, and documented the data issues for the marketing dashboard project.\n    - Reviewed the data issues, documented the requirements, and documented the deployment steps for the marketing dashboard project.\n\nAuthentication Revamp\n    - discussed the user stories, Reviewed the deployment steps, and finalized the data issues for the authentication revamp project.\n    - documented the requirements, updated the feedback, and Reviewed the feedback for the authentication revamp project.\n    - coordinated the data issues, tested the requirements, and documented the requirements for the authentication revamp project.\n\nUser Onboarding Redesign\n    - coordinated the requirements, discussed the feedback, and updated the requirements for the user onboarding redesign project.\n    - documented the deployment steps, Reviewed the user stories, and coordinated the user stories for the user onboarding redesign project.\n    - discussed the feedback, tested the requirements, and Reviewed the data issues for the user onboarding redesign project.\n\nContent Management Refactor\n    - tested the feedback, discussed the user stories, and Reviewed the requirements for the content management refactor project.\n    - discussed the requirements, tested the UI changes, and updated the user stories for the content management refactor project.\n    - Reviewed the data issues, updated the feedback, and tested the data issues for the content management refactor project.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"coordinated the user stories, finalized the deployment steps, and clarified the user stories for the user onboarding redesign project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"finalized the feedback, coordinated the requirements, and clarified the feedback for the user onboarding redesign project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the requirements, finalized the feedback, and clarified the UI changes for the marketing dashboard project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the data issues, Reviewed the UI changes, and documented the UI changes for the marketing dashboard project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the UI changes, tested the feedback, and Reviewed the feedback for the marketing dashboard project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the data issues, clarified the deployment steps, and documented the user stories for the marketing dashboard project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the deployment steps, coordinated the UI changes, and discussed the user stories for the ci/cd pipeline update project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"finalized the user stories, documented the data issues, and Reviewed the user stories for the ci/cd pipeline update project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the requirements, clarified the user stories, and finalized the requirements for the ci/cd pipeline update project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the requirements, tested the deployment steps, and clarified the feedback for the ci/cd pipeline update project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"clarified the feedback, discussed the feedback, and clarified the deployment steps for the ci/cd pipeline update project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the user stories, documented the UI changes, and coordinated the data issues for the authentication revamp project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the UI changes, finalized the data issues, and discussed the deployment steps for the authentication revamp project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"finalized the feedback, clarified the requirements, and updated the data issues for the authentication revamp project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the deployment steps, discussed the user stories, and documented the user stories for the authentication revamp project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the data issues, finalized the data issues, and Reviewed the requirements for the payment gateway integration project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the requirements, updated the data issues, and discussed the requirements for the payment gateway integration project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the user stories, finalized the requirements, and tested the data issues for the payment gateway integration project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the feedback, tested the user stories, and updated the requirements for the payment gateway integration project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"tested the user stories, discussed the data issues, and updated the requirements for the payment gateway integration project\",\n        \"status\": \"Pending\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the feedback, documented the data issues, and Reviewed the UI changes for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the feedback, clarified the UI changes, and clarified the deployment steps for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the deployment steps, Reviewed the deployment steps, and finalized the data issues for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"updated the requirements, updated the user stories, and updated the feedback for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the data issues, documented the user stories, and documented the requirements for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the feedback, updated the feedback, and tested the data issues for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"clarified the user stories, documented the requirements, and documented the data issues for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the data issues, documented the requirements, and documented the deployment steps for the marketing dashboard project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Marketing Dashboard\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the user stories, Reviewed the deployment steps, and finalized the data issues for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the requirements, updated the feedback, and Reviewed the feedback for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the data issues, tested the requirements, and documented the requirements for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the requirements, discussed the feedback, and updated the requirements for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"documented the deployment steps, Reviewed the user stories, and coordinated the user stories for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the feedback, tested the requirements, and Reviewed the data issues for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"tested the feedback, discussed the user stories, and Reviewed the requirements for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"discussed the requirements, tested the UI changes, and updated the user stories for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the data issues, updated the feedback, and tested the data issues for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Maria Morales\",\n        \"date\": \"2025-02-21\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "coordinated the user stories, finalized the deployment steps, and clarified the user stories for the user onboarding redesign project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "finalized the feedback, coordinated the requirements, and clarified the feedback for the user onboarding redesign project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the requirements, finalized the feedback, and clarified the UI changes for the marketing dashboard project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the data issues, Reviewed the UI changes, and documented the UI changes for the marketing dashboard project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the UI changes, tested the feedback, and Reviewed the feedback for the marketing dashboard project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the data issues, clarified the deployment steps, and documented the user stories for the marketing dashboard project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the deployment steps, coordinated the UI changes, and discussed the user stories for the ci/cd pipeline update project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "finalized the user stories, documented the data issues, and Reviewed the user stories for the ci/cd pipeline update project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the requirements, clarified the user stories, and finalized the requirements for the ci/cd pipeline update project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the requirements, tested the deployment steps, and clarified the feedback for the ci/cd pipeline update project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "clarified the feedback, discussed the feedback, and clarified the deployment steps for the ci/cd pipeline update project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the user stories, documented the UI changes, and coordinated the data issues for the authentication revamp project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the UI changes, finalized the data issues, and discussed the deployment steps for the authentication revamp project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "finalized the feedback, clarified the requirements, and updated the data issues for the authentication revamp project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the deployment steps, discussed the user stories, and documented the user stories for the authentication revamp project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the data issues, finalized the data issues, and Reviewed the requirements for the payment gateway integration project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the requirements, updated the data issues, and discussed the requirements for the payment gateway integration project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the user stories, finalized the requirements, and tested the data issues for the payment gateway integration project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the feedback, tested the user stories, and updated the requirements for the payment gateway integration project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "tested the user stories, discussed the data issues, and updated the requirements for the payment gateway integration project",
+      "status": "Planned",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the feedback, documented the data issues, and Reviewed the UI changes for the mobile app performance project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the feedback, clarified the UI changes, and clarified the deployment steps for the mobile app performance project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the deployment steps, Reviewed the deployment steps, and finalized the data issues for the mobile app performance project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Mobile App Performance",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the requirements, updated the user stories, and updated the feedback for the marketing dashboard project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the data issues, documented the user stories, and documented the requirements for the marketing dashboard project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the feedback, updated the feedback, and tested the data issues for the marketing dashboard project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "clarified the user stories, documented the requirements, and documented the data issues for the marketing dashboard project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the data issues, documented the requirements, and documented the deployment steps for the marketing dashboard project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Marketing Dashboard",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the user stories, Reviewed the deployment steps, and finalized the data issues for the authentication revamp project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the requirements, updated the feedback, and Reviewed the feedback for the authentication revamp project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the data issues, tested the requirements, and documented the requirements for the authentication revamp project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the requirements, discussed the feedback, and updated the requirements for the user onboarding redesign project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the deployment steps, Reviewed the user stories, and coordinated the user stories for the user onboarding redesign project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the feedback, tested the requirements, and Reviewed the data issues for the user onboarding redesign project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "User Onboarding Redesign",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "tested the feedback, discussed the user stories, and Reviewed the requirements for the content management refactor project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the requirements, tested the UI changes, and updated the user stories for the content management refactor project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the data issues, updated the feedback, and tested the data issues for the content management refactor project",
+      "status": "Completed",
+      "employee": "Maria Morales",
+      "date": "2025-02-21",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "timestamp": "20250605_131455",
+  "input_text": "From: James Phillips <laura14@hotmail.com>\nTo: David Chang <michaelhuffman@hotmail.com>\nDate: 2025-04-06 09:42:18\nSubject: Daily Work Summary\n\nPlanned Activities:\nContent Management Refactor\n    - Reviewed the UI changes, finalized the requirements, and tested the deployment steps for the content management refactor project.\n    - coordinated the data issues, discussed the data issues, and coordinated the requirements for the content management refactor project.\n    - tested the feedback, tested the deployment steps, and finalized the data issues for the content management refactor project.\n    - clarified the deployment steps, finalized the deployment steps, and documented the requirements for the content management refactor project.\n\nCI/CD Pipeline Update\n    - Reviewed the data issues, coordinated the deployment steps, and discussed the deployment steps for the ci/cd pipeline update project.\n    - Reviewed the feedback, documented the UI changes, and tested the requirements for the ci/cd pipeline update project.\n    - tested the feedback, Reviewed the UI changes, and documented the user stories for the ci/cd pipeline update project.\n\nCompleted Activities:\nCI/CD Pipeline Update\n    - tested the user stories, coordinated the requirements, and tested the requirements for the ci/cd pipeline update project.\n    - clarified the user stories, documented the requirements, and discussed the feedback for the ci/cd pipeline update project.\n    - Reviewed the data issues, finalized the user stories, and Reviewed the data issues for the ci/cd pipeline update project.\n    - finalized the feedback, coordinated the user stories, and coordinated the user stories for the ci/cd pipeline update project.\n    - discussed the data issues, coordinated the requirements, and coordinated the deployment steps for the ci/cd pipeline update project.\n\nPayment Gateway Integration\n    - documented the deployment steps, Reviewed the data issues, and finalized the data issues for the payment gateway integration project.\n    - clarified the requirements, coordinated the user stories, and clarified the requirements for the payment gateway integration project.\n\nData Warehouse Migration\n    - clarified the feedback, updated the user stories, and discussed the UI changes for the data warehouse migration project.\n    - documented the feedback, discussed the user stories, and clarified the data issues for the data warehouse migration project.\n\nContent Management Refactor\n    - discussed the data issues, finalized the feedback, and Reviewed the UI changes for the content management refactor project.\n    - discussed the deployment steps, Reviewed the feedback, and coordinated the deployment steps for the content management refactor project.\n\nInternal API Cleanup\n    - clarified the UI changes, tested the deployment steps, and Reviewed the user stories for the internal api cleanup project.\n    - coordinated the feedback, updated the UI changes, and finalized the user stories for the internal api cleanup project.\n    - clarified the UI changes, coordinated the UI changes, and discussed the requirements for the internal api cleanup project.\n    - Reviewed the feedback, clarified the requirements, and discussed the requirements for the internal api cleanup project.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: James Phillips <laura14@hotmail.com>\nTo: David Chang <michaelhuffman@hotmail.com>\nDate: 2025-04-06 09:42:18\nSubject: Daily Work Summary\n\nPlanned Activities:\nContent Management Refactor\n    - Reviewed the UI changes, finalized the requirements, and tested the deployment steps for the content management refactor project.\n    - coordinated the data issues, discussed the data issues, and coordinated the requirements for the content management refactor project.\n    - tested the feedback, tested the deployment steps, and finalized the data issues for the content management refactor project.\n    - clarified the deployment steps, finalized the deployment steps, and documented the requirements for the content management refactor project.\n\nCI/CD Pipeline Update\n    - Reviewed the data issues, coordinated the deployment steps, and discussed the deployment steps for the ci/cd pipeline update project.\n    - Reviewed the feedback, documented the UI changes, and tested the requirements for the ci/cd pipeline update project.\n    - tested the feedback, Reviewed the UI changes, and documented the user stories for the ci/cd pipeline update project.\n\nCompleted Activities:\nCI/CD Pipeline Update\n    - tested the user stories, coordinated the requirements, and tested the requirements for the ci/cd pipeline update project.\n    - clarified the user stories, documented the requirements, and discussed the feedback for the ci/cd pipeline update project.\n    - Reviewed the data issues, finalized the user stories, and Reviewed the data issues for the ci/cd pipeline update project.\n    - finalized the feedback, coordinated the user stories, and coordinated the user stories for the ci/cd pipeline update project.\n    - discussed the data issues, coordinated the requirements, and coordinated the deployment steps for the ci/cd pipeline update project.\n\nPayment Gateway Integration\n    - documented the deployment steps, Reviewed the data issues, and finalized the data issues for the payment gateway integration project.\n    - clarified the requirements, coordinated the user stories, and clarified the requirements for the payment gateway integration project.\n\nData Warehouse Migration\n    - clarified the feedback, updated the user stories, and discussed the UI changes for the data warehouse migration project.\n    - documented the feedback, discussed the user stories, and clarified the data issues for the data warehouse migration project.\n\nContent Management Refactor\n    - discussed the data issues, finalized the feedback, and Reviewed the UI changes for the content management refactor project.\n    - discussed the deployment steps, Reviewed the feedback, and coordinated the deployment steps for the content management refactor project.\n\nInternal API Cleanup\n    - clarified the UI changes, tested the deployment steps, and Reviewed the user stories for the internal api cleanup project.\n    - coordinated the feedback, updated the UI changes, and finalized the user stories for the internal api cleanup project.\n    - clarified the UI changes, coordinated the UI changes, and discussed the requirements for the internal api cleanup project.\n    - Reviewed the feedback, clarified the requirements, and discussed the requirements for the internal api cleanup project.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Reviewed the UI changes, finalized the requirements, and tested the deployment steps for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated the data issues, discussed the data issues, and coordinated the requirements for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Tested the feedback, tested the deployment steps, and finalized the data issues for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the deployment steps, finalized the deployment steps, and documented the requirements for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the data issues, coordinated the deployment steps, and discussed the deployment steps for the CI/CD pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the feedback, documented the UI changes, and tested the requirements for the CI/CD pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Tested the feedback, reviewed the UI changes, and documented the user stories for the CI/CD pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Tested the user stories, coordinated the requirements, and tested the requirements for the CI/CD pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the user stories, documented the requirements, and discussed the feedback for the CI/CD pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the data issues, finalized the user stories, and reviewed the data issues for the CI/CD pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finalized the feedback, coordinated the user stories, and coordinated the user stories for the CI/CD pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the data issues, coordinated the requirements, and coordinated the deployment steps for the CI/CD pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Documented the deployment steps, reviewed the data issues, and finalized the data issues for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the requirements, coordinated the user stories, and clarified the requirements for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the feedback, updated the user stories, and discussed the UI changes for the data warehouse migration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Documented the feedback, discussed the user stories, and clarified the data issues for the data warehouse migration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the data issues, finalized the feedback, and reviewed the UI changes for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the deployment steps, reviewed the feedback, and coordinated the deployment steps for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the UI changes, tested the deployment steps, and reviewed the user stories for the internal API cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated the feedback, updated the UI changes, and finalized the user stories for the internal API cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the UI changes, coordinated the UI changes, and discussed the requirements for the internal API cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the feedback, clarified the requirements, and discussed the requirements for the internal API cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"James Phillips\",\n        \"date\": \"2025-04-06\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Reviewed the UI changes, finalized the requirements, and tested the deployment steps for the content management refactor project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Coordinated the data issues, discussed the data issues, and coordinated the requirements for the content management refactor project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tested the feedback, tested the deployment steps, and finalized the data issues for the content management refactor project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Clarified the deployment steps, finalized the deployment steps, and documented the requirements for the content management refactor project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the data issues, coordinated the deployment steps, and discussed the deployment steps for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the feedback, documented the UI changes, and tested the requirements for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tested the feedback, Reviewed the UI changes, and documented the user stories for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Tested the user stories, coordinated the requirements, and tested the requirements for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Clarified the user stories, documented the requirements, and discussed the feedback for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the data issues, finalized the user stories, and Reviewed the data issues for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Finalized the feedback, coordinated the user stories, and coordinated the user stories for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Discussed the data issues, coordinated the requirements, and coordinated the deployment steps for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Documented the deployment steps, Reviewed the data issues, and finalized the data issues for the payment gateway integration project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Clarified the requirements, coordinated the user stories, and clarified the requirements for the payment gateway integration project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Clarified the feedback, updated the user stories, and discussed the UI changes for the data warehouse migration project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Documented the feedback, discussed the user stories, and clarified the data issues for the data warehouse migration project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Data Warehouse Migration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Discussed the data issues, finalized the feedback, and Reviewed the UI changes for the content management refactor project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Discussed the deployment steps, Reviewed the feedback, and coordinated the deployment steps for the content management refactor project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Clarified the UI changes, tested the deployment steps, and Reviewed the user stories for the internal api cleanup project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Internal API Cleanup",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Coordinated the feedback, updated the UI changes, and finalized the user stories for the internal api cleanup project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Internal API Cleanup",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Clarified the UI changes, coordinated the UI changes, and discussed the requirements for the internal api cleanup project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Internal API Cleanup",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the feedback, clarified the requirements, and discussed the requirements for the internal api cleanup project",
+      "status": "Completed",
+      "employee": "James Phillips",
+      "date": "2025-04-06",
+      "category": "Internal API Cleanup",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+From: Kim Perkins <anna92@cervantes.org>
+To: Chris Perez <daniel25@weber.biz>
+Date: 2025-05-01 14:18:40
+Subject: Daily Work Summary
+
+Planned Activities:
+Marketing Dashboard
+    - updated the UI changes, discussed the deployment steps, and discussed the user stories for the marketing dashboard project.
+    - clarified the UI changes, discussed the data issues, and discussed the deployment steps for the marketing dashboard project.
+
+CI/CD Pipeline Update
+    - documented the UI changes, finalized the data issues, and discussed the deployment steps for the ci/cd pipeline update project.
+    - updated the requirements, discussed the requirements, and coordinated the requirements for the ci/cd pipeline update project.
+    - clarified the deployment steps, discussed the requirements, and finalized the deployment steps for the ci/cd pipeline update project.
+    - clarified the data issues, clarified the user stories, and tested the user stories for the ci/cd pipeline update project.
+    - Reviewed the requirements, coordinated the deployment steps, and Reviewed the feedback for the ci/cd pipeline update project.
+
+Completed Activities:
+Content Management Refactor
+    - Reviewed the user stories, documented the UI changes, and Reviewed the deployment steps for the content management refactor project.
+    - finalized the UI changes, Reviewed the deployment steps, and updated the feedback for the content management refactor project.
+    - Reviewed the requirements, coordinated the requirements, and coordinated the feedback for the content management refactor project.
+    - coordinated the requirements, tested the data issues, and tested the data issues for the content management refactor project.
+    - finalized the UI changes, discussed the user stories, and clarified the UI changes for the content management refactor project.
+
+Mobile App Performance
+    - discussed the deployment steps, finalized the feedback, and Reviewed the deployment steps for the mobile app performance project.
+    - finalized the user stories, tested the requirements, and tested the deployment steps for the mobile app performance project.

@@ -1,0 +1,294 @@
+{
+  "timestamp": "20250605_130524",
+  "input_text": "From: Robert Cooper <saragreen@davis.com>\nTo: Travis Woods <zhernandez@gmail.com>\nDate: 2025-05-11 18:57:13\nSubject: Daily Work Summary\n\nPlanned Activities:\nInternal API Cleanup\n    - coordinated the deployment steps, coordinated the deployment steps, and updated the data issues for the internal api cleanup project.\n    - discussed the deployment steps, finalized the requirements, and updated the requirements for the internal api cleanup project.\n    - discussed the feedback, coordinated the deployment steps, and documented the requirements for the internal api cleanup project.\n    - documented the deployment steps, documented the requirements, and Reviewed the feedback for the internal api cleanup project.\n    - tested the UI changes, discussed the deployment steps, and clarified the deployment steps for the internal api cleanup project.\n\nAuthentication Revamp\n    - updated the UI changes, finalized the deployment steps, and finalized the requirements for the authentication revamp project.\n    - updated the user stories, coordinated the user stories, and documented the user stories for the authentication revamp project.\n    - updated the UI changes, tested the deployment steps, and finalized the feedback for the authentication revamp project.\n    - discussed the user stories, clarified the user stories, and coordinated the feedback for the authentication revamp project.\n    - coordinated the UI changes, tested the data issues, and discussed the requirements for the authentication revamp project.\n\nCompleted Activities:\nCustomer Feedback Analysis\n    - finalized the requirements, discussed the requirements, and tested the UI changes for the customer feedback analysis project.\n    - coordinated the feedback, Reviewed the requirements, and tested the UI changes for the customer feedback analysis project.\n\nContent Management Refactor\n    - tested the data issues, tested the user stories, and tested the data issues for the content management refactor project.\n    - Reviewed the deployment steps, tested the feedback, and updated the deployment steps for the content management refactor project.\n    - discussed the deployment steps, finalized the requirements, and discussed the requirements for the content management refactor project.\n\nData Warehouse Migration\n    - coordinated the requirements, discussed the requirements, and clarified the deployment steps for the data warehouse migration project.\n    - clarified the requirements, clarified the UI changes, and Reviewed the user stories for the data warehouse migration project.\n\nPayment Gateway Integration\n    - discussed the user stories, coordinated the UI changes, and Reviewed the feedback for the payment gateway integration project.\n    - coordinated the data issues, tested the data issues, and documented the data issues for the payment gateway integration project.\n\nInternal API Cleanup\n    - discussed the deployment steps, documented the requirements, and tested the feedback for the internal api cleanup project.\n    - clarified the UI changes, coordinated the deployment steps, and documented the feedback for the internal api cleanup project.\n    - clarified the deployment steps, clarified the requirements, and tested the user stories for the internal api cleanup project.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Robert Cooper <saragreen@davis.com>\nTo: Travis Woods <zhernandez@gmail.com>\nDate: 2025-05-11 18:57:13\nSubject: Daily Work Summary\n\nPlanned Activities:\nInternal API Cleanup\n    - coordinated the deployment steps, coordinated the deployment steps, and updated the data issues for the internal api cleanup project.\n    - discussed the deployment steps, finalized the requirements, and updated the requirements for the internal api cleanup project.\n    - discussed the feedback, coordinated the deployment steps, and documented the requirements for the internal api cleanup project.\n    - documented the deployment steps, documented the requirements, and Reviewed the feedback for the internal api cleanup project.\n    - tested the UI changes, discussed the deployment steps, and clarified the deployment steps for the internal api cleanup project.\n\nAuthentication Revamp\n    - updated the UI changes, finalized the deployment steps, and finalized the requirements for the authentication revamp project.\n    - updated the user stories, coordinated the user stories, and documented the user stories for the authentication revamp project.\n    - updated the UI changes, tested the deployment steps, and finalized the feedback for the authentication revamp project.\n    - discussed the user stories, clarified the user stories, and coordinated the feedback for the authentication revamp project.\n    - coordinated the UI changes, tested the data issues, and discussed the requirements for the authentication revamp project.\n\nCompleted Activities:\nCustomer Feedback Analysis\n    - finalized the requirements, discussed the requirements, and tested the UI changes for the customer feedback analysis project.\n    - coordinated the feedback, Reviewed the requirements, and tested the UI changes for the customer feedback analysis project.\n\nContent Management Refactor\n    - tested the data issues, tested the user stories, and tested the data issues for the content management refactor project.\n    - Reviewed the deployment steps, tested the feedback, and updated the deployment steps for the content management refactor project.\n    - discussed the deployment steps, finalized the requirements, and discussed the requirements for the content management refactor project.\n\nData Warehouse Migration\n    - coordinated the requirements, discussed the requirements, and clarified the deployment steps for the data warehouse migration project.\n    - clarified the requirements, clarified the UI changes, and Reviewed the user stories for the data warehouse migration project.\n\nPayment Gateway Integration\n    - discussed the user stories, coordinated the UI changes, and Reviewed the feedback for the payment gateway integration project.\n    - coordinated the data issues, tested the data issues, and documented the data issues for the payment gateway integration project.\n\nInternal API Cleanup\n    - discussed the deployment steps, documented the requirements, and tested the feedback for the internal api cleanup project.\n    - clarified the UI changes, coordinated the deployment steps, and documented the feedback for the internal api cleanup project.\n    - clarified the deployment steps, clarified the requirements, and tested the user stories for the internal api cleanup project.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"Coordinated the deployment steps, and updated the data issues for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the deployment steps, finalized the requirements, and updated the requirements for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the feedback, coordinated the deployment steps, and documented the requirements for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Documented the deployment steps, documented the requirements, and Reviewed the feedback for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Tested the UI changes, discussed the deployment steps, and clarified the deployment steps for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Updated the UI changes, finalized the deployment steps, and finalized the requirements for the authentication revamp project\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Updated the user stories, coordinated the user stories, and documented the user stories for the authentication revamp project\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Updated the UI changes, tested the deployment steps, and finalized the feedback for the authentication revamp project\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the user stories, clarified the user stories, and coordinated the feedback for the authentication revamp project\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated the UI changes, tested the data issues, and discussed the requirements for the authentication revamp project\",\n        \"status\": \"In Progress\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Finalized the requirements, discussed the requirements, and tested the UI changes for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated the feedback, Reviewed the requirements, and tested the UI changes for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Tested the data issues, tested the user stories, and tested the data issues for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the deployment steps, tested the feedback, and updated the deployment steps for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the deployment steps, finalized the requirements, and discussed the requirements for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated the requirements, discussed the requirements, and clarified the deployment steps for the data warehouse migration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the requirements, clarified the UI changes, and Reviewed the user stories for the data warehouse migration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Data Warehouse Migration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the user stories, coordinated the UI changes, and Reviewed the feedback for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Coordinated the data issues, tested the data issues, and documented the data issues for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Discussed the deployment steps, documented the requirements, and tested the feedback for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the UI changes, coordinated the deployment steps, and documented the feedback for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Clarified the deployment steps, clarified the requirements, and tested the user stories for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Robert Cooper\",\n        \"date\": \"2025-05-11\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "Internal API Cleanup - coordinated the deployment steps, coordinated the deployment steps, and updated the data issues for the internal api cleanup project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the specific deployment steps and data issues updated for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup - discussed the deployment steps, finalized the requirements, and updated the requirements for the internal api cleanup project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific requirements were finalized and updated during the discussion of deployment steps for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup - discussed the feedback, coordinated the deployment steps, and documented the requirements for the internal api cleanup project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What feedback was discussed and how were the requirements documented for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup - documented the deployment steps, documented the requirements, and Reviewed the feedback for the internal api cleanup project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the feedback reviewed and the specific requirements documented for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup - tested the UI changes, discussed the deployment steps, and clarified the deployment steps for the internal api cleanup project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific UI changes were tested and how were the deployment steps clarified for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - updated the UI changes, finalized the deployment steps, and finalized the requirements for the authentication revamp project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the UI changes updated and the finalized deployment steps and requirements for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - updated the user stories, coordinated the user stories, and documented the user stories for the authentication revamp project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific user stories were updated, coordinated, and documented for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - updated the UI changes, tested the deployment steps, and finalized the feedback for the authentication revamp project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the UI changes tested, deployment steps, and feedback finalized for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - discussed the user stories, clarified the user stories, and coordinated the feedback for the authentication revamp project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific discussions were held regarding the user stories, how were they clarified, and what feedback was coordinated for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Authentication Revamp - coordinated the UI changes, tested the data issues, and discussed the requirements for the authentication revamp project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the data issues tested, UI changes coordinated, and requirements discussed for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis - finalized the requirements, discussed the requirements, and tested the UI changes for the customer feedback analysis project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific requirements were finalized and discussed, and how were the UI changes tested for the customer feedback analysis project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Customer Feedback Analysis - coordinated the feedback, Reviewed the requirements, and tested the UI changes for the customer feedback analysis project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the feedback coordinated, requirements reviewed, and UI changes tested for the customer feedback analysis project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Content Management Refactor - tested the data issues, tested the user stories, and tested the data issues for the content management refactor project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific data issues and user stories were tested for the content management refactor project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Content Management Refactor - Reviewed the deployment steps, tested the feedback, and updated the deployment steps for the content management refactor project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the feedback tested, deployment steps reviewed, and updated for the content management refactor project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Content Management Refactor - discussed the deployment steps, finalized the requirements, and discussed the requirements for the content management refactor project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific deployment steps were discussed and how were the requirements finalized and discussed for the content management refactor project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Data Warehouse Migration - coordinated the requirements, discussed the requirements, and clarified the deployment steps for the data warehouse migration project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the requirements coordinated, discussed, and how the deployment steps were clarified for the data warehouse migration project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Data Warehouse Migration - clarified the requirements, clarified the UI changes, and Reviewed the user stories for the data warehouse migration project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific requirements and UI changes were clarified, and what user stories were reviewed for the data warehouse migration project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Payment Gateway Integration - discussed the user stories, coordinated the UI changes, and Reviewed the feedback for the payment gateway integration project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the user stories discussed, UI changes coordinated, and feedback reviewed for the payment gateway integration project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Payment Gateway Integration - coordinated the data issues, tested the data issues, and documented the data issues for the payment gateway integration project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific data issues were coordinated, tested, and documented for the payment gateway integration project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup - discussed the deployment steps, documented the requirements, and tested the feedback for the internal api cleanup project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the deployment steps discussed, requirements documented, and feedback tested for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup - clarified the UI changes, coordinated the deployment steps, and documented the feedback for the internal api cleanup project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific UI changes were clarified, how were the deployment steps coordinated, and what feedback was documented for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Internal API Cleanup - clarified the deployment steps, clarified the requirements, and tested the user stories for the internal api cleanup project.",
+      "status": "Completed",
+      "employee": "Robert Cooper",
+      "date": "2025-05-11",
+      "category": "General",
+      "needs_description": true,
+      "suggested_question": "What specific deployment steps and requirements were clarified, and how were the user stories tested for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

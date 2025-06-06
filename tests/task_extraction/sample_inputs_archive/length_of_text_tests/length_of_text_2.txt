@@ -1,0 +1,10 @@
+From: Sarah Reynolds <sarah.reynolds@example.com>
+Date: Mon, Feb 17, 2025 at 12:00 AM
+Subject: Re: Daily Update - 02/17/2025
+To: michelle@example.com, sharon@example.com
+
+Planned Activities:
+Ontario Health:
+- Train new interns on security protocols
+- Draft project status report
+- Design new feature mockups

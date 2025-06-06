@@ -1,0 +1,229 @@
+{
+  "timestamp": "20250605_131426",
+  "input_text": "From: Mary Walton <sgreen@mckay.info>\nTo: Elizabeth Williams <kperkins@yahoo.com>\nDate: 2025-03-11 19:13:00\nSubject: Daily Work Summary\n\nPlanned Activities:\nAuthentication Revamp\n    - discussed the requirements, updated the feedback, and documented the deployment steps for the authentication revamp project.\n    - coordinated the data issues, coordinated the data issues, and Reviewed the deployment steps for the authentication revamp project.\n\nPayment Gateway Integration\n    - updated the UI changes, documented the user stories, and clarified the feedback for the payment gateway integration project.\n    - coordinated the feedback, discussed the requirements, and discussed the feedback for the payment gateway integration project.\n    - tested the UI changes, coordinated the requirements, and Reviewed the feedback for the payment gateway integration project.\n    - documented the user stories, clarified the UI changes, and clarified the deployment steps for the payment gateway integration project.\n    - coordinated the UI changes, documented the user stories, and Reviewed the feedback for the payment gateway integration project.\n\nCI/CD Pipeline Update\n    - discussed the UI changes, discussed the feedback, and finalized the requirements for the ci/cd pipeline update project.\n    - finalized the user stories, tested the feedback, and finalized the deployment steps for the ci/cd pipeline update project.\n    - coordinated the data issues, Reviewed the deployment steps, and discussed the data issues for the ci/cd pipeline update project.\n\nCompleted Activities:\nAuthentication Revamp\n    - updated the UI changes, tested the feedback, and clarified the requirements for the authentication revamp project.\n    - tested the UI changes, coordinated the deployment steps, and finalized the feedback for the authentication revamp project.\n\nContent Management Refactor\n    - discussed the data issues, clarified the data issues, and finalized the user stories for the content management refactor project.\n    - coordinated the feedback, Reviewed the UI changes, and updated the UI changes for the content management refactor project.\n    - Reviewed the UI changes, discussed the deployment steps, and finalized the user stories for the content management refactor project.\n\nCustomer Feedback Analysis\n    - finalized the deployment steps, discussed the data issues, and tested the user stories for the customer feedback analysis project.\n    - Reviewed the feedback, clarified the feedback, and Reviewed the deployment steps for the customer feedback analysis project.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: Mary Walton <sgreen@mckay.info>\nTo: Elizabeth Williams <kperkins@yahoo.com>\nDate: 2025-03-11 19:13:00\nSubject: Daily Work Summary\n\nPlanned Activities:\nAuthentication Revamp\n    - discussed the requirements, updated the feedback, and documented the deployment steps for the authentication revamp project.\n    - coordinated the data issues, coordinated the data issues, and Reviewed the deployment steps for the authentication revamp project.\n\nPayment Gateway Integration\n    - updated the UI changes, documented the user stories, and clarified the feedback for the payment gateway integration project.\n    - coordinated the feedback, discussed the requirements, and discussed the feedback for the payment gateway integration project.\n    - tested the UI changes, coordinated the requirements, and Reviewed the feedback for the payment gateway integration project.\n    - documented the user stories, clarified the UI changes, and clarified the deployment steps for the payment gateway integration project.\n    - coordinated the UI changes, documented the user stories, and Reviewed the feedback for the payment gateway integration project.\n\nCI/CD Pipeline Update\n    - discussed the UI changes, discussed the feedback, and finalized the requirements for the ci/cd pipeline update project.\n    - finalized the user stories, tested the feedback, and finalized the deployment steps for the ci/cd pipeline update project.\n    - coordinated the data issues, Reviewed the deployment steps, and discussed the data issues for the ci/cd pipeline update project.\n\nCompleted Activities:\nAuthentication Revamp\n    - updated the UI changes, tested the feedback, and clarified the requirements for the authentication revamp project.\n    - tested the UI changes, coordinated the deployment steps, and finalized the feedback for the authentication revamp project.\n\nContent Management Refactor\n    - discussed the data issues, clarified the data issues, and finalized the user stories for the content management refactor project.\n    - coordinated the feedback, Reviewed the UI changes, and updated the UI changes for the content management refactor project.\n    - Reviewed the UI changes, discussed the deployment steps, and finalized the user stories for the content management refactor project.\n\nCustomer Feedback Analysis\n    - finalized the deployment steps, discussed the data issues, and tested the user stories for the customer feedback analysis project.\n    - Reviewed the feedback, clarified the feedback, and Reviewed the deployment steps for the customer feedback analysis project.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"discussed the requirements, updated the feedback, and documented the deployment steps for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the data issues, coordinated the data issues, and Reviewed the deployment steps for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific data issues were coordinated and reviewed for the authentication revamp project?\"\n    },\n    {\n        \"task\": \"updated the UI changes, documented the user stories, and clarified the feedback for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the feedback, discussed the requirements, and discussed the feedback for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific feedback was coordinated and discussed for the payment gateway integration project?\"\n    },\n    {\n        \"task\": \"tested the UI changes, coordinated the requirements, and Reviewed the feedback for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific UI changes were tested and feedback was reviewed for the payment gateway integration project?\"\n    },\n    {\n        \"task\": \"documented the user stories, clarified the UI changes, and clarified the deployment steps for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the UI changes, documented the user stories, and Reviewed the feedback for the payment gateway integration project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Payment Gateway Integration\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific UI changes were coordinated and feedback was reviewed for the payment gateway integration project?\"\n    },\n    {\n        \"task\": \"discussed the UI changes, discussed the feedback, and finalized the requirements for the ci/cd pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"finalized the user stories, tested the feedback, and finalized the deployment steps for the ci/cd pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the data issues, Reviewed the deployment steps, and discussed the data issues for the ci/cd pipeline update project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"CI/CD Pipeline Update\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific data issues were coordinated, deployment steps were reviewed, and discussed for the ci/cd pipeline update project?\"\n    },\n    {\n        \"task\": \"updated the UI changes, tested the feedback, and clarified the requirements for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"tested the UI changes, coordinated the deployment steps, and finalized the feedback for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific UI changes were tested, deployment steps were coordinated, and feedback was finalized for the authentication revamp project?\"\n    },\n    {\n        \"task\": \"discussed the data issues, clarified the data issues, and finalized the user stories for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"coordinated the feedback, Reviewed the UI changes, and updated the UI changes for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific feedback was coordinated, UI changes were reviewed, and updated for the content management refactor project?\"\n    },\n    {\n        \"task\": \"Reviewed the UI changes, discussed the deployment steps, and finalized the user stories for the content management refactor project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Content Management Refactor\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific UI changes were reviewed, deployment steps were discussed, and user stories were finalized for the content management refactor project?\"\n    },\n    {\n        \"task\": \"finalized the deployment steps, discussed the data issues, and tested the user stories for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": false,\n        \"suggested_question\": \"\"\n    },\n    {\n        \"task\": \"Reviewed the feedback, clarified the feedback, and Reviewed the deployment steps for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"Mary Walton\",\n        \"date\": \"2025-03-11\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific feedback was reviewed and clarified, and deployment steps were reviewed for the customer feedback analysis project?\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "discussed the requirements, updated the feedback, and documented the deployment steps for the authentication revamp project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the data issues, coordinated the data issues, and Reviewed the deployment steps for the authentication revamp project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What specific data issues were coordinated and what was the outcome of reviewing the deployment steps?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the UI changes, documented the user stories, and clarified the feedback for the payment gateway integration project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the feedback, discussed the requirements, and discussed the feedback for the payment gateway integration project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Payment Gateway Integration",
+      "needs_description": true,
+      "suggested_question": "What specific feedback was coordinated and discussed in relation to the payment gateway integration project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "tested the UI changes, coordinated the requirements, and Reviewed the feedback for the payment gateway integration project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Payment Gateway Integration",
+      "needs_description": true,
+      "suggested_question": "What were the outcomes of testing the UI changes and what feedback was reviewed?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the user stories, clarified the UI changes, and clarified the deployment steps for the payment gateway integration project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Payment Gateway Integration",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the UI changes, documented the user stories, and Reviewed the feedback for the payment gateway integration project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Payment Gateway Integration",
+      "needs_description": true,
+      "suggested_question": "What specific UI changes were coordinated and what feedback was reviewed in relation to the payment gateway integration project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the UI changes, discussed the feedback, and finalized the requirements for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "finalized the user stories, tested the feedback, and finalized the deployment steps for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the data issues, Reviewed the deployment steps, and discussed the data issues for the ci/cd pipeline update project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "CI/CD Pipeline Update",
+      "needs_description": true,
+      "suggested_question": "What specific data issues were coordinated and discussed in relation to the ci/cd pipeline update project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the UI changes, tested the feedback, and clarified the requirements for the authentication revamp project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Authentication Revamp",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "tested the UI changes, coordinated the deployment steps, and finalized the feedback for the authentication revamp project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What specific UI changes were tested and what feedback was finalized in relation to the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the data issues, clarified the data issues, and finalized the user stories for the content management refactor project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Content Management Refactor",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the feedback, Reviewed the UI changes, and updated the UI changes for the content management refactor project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Content Management Refactor",
+      "needs_description": true,
+      "suggested_question": "What specific feedback was coordinated and what UI changes were updated in relation to the content management refactor project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the UI changes, discussed the deployment steps, and finalized the user stories for the content management refactor project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Content Management Refactor",
+      "needs_description": true,
+      "suggested_question": "What specific UI changes were reviewed and what deployment steps were discussed in relation to the content management refactor project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "finalized the deployment steps, discussed the data issues, and tested the user stories for the customer feedback analysis project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Customer Feedback Analysis",
+      "needs_description": false,
+      "suggested_question": "",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the feedback, clarified the feedback, and Reviewed the deployment steps for the customer feedback analysis project",
+      "status": "Completed",
+      "employee": "Mary Walton",
+      "date": "2025-03-11",
+      "category": "Customer Feedback Analysis",
+      "needs_description": true,
+      "suggested_question": "What specific feedback was reviewed and clarified in relation to the customer feedback analysis project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

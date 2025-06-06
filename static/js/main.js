@@ -46,6 +46,88 @@ $(document).ready(function() {
     // Store the user ID
     localStorage.setItem('chat_user_id', userId);
     
+    // Function to display results
+    function displayResults(response) {
+        let html = '';
+        
+        // Display extracted tasks
+        if (response.processed_tasks && response.processed_tasks.length > 0) {
+            html += `
+                <div class="mb-4">
+                    <h6 class="mb-3">
+                        <i class="bi bi-list-check text-primary me-2"></i>
+                        Processed Tasks (${response.processed_tasks.length})
+                    </h6>
+                    <ul class="task-list">
+            `;
+            
+            response.processed_tasks.forEach(function(task) {
+                const statusClass = getStatusClass(task.status);
+                html += `
+                    <li class="task-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                ${task.task}
+                                <span class="task-status ${statusClass}">${task.status}</span>
+                            </div>
+                            <small class="text-muted ms-2">${task.category}</small>
+                        </div>
+                        <div class="mt-1">
+                            <small class="text-muted">Assigned to: ${task.employee}</small>
+                        </div>
+                    </li>
+                `;
+            });
+            
+            html += `
+                    </ul>
+                    <div class="alert alert-success mt-3">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        ${response.processed_tasks.length} tasks synced to Notion.
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Display coaching insights if available
+        if (response.coaching) {
+            html += `
+                <div class="insights-section">
+                    <h6 class="mb-3">
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        AI Assessment
+                    </h6>
+                    <div class="alert alert-info">
+                        ${response.coaching}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Update the results section
+        $('#results').html(html);
+        
+        // Show chat verification if needed
+        if (response.requires_verification) {
+            $('#chatVerificationContainer').show();
+            addChatMessage('bot', response.verification_message || 'Please verify these tasks.');
+        }
+    }
+    
+    // Function to get status class for styling
+    function getStatusClass(status) {
+        switch(status.toLowerCase()) {
+            case 'completed':
+                return 'text-success';
+            case 'in progress':
+                return 'text-warning';
+            case 'blocked':
+                return 'text-danger';
+            default:
+                return 'text-secondary';
+        }
+    }
+    
     // Form submission handler with enhanced UX
     $('#updateForm').on('submit', function(e) {
         e.preventDefault();

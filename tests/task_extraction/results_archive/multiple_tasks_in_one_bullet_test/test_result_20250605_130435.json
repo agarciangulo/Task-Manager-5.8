@@ -1,0 +1,398 @@
+{
+  "timestamp": "20250605_130435",
+  "input_text": "From: David Barber <rhughes@anderson.biz>\nTo: Cynthia Yates <jennifermiller@green-vasquez.com>\nDate: 2025-04-14 14:17:03\nSubject: Daily Work Summary\n\nPlanned Activities:\nUser Onboarding Redesign\n    - documented the feedback, documented the feedback, and tested the UI changes for the user onboarding redesign project.\n    - finalized the user stories, documented the deployment steps, and documented the data issues for the user onboarding redesign project.\n    - coordinated the deployment steps, Reviewed the requirements, and documented the user stories for the user onboarding redesign project.\n    - discussed the UI changes, updated the feedback, and Reviewed the feedback for the user onboarding redesign project.\n    - documented the deployment steps, Reviewed the user stories, and tested the data issues for the user onboarding redesign project.\n\nInternal API Cleanup\n    - updated the requirements, discussed the UI changes, and clarified the UI changes for the internal api cleanup project.\n    - documented the requirements, Reviewed the deployment steps, and discussed the data issues for the internal api cleanup project.\n    - clarified the requirements, documented the UI changes, and Reviewed the user stories for the internal api cleanup project.\n\nMobile App Performance\n    - Reviewed the requirements, discussed the UI changes, and clarified the requirements for the mobile app performance project.\n    - documented the UI changes, discussed the feedback, and updated the feedback for the mobile app performance project.\n    - coordinated the data issues, Reviewed the user stories, and Reviewed the user stories for the mobile app performance project.\n    - documented the UI changes, finalized the user stories, and tested the user stories for the mobile app performance project.\n    - discussed the feedback, Reviewed the user stories, and finalized the requirements for the mobile app performance project.\n\nCompleted Activities:\nInternal API Cleanup\n    - clarified the data issues, documented the requirements, and tested the user stories for the internal api cleanup project.\n    - Reviewed the deployment steps, finalized the data issues, and tested the UI changes for the internal api cleanup project.\n    - finalized the UI changes, updated the feedback, and documented the user stories for the internal api cleanup project.\n\nAuthentication Revamp\n    - updated the data issues, coordinated the UI changes, and discussed the UI changes for the authentication revamp project.\n    - Reviewed the UI changes, tested the deployment steps, and clarified the data issues for the authentication revamp project.\n    - coordinated the user stories, documented the user stories, and coordinated the feedback for the authentication revamp project.\n    - discussed the data issues, Reviewed the UI changes, and documented the data issues for the authentication revamp project.\n    - tested the deployment steps, documented the feedback, and documented the user stories for the authentication revamp project.\n\nUser Onboarding Redesign\n    - documented the data issues, discussed the requirements, and discussed the feedback for the user onboarding redesign project.\n    - documented the requirements, tested the deployment steps, and discussed the user stories for the user onboarding redesign project.\n    - discussed the user stories, tested the deployment steps, and Reviewed the user stories for the user onboarding redesign project.\n\nMobile App Performance\n    - documented the feedback, Reviewed the UI changes, and finalized the data issues for the mobile app performance project.\n    - documented the feedback, coordinated the feedback, and clarified the deployment steps for the mobile app performance project.\n    - updated the UI changes, clarified the feedback, and Reviewed the user stories for the mobile app performance project.\n    - finalized the user stories, discussed the UI changes, and Reviewed the UI changes for the mobile app performance project.\n\nCustomer Feedback Analysis\n    - clarified the requirements, tested the user stories, and tested the requirements for the customer feedback analysis project.\n    - Reviewed the UI changes, coordinated the user stories, and tested the deployment steps for the customer feedback analysis project.",
+  "prompt": "You are TaskExtractor, an expert system that extracts structured task updates from both formal and casual work logs, emails, and messages.\n\nYOUR TASK:\nExtract actionable tasks from the provided text, which may be in various formats (formal reports, casual updates, bullet points, etc.). Follow these precise steps:\n\n1. TEXT ANALYSIS:\n   - Identify the main author of the update\n   - Look for any date information\n   - Recognize different formats (bullet points, paragraphs, categories, etc.)\n   - Handle both formal and casual language\n\n2. SENDER IDENTIFICATION:\n   - Extract the full name of the person who performed the tasks\n   - Look for patterns like \"From:\", email signatures, or introductory lines\n   - If no name is found, use the email sender's name\n\n3. TASK EXTRACTION STRATEGIES:\n   - Look for tasks in any format: bullet points, paragraphs, categories, etc.\n   - Extract tasks from both completed and planned sections\n   - Recognize tasks even without explicit \"Completed\" or \"Planned\" labels\n   - Identify action verbs to determine what work was performed\n   - Ignore non-task information like greetings and signatures\n   - IMPORTANT: Extract ALL items as tasks, even single words like \"Resume\" or \"Training\"\n\n4. VAGUE TASK DETECTION (CRITICAL):\n   - Flag tasks as needing more context (set needs_description=true) if they match ANY of these criteria:\n     * Single-word tasks (e.g., \"Resume\", \"Training\", \"Meeting\")\n     * Short phrases without specific details (e.g., \"VC University\", \"Project work\")\n     * Generic descriptions (e.g., \"Worked on project\", \"Made updates\")\n     * Tasks missing what was actually done (e.g., \"Resume\" instead of \"Updated resume\")\n     * Tasks without clear deliverables or outcomes\n   - For each vague task, generate a specific follow-up question asking for:\n     * What specifically was done\n     * What was the outcome or progress made\n     * Any relevant details about the work\n\n5. STATUS DETERMINATION - CLASSIFY AS:\n   - \"Completed\": Tasks described in past tense or marked as done\n   - \"In Progress\": Work mentioned as started but not finished\n   - \"Pending\": Tasks mentioned without completion status\n   - \"Blocked\": Tasks explicitly mentioned as blocked\n\n6. DATE EXTRACTION:\n   - Extract the date when tasks were performed\n   - If not explicitly mentioned, use the email/update date\n   - Standardize all dates to YYYY-MM-DD format\n   - For updates with multiple dates, use the most recent relevant date\n\n7. CATEGORIZATION:\n   - Assign each task to a category based on context\n   - Use section headers, indentation, or prefix labels to determine categories\n   - If a task mentions multiple categories, prefer the most specific one\n   - If no category is explicitly mentioned, use \"General\"\n\nOUTPUT FORMAT:\nReturn a list of tasks in this exact format:\n[\n    {\n        \"task\": \"Detailed description of the task\",\n        \"status\": \"Completed/In Progress/Pending/Blocked\",\n        \"employee\": \"Full name of the person who did the task\",\n        \"date\": \"YYYY-MM-DD\",\n        \"category\": \"Category name\",\n        \"needs_description\": true/false,\n        \"suggested_question\": \"Specific follow-up question for vague tasks\"\n    },\n    ...\n]\n\nEXAMPLE VAGUE TASKS AND QUESTIONS:\n1. Task: \"Resume\"\n   Question: \"Could you specify what you did with your resume? (e.g., updated specific sections, created new version, etc.)\"\n   needs_description: true\n\n2. Task: \"VC University\"\n   Question: \"What specific work did you do related to VC University? (e.g., completed specific modules, watched lectures, etc.)\"\n   needs_description: true\n\n3. Task: \"Meeting\"\n   Question: \"What was this meeting about and what were the key outcomes or decisions made?\"\n   needs_description: true\n\nINPUT TEXT:\nFrom: David Barber <rhughes@anderson.biz>\nTo: Cynthia Yates <jennifermiller@green-vasquez.com>\nDate: 2025-04-14 14:17:03\nSubject: Daily Work Summary\n\nPlanned Activities:\nUser Onboarding Redesign\n    - documented the feedback, documented the feedback, and tested the UI changes for the user onboarding redesign project.\n    - finalized the user stories, documented the deployment steps, and documented the data issues for the user onboarding redesign project.\n    - coordinated the deployment steps, Reviewed the requirements, and documented the user stories for the user onboarding redesign project.\n    - discussed the UI changes, updated the feedback, and Reviewed the feedback for the user onboarding redesign project.\n    - documented the deployment steps, Reviewed the user stories, and tested the data issues for the user onboarding redesign project.\n\nInternal API Cleanup\n    - updated the requirements, discussed the UI changes, and clarified the UI changes for the internal api cleanup project.\n    - documented the requirements, Reviewed the deployment steps, and discussed the data issues for the internal api cleanup project.\n    - clarified the requirements, documented the UI changes, and Reviewed the user stories for the internal api cleanup project.\n\nMobile App Performance\n    - Reviewed the requirements, discussed the UI changes, and clarified the requirements for the mobile app performance project.\n    - documented the UI changes, discussed the feedback, and updated the feedback for the mobile app performance project.\n    - coordinated the data issues, Reviewed the user stories, and Reviewed the user stories for the mobile app performance project.\n    - documented the UI changes, finalized the user stories, and tested the user stories for the mobile app performance project.\n    - discussed the feedback, Reviewed the user stories, and finalized the requirements for the mobile app performance project.\n\nCompleted Activities:\nInternal API Cleanup\n    - clarified the data issues, documented the requirements, and tested the user stories for the internal api cleanup project.\n    - Reviewed the deployment steps, finalized the data issues, and tested the UI changes for the internal api cleanup project.\n    - finalized the UI changes, updated the feedback, and documented the user stories for the internal api cleanup project.\n\nAuthentication Revamp\n    - updated the data issues, coordinated the UI changes, and discussed the UI changes for the authentication revamp project.\n    - Reviewed the UI changes, tested the deployment steps, and clarified the data issues for the authentication revamp project.\n    - coordinated the user stories, documented the user stories, and coordinated the feedback for the authentication revamp project.\n    - discussed the data issues, Reviewed the UI changes, and documented the data issues for the authentication revamp project.\n    - tested the deployment steps, documented the feedback, and documented the user stories for the authentication revamp project.\n\nUser Onboarding Redesign\n    - documented the data issues, discussed the requirements, and discussed the feedback for the user onboarding redesign project.\n    - documented the requirements, tested the deployment steps, and discussed the user stories for the user onboarding redesign project.\n    - discussed the user stories, tested the deployment steps, and Reviewed the user stories for the user onboarding redesign project.\n\nMobile App Performance\n    - documented the feedback, Reviewed the UI changes, and finalized the data issues for the mobile app performance project.\n    - documented the feedback, coordinated the feedback, and clarified the deployment steps for the mobile app performance project.\n    - updated the UI changes, clarified the feedback, and Reviewed the user stories for the mobile app performance project.\n    - finalized the user stories, discussed the UI changes, and Reviewed the UI changes for the mobile app performance project.\n\nCustomer Feedback Analysis\n    - clarified the requirements, tested the user stories, and tested the requirements for the customer feedback analysis project.\n    - Reviewed the UI changes, coordinated the user stories, and tested the deployment steps for the customer feedback analysis project.\n\nRemember:\n- Extract ALL tasks, even single words or short phrases\n- Flag ANY task that lacks specific details about what was done\n- Generate specific, contextual follow-up questions for vague tasks\n- Use context clues to determine status and categories\n- If a task is ambiguous, make reasonable assumptions but still flag for verification\n- Always return a list, even if empty\n",
+  "raw_response": "[\n    {\n        \"task\": \"documented the feedback, documented the feedback, and tested the UI changes for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the specific feedback documented and the UI changes tested for the user onboarding redesign project?\"\n    },\n    {\n        \"task\": \"finalized the user stories, documented the deployment steps, and documented the data issues for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What were the specific details of the finalized user stories and the deployment steps documented for the user onboarding redesign project?\"\n    },\n    {\n        \"task\": \"coordinated the deployment steps, Reviewed the requirements, and documented the user stories for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you elaborate on the coordination of deployment steps, the requirements reviewed, and the user stories documented for the user onboarding redesign project?\"\n    },\n    {\n        \"task\": \"discussed the UI changes, updated the feedback, and Reviewed the feedback for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What were the key points discussed about the UI changes, the updates made to feedback, and the feedback reviewed for the user onboarding redesign project?\"\n    },\n    {\n        \"task\": \"documented the deployment steps, Reviewed the user stories, and tested the data issues for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the deployment steps documented, the user stories reviewed, and the data issues tested for the user onboarding redesign project?\"\n    },\n    {\n        \"task\": \"updated the requirements, discussed the UI changes, and clarified the UI changes for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific updates were made to the requirements, what was discussed about the UI changes, and how were the UI changes clarified for the internal API cleanup project?\"\n    },\n    {\n        \"task\": \"documented the requirements, Reviewed the deployment steps, and discussed the data issues for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the requirements documented, the deployment steps reviewed, and the data issues discussed for the internal API cleanup project?\"\n    },\n    {\n        \"task\": \"clarified the requirements, documented the UI changes, and Reviewed the user stories for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific details were clarified about the requirements, what UI changes were documented, and what user stories were reviewed for the internal API cleanup project?\"\n    },\n    {\n        \"task\": \"Reviewed the requirements, discussed the UI changes, and clarified the requirements for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What were the key points discussed about the UI changes, and how were the requirements clarified for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"documented the UI changes, discussed the feedback, and updated the feedback for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the UI changes documented, the feedback discussed, and the updates made to the feedback for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"coordinated the data issues, Reviewed the user stories, and Reviewed the user stories for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific coordination was done regarding the data issues, and what were the key points in the user stories reviewed for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"documented the UI changes, finalized the user stories, and tested the user stories for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the UI changes documented, the finalization of user stories, and the testing of user stories for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"discussed the feedback, Reviewed the user stories, and finalized the requirements for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What were the key points discussed about the feedback, what user stories were reviewed, and how were the requirements finalized for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"clarified the data issues, documented the requirements, and tested the user stories for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the clarification of data issues, the requirements documented, and the testing of user stories for the internal API cleanup project?\"\n    },\n    {\n        \"task\": \"Reviewed the deployment steps, finalized the data issues, and tested the UI changes for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific details were reviewed in the deployment steps, how were the data issues finalized, and what UI changes were tested for the internal API cleanup project?\"\n    },\n    {\n        \"task\": \"finalized the UI changes, updated the feedback, and documented the user stories for the internal api cleanup project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Internal API Cleanup\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the finalization of UI changes, the updates made to feedback, and the documentation of user stories for the internal API cleanup project?\"\n    },\n    {\n        \"task\": \"updated the data issues, coordinated the UI changes, and discussed the UI changes for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific updates were made to the data issues, how were the UI changes coordinated, and what key points were discussed about the UI changes for the authentication revamp project?\"\n    },\n    {\n        \"task\": \"Reviewed the UI changes, tested the deployment steps, and clarified the data issues for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the UI changes reviewed, the deployment steps tested, and the clarification of data issues for the authentication revamp project?\"\n    },\n    {\n        \"task\": \"coordinated the user stories, documented the user stories, and coordinated the feedback for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific coordination was done regarding the user stories, what user stories were documented, and how was the feedback coordinated for the authentication revamp project?\"\n    },\n    {\n        \"task\": \"discussed the data issues, Reviewed the UI changes, and documented the data issues for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What were the key points discussed about the data issues, what UI changes were reviewed, and how were the data issues documented for the authentication revamp project?\"\n    },\n    {\n        \"task\": \"tested the deployment steps, documented the feedback, and documented the user stories for the authentication revamp project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Authentication Revamp\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the testing of deployment steps, the feedback documented, and the user stories documented for the authentication revamp project?\"\n    },\n    {\n        \"task\": \"documented the data issues, discussed the requirements, and discussed the feedback for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific data issues were documented, what requirements were discussed, and what feedback was discussed for the user onboarding redesign project?\"\n    },\n    {\n        \"task\": \"documented the requirements, tested the deployment steps, and discussed the user stories for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the requirements documented, the deployment steps tested, and the user stories discussed for the user onboarding redesign project?\"\n    },\n    {\n        \"task\": \"discussed the user stories, tested the deployment steps, and Reviewed the user stories for the user onboarding redesign project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"User Onboarding Redesign\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What were the key points discussed about the user stories, how were the deployment steps tested, and what user stories were reviewed for the user onboarding redesign project?\"\n    },\n    {\n        \"task\": \"documented the feedback, Reviewed the UI changes, and finalized the data issues for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific feedback was documented, what UI changes were reviewed, and how were the data issues finalized for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"documented the feedback, coordinated the feedback, and clarified the deployment steps for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the feedback documented, the coordination of feedback, and the clarification of deployment steps for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"updated the UI changes, clarified the feedback, and Reviewed the user stories for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific UI changes were updated, how was the feedback clarified, and what user stories were reviewed for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"finalized the user stories, discussed the UI changes, and Reviewed the UI changes for the mobile app performance project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Mobile App Performance\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Can you provide more details on the finalization of user stories, the discussion about UI changes, and the UI changes reviewed for the mobile app performance project?\"\n    },\n    {\n        \"task\": \"clarified the requirements, tested the user stories, and tested the requirements for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": true,\n        \"suggested_question\": \"What specific details were clarified about the requirements, how were the user stories tested, and what testing was done on the requirements for the customer feedback analysis project?\"\n    },\n    {\n        \"task\": \"Reviewed the UI changes, coordinated the user stories, and tested the deployment steps for the customer feedback analysis project\",\n        \"status\": \"Completed\",\n        \"employee\": \"David Barber\",\n        \"date\": \"2025-04-14\",\n        \"category\": \"Customer Feedback Analysis\",\n        \"needs_description\": true,\n        \"suggested_question\": \"Could you provide more details on the UI changes reviewed, the coordination of user stories, and the testing of deployment steps for the customer feedback analysis project?\"\n    }\n]",
+  "processed_tasks": [
+    {
+      "task": "documented the feedback, documented the feedback, and tested the UI changes for the user onboarding redesign project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the feedback documentation and UI changes testing for the user onboarding redesign project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "finalized the user stories, documented the deployment steps, and documented the data issues for the user onboarding redesign project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What specific user stories were finalized and what data issues were documented for the user onboarding redesign project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the deployment steps, Reviewed the requirements, and documented the user stories for the user onboarding redesign project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "Can you elaborate on the coordination of deployment steps, requirements review, and user stories documentation for the user onboarding redesign project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the UI changes, updated the feedback, and Reviewed the feedback for the user onboarding redesign project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What were the key points discussed regarding UI changes, feedback updates, and feedback review for the user onboarding redesign project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the deployment steps, Reviewed the user stories, and tested the data issues for the user onboarding redesign project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the documentation of deployment steps, user stories review, and data issues testing for the user onboarding redesign project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the requirements, discussed the UI changes, and clarified the UI changes for the internal api cleanup project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific requirements were updated and what discussions took place regarding UI changes and their clarification for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the requirements, Reviewed the deployment steps, and discussed the data issues for the internal api cleanup project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the documentation of requirements, deployment steps review, and data issues discussions for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "clarified the requirements, documented the UI changes, and Reviewed the user stories for the internal api cleanup project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What specific requirements were clarified, UI changes were documented, and user stories were reviewed for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the requirements, discussed the UI changes, and clarified the requirements for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What were the key points discussed regarding UI changes and requirements clarification for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the UI changes, discussed the feedback, and updated the feedback for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the documentation of UI changes, feedback discussions, and feedback updates for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the data issues, Reviewed the user stories, and Reviewed the user stories for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What specific data issues were coordinated, and what were the key points in the review of user stories for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the UI changes, finalized the user stories, and tested the user stories for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the UI changes documentation, user stories finalization, and user stories testing for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the feedback, Reviewed the user stories, and finalized the requirements for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What feedback points were discussed, and what were the key aspects of user stories review and requirements finalization for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "clarified the data issues, documented the requirements, and tested the user stories for the internal api cleanup project",
+      "status": "Completed",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the clarification of data issues, requirements documentation, and user stories testing for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the deployment steps, finalized the data issues, and tested the UI changes for the internal api cleanup project",
+      "status": "Completed",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "What were the key aspects of deployment steps review, data issues finalization, and UI changes testing for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "finalized the UI changes, updated the feedback, and documented the user stories for the internal api cleanup project",
+      "status": "Completed",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Internal API Cleanup",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the finalization of UI changes, feedback updates, and user stories documentation for the internal API cleanup project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the data issues, coordinated the UI changes, and discussed the UI changes for the authentication revamp project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What specific data issues were updated, and what were the key points in coordinating and discussing UI changes for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the UI changes, tested the deployment steps, and clarified the data issues for the authentication revamp project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the UI changes review, deployment steps testing, and data issues clarification for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "coordinated the user stories, documented the user stories, and coordinated the feedback for the authentication revamp project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What were the key aspects of coordinating user stories, documenting user stories, and coordinating feedback for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the data issues, Reviewed the UI changes, and documented the data issues for the authentication revamp project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "What data issues were discussed, and what were the key points in UI changes review and data issues documentation for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "tested the deployment steps, documented the feedback, and documented the user stories for the authentication revamp project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Authentication Revamp",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the testing of deployment steps, feedback documentation, and user stories documentation for the authentication revamp project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the data issues, discussed the requirements, and discussed the feedback for the user onboarding redesign project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What specific data issues were documented, and what were the key points in requirements and feedback discussions for the user onboarding redesign project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the requirements, tested the deployment steps, and discussed the user stories for the user onboarding redesign project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the documentation of requirements, deployment steps testing, and user stories discussions for the user onboarding redesign project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "discussed the user stories, tested the deployment steps, and Reviewed the user stories for the user onboarding redesign project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "User Onboarding Redesign",
+      "needs_description": true,
+      "suggested_question": "What were the key aspects of user stories discussions, deployment steps testing, and user stories review for the user onboarding redesign project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the feedback, Reviewed the UI changes, and finalized the data issues for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What feedback points were documented, and what were the key aspects of UI changes review and data issues finalization for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "documented the feedback, coordinated the feedback, and clarified the deployment steps for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the documentation and coordination of feedback, as well as the clarification of deployment steps for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "updated the UI changes, clarified the feedback, and Reviewed the user stories for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "What specific UI changes were updated, how was the feedback clarified, and what were the key points in user stories review for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "finalized the user stories, discussed the UI changes, and Reviewed the UI changes for the mobile app performance project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Mobile App Performance",
+      "needs_description": true,
+      "suggested_question": "Could you provide more details on the finalization of user stories, UI changes discussions, and UI changes review for the mobile app performance project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "clarified the requirements, tested the user stories, and tested the requirements for the customer feedback analysis project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Customer Feedback Analysis",
+      "needs_description": true,
+      "suggested_question": "What specific requirements were clarified, and what were the key aspects of user stories and requirements testing for the customer feedback analysis project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    },
+    {
+      "task": "Reviewed the UI changes, coordinated the user stories, and tested the deployment steps for the customer feedback analysis project",
+      "status": "Planned",
+      "employee": "David Barber",
+      "date": "2025-04-14",
+      "category": "Customer Feedback Analysis",
+      "needs_description": true,
+      "suggested_question": "Can you provide more details on the UI changes review, user stories coordination, and deployment steps testing for the customer feedback analysis project?",
+      "confidence": {
+        "category": "MEDIUM",
+        "status": "MEDIUM"
+      }
+    }
+  ]
+}

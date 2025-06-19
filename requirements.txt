@@ -1,6 +1,7 @@
 Flask
 Flask-Cors
 openai
+google-generativeai
 httpx
 pandas
 numpy

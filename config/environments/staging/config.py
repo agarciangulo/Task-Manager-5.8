@@ -1,14 +1,14 @@
 """
-Development environment configuration.
+Staging environment configuration.
 """
 import os
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv('.env.development')
+load_dotenv('.env.staging')
 
 # Debug settings
-DEBUG = True
+DEBUG = True  # Keep debug on for staging
 TESTING = False
 
 # API Configuration
@@ -25,12 +25,12 @@ DAYS_THRESHOLD = 2
 
 # AI Configuration
 AI_PROVIDER = 'gemini'
-CHAT_MODEL = 'gpt-3.5-turbo'
+CHAT_MODEL = 'gpt-3.5-turbo'  # Using same model as development for testing
 EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L6-v2'
 
 # Database
-DATABASE_URL = 'sqlite:///development.db'
+DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///staging.db')  # Fallback to SQLite if no env var
 
 # Logging
-LOG_LEVEL = 'DEBUG'
-LOG_FILE = 'logs/development.log' 
+LOG_LEVEL = 'DEBUG'  # Keep debug logging for staging
+LOG_FILE = 'logs/staging.log' 

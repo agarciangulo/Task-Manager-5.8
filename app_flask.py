@@ -16,7 +16,7 @@ load_dotenv()
 
 # Debug: Print environment variables (only first few characters for security)
 print("\nEnvironment Variables Loaded:")
-print(f"OPENAI_API_KEY: {os.getenv('OPENAI_API_KEY')[:8]}..." if os.getenv('OPENAI_API_KEY') else "Not found")
+print(f"GEMINI_API_KEY: {os.getenv('GEMINI_API_KEY')[:8]}..." if os.getenv('GEMINI_API_KEY') else "Not found")
 print(f"NOTION_TOKEN: {os.getenv('NOTION_TOKEN')[:8]}..." if os.getenv('NOTION_TOKEN') else "Not found")
 print(f"NOTION_DATABASE_ID: {os.getenv('NOTION_DATABASE_ID')[:8]}..." if os.getenv('NOTION_DATABASE_ID') else "Not found")
 print(f"NOTION_FEEDBACK_DB_ID: {os.getenv('NOTION_FEEDBACK_DB_ID')[:8]}..." if os.getenv('NOTION_FEEDBACK_DB_ID') else "Not found")
@@ -83,7 +83,7 @@ from core.agents.notion_agent import NotionAgent
 from core.agents.task_extraction_agent import TaskExtractionAgent
 from core.agents.task_processing_agent import TaskProcessingAgent
 from core.ai.analyzers import TaskAnalyzer, ProjectAnalyzer
-from core.openai_client import get_project_insight
+from core.ai.insights import get_project_insight
 from core import identify_stale_tasks, list_all_categories
 
 # Import from plugins
@@ -91,7 +91,7 @@ from plugins import initialize_all_plugins, plugin_manager
 
 # Import from config
 from config import (
-    OPENAI_API_KEY,
+    GEMINI_API_KEY,
     NOTION_TOKEN,
     NOTION_DATABASE_ID,
     NOTION_FEEDBACK_DB_ID,

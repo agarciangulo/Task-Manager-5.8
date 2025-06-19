@@ -65,6 +65,29 @@ from config import (
     NOTION_FEEDBACK_DB_ID
 )
 
+# Import from the new structure
+from core.agents.notion_agent import NotionAgent
+from core.agents.task_extraction_agent import TaskExtractionAgent
+from core.agents.task_processing_agent import TaskProcessingAgent
+from core.ai.analyzers import TaskAnalyzer, ProjectAnalyzer
+from core.ai.insights import get_project_insight
+from core import identify_stale_tasks, list_all_categories
+
+# Import from plugins
+from plugins import initialize_all_plugins, plugin_manager
+
+# Import from config
+from config import (
+    GEMINI_API_KEY,
+    NOTION_TOKEN,
+    NOTION_DATABASE_ID,
+    NOTION_FEEDBACK_DB_ID,
+    SIMILARITY_THRESHOLD,
+    ENABLE_TASK_VALIDATION,
+    ENABLE_CHAT_VERIFICATION,
+    DEBUG_MODE
+)
+
 def check_environment():
     """Check if all required API keys are set."""
     from config import (

@@ -4,7 +4,8 @@ import argparse
 import os
 from datetime import datetime
 from core.task_extractor import extract_tasks_from_update
-from core.openai_client import client, CHAT_MODEL
+from core.gemini_client import client
+from config import CHAT_MODEL
 
 def split_test_files(input_file, output_dir):
     """Split a master test file into individual test files."""
@@ -88,13 +89,11 @@ def test_task_extraction(sample_text=None, save_output=True, results_dir="tests/
     
     # Get raw response from ChatGPT
     print("\n=== Raw ChatGPT Response ===")
-    response = client.chat_completions_create(
-        model=CHAT_MODEL,
-        messages=[{"role": "user", "content": prompt}],
+    response_text = client.generate_content(
+        prompt,
         temperature=0.3
     )
-    raw_response = response.choices[0].message.content
-    print(raw_response)
+    print(response_text)
     
     # Get processed tasks
     print("\n=== Processed Tasks ===")
@@ -103,7 +102,7 @@ def test_task_extraction(sample_text=None, save_output=True, results_dir="tests/
     
     # Save results if requested
     if save_output:
-        return save_results(sample_text, prompt, raw_response, tasks, results_dir)
+        return save_results(sample_text, prompt, response_text, tasks, results_dir)
     return None
 
 def process_sample_files(input_dir, output_dir):

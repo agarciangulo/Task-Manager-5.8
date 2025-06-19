@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from core.task_extractor import extract_tasks_from_update
 from core.task_processor import insert_or_update_task
 from core import fetch_notion_tasks
-from core.openai_client import get_coaching_insight
+from core.ai.insights import get_coaching_insight
 
 # Gmail settings - UPDATE THESE WITH YOUR INFO
 GMAIL_USER = "task.manager.mpiv@gmail.com"  # Replace with your Gmail address

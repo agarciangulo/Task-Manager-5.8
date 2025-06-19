@@ -9,7 +9,7 @@ import json
 import os
 
 from config import (
-    OPENAI_API_KEY,
+    GEMINI_API_KEY,
     CHAT_MODEL,
     DEBUG_MODE,
     AI_PROVIDER,
@@ -110,30 +110,29 @@ def get_coaching_insight(person_name: str, tasks: List[Dict[str, Any]], recent_t
     - Sound encouraging and supportive throughout
     """
 
-    if AI_PROVIDER == 'openai':
-        from core.openai_client import client
-        try:
-            response = client.chat_completions_create(
-                model=CHAT_MODEL,
-                messages=[{"role": "user", "content": feedback_prompt}],
-                temperature=0.4
-            )
+    try:
+        from core.gemini_client import client
+        
+        if not client:
+            raise Exception("Gemini client not available")
+        
+        # Use Gemini's native API
+        ai_response = client.generate_content(
+            feedback_prompt,
+            temperature=0.4
+        )
+        
+        # Unprotect any project tokens in the insights if needed
+        if use_protection:
+            try:
+                ai_response = protection_plugin.unprotect_text(ai_response)
+            except Exception as e:
+                debug_print(f"Error unprotecting insights: {e}")
             
-            insights = response.choices[0].message.content
-            
-            # Unprotect any project tokens in the insights if needed
-            if use_protection:
-                try:
-                    insights = protection_plugin.unprotect_text(insights)
-                except Exception as e:
-                    debug_print(f"Error unprotecting insights: {e}")
-                
-            return insights
-        except Exception as e:
-            debug_print(f"Error generating coaching insights: {e}")
-            return "Unable to generate coaching insights at this time."
-    else:
-        return "AI provider not supported."
+        return ai_response
+    except Exception as e:
+        debug_print(f"Error generating coaching insights: {e}")
+        return "Unable to generate coaching insights at this time."
 
 def get_project_insight(selected_category: str, filtered_tasks: pd.DataFrame) -> str:
     """
@@ -227,40 +226,44 @@ def get_project_insight(selected_category: str, filtered_tasks: pd.DataFrame) ->
     Keep your response focused, data-driven, and immediately actionable.
     """
 
-    if AI_PROVIDER == 'openai':
-        from core.openai_client import client
-        try:
-            response = client.chat_completions_create(
-                model=CHAT_MODEL,
-                messages=[{"role": "user", "content": project_prompt}],
-                temperature=0.5
-            )
-            
-            insights = response.choices[0].message.content
-            
-            # Unprotect any project tokens in the insights if needed
-            if use_protection:
-                try:
-                    insights = protection_plugin.unprotect_text(insights)
-                except Exception as e:
-                    debug_print(f"Error unprotecting project insights: {e}")
-            
-            return insights.strip()
-        except Exception as e:
-            debug_print(f"Error generating project insight: {e}")
-            return f"⚠️ Unable to generate AI insight: {e}"
-    else:
-        return f"AI provider not supported."
+    try:
+        from core.gemini_client import client
+        
+        if not client:
+            raise Exception("Gemini client not available")
+        
+        # Use Gemini's native API
+        ai_response = client.generate_content(
+            project_prompt,
+            temperature=0.5
+        )
+        
+        # Unprotect any project tokens in the insights if needed
+        if use_protection:
+            try:
+                ai_response = protection_plugin.unprotect_text(ai_response)
+            except Exception as e:
+                debug_print(f"Error unprotecting project insights: {e}")
+        
+        return ai_response.strip()
+    except Exception as e:
+        debug_print(f"Error generating project insight: {e}")
+        return f"⚠️ Unable to generate AI insight: {e}"
 
 def get_ai_response(prompt: str) -> str:
     """Get response from the configured AI provider."""
-    if AI_PROVIDER == 'openai':
-        from core.openai_client import client
-        response = client.chat_completions_create(
-            model=CHAT_MODEL,
-            messages=[{"role": "user", "content": prompt}],
+    try:
+        from core.gemini_client import client
+        
+        if not client:
+            raise Exception("Gemini client not available")
+        
+        # Use Gemini's native API
+        ai_response = client.generate_content(
+            prompt,
             temperature=0.3
         )
-        return response.choices[0].message.content
-    else:
-        return f"AI provider not supported."
+        
+        return ai_response
+    except Exception as e:
+        return f"Error: {str(e)}"

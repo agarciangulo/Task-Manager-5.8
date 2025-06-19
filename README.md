@@ -7,7 +7,7 @@
 - Docker Desktop
 - Git
 - Notion API access
-- OpenAI API key
+- Google AI (Gemini) API key
 
 ### Quick Start
 
@@ -76,13 +76,32 @@
 NOTION_TOKEN=your_notion_token
 NOTION_DATABASE_ID=your_database_id
 NOTION_FEEDBACK_DB_ID=your_feedback_db_id
-OPENAI_API_KEY=your_openai_key
+GEMINI_API_KEY=your_gemini_api_key
+
+# AI Configuration
+AI_PROVIDER=gemini  # or 'openai' if you prefer
+CHAT_MODEL=gemini-1.5-flash  # Default Gemini model
 
 # Application Settings
 FLASK_APP=app_flask.py
 FLASK_ENV=development  # or staging/production
 FLASK_DEBUG=1  # 0 for staging/production
 ```
+
+### AI Provider Configuration
+
+This application supports multiple AI providers:
+
+#### Google AI (Gemini) - Default
+- **API Key**: Get from [Google AI Studio](https://makersuite.google.com/app/apikey)
+- **Model**: `gemini-1.5-flash` (recommended) or `gemini-1.5-pro`
+- **Environment Variable**: `GEMINI_API_KEY=your_key_here`
+
+#### OpenAI (Alternative)
+- **API Key**: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+- **Model**: `gpt-4` or `gpt-3.5-turbo`
+- **Environment Variable**: `OPENAI_API_KEY=your_key_here`
+- **Configuration**: Set `AI_PROVIDER=openai` in your environment
 
 ### Common Tasks
 
@@ -125,6 +144,11 @@ docker compose logs -f web
 3. **Docker Build Fails**
    - Clear Docker cache: `docker system prune -a`
    - Rebuild: `docker compose build --no-cache`
+
+4. **AI Provider Issues**
+   - Verify API key is correct
+   - Check AI_PROVIDER setting
+   - Ensure required dependencies are installed
 
 ### Best Practices
 
@@ -174,7 +198,7 @@ For issues or questions:
 ## Features
 
 - Task management and tracking
-- AI-powered task analysis
+- AI-powered task analysis (Gemini/OpenAI)
 - Notion integration
 - Team feedback system
 - Project health monitoring
@@ -182,7 +206,7 @@ For issues or questions:
 ## Requirements
 
 - Python 3.13+
-- OpenAI API key
+- Google AI (Gemini) API key (or OpenAI API key)
 - Notion API access
 - Modern web browser
 
@@ -193,6 +217,7 @@ For issues or questions:
 ├── app_flask.py          # Main Flask application
 ├── core/                 # Core functionality
 │   ├── ai/              # AI-related code
+│   ├── agents/          # AI agents
 │   ├── adapters/        # External service adapters
 │   └── ...
 ├── static/              # Static files (CSS, JS)

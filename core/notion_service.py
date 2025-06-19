@@ -209,10 +209,13 @@ class NotionService:
             # Extract task data
             task = {
                 "id": page["id"],
-                "task": properties.get("Task", {}).get("title", [{}])[0].get("text", {}).get("content", ""),
-                "status": properties.get("Status", {}).get("select", {}).get("name", "Not Started"),
-                "priority": properties.get("Priority", {}).get("select", {}).get("name", "Medium"),
-                "due_date": properties.get("Due Date", {}).get("date", {}).get("start"),
+                "task": self.get_title_content(properties, "Task"),
+                "status": self.get_select_value(properties, "Status", "Not Started"),
+                "employee": self.get_rich_text_content(properties, "Employee"),
+                "date": self.get_date_value(properties, "Date"),
+                "category": self.get_rich_text_content(properties, "Category"),
+                "priority": self.get_select_value(properties, "Priority", "Medium"),
+                "due_date": self.get_date_value(properties, "Due Date"),
                 "created_time": page.get("created_time"),
                 "last_edited_time": page.get("last_edited_time")
             }

@@ -10,7 +10,7 @@ from config import (
     DEBUG_MODE,
     AI_MODEL,
     AI_PROVIDER,
-    OPENAI_API_KEY,
+    GEMINI_API_KEY,
     CHAT_MODEL,
     HUGGINGFACE_TOKEN
 )
@@ -21,34 +21,32 @@ class AnalyzerBase:
         self.model_name = model_name or AI_MODEL
         self.provider = AI_PROVIDER
         self.client = None
-        self._initialize_openai()
+        self._initialize_gemini()
 
-    def _initialize_openai(self):
-        """Initialize OpenAI client."""
-        import httpx
-        from openai import OpenAI
-        from core.openai_client import client as openai_client
-        
-        # Use the shared client if available
-        self.client = openai_client
-        if self.client is None:
-            http_client = httpx.Client(
-                base_url="https://api.openai.com/v1",
-                headers={"Authorization": f"Bearer {OPENAI_API_KEY}"}
-            )
-            self.client = OpenAI(
-                api_key=OPENAI_API_KEY,
-                http_client=http_client
-            )
+    def _initialize_gemini(self):
+        """Initialize Gemini client."""
+        try:
+            from core.gemini_client import client as gemini_client
+            self.client = gemini_client
+        except ImportError:
+            print("Gemini client not available")
+            self.client = None
 
     def generate_text(self, prompt: str) -> str:
-        """Generate text using OpenAI."""
-        response = self.client.chat_completions_create(
-            model=self.model_name,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
-        )
-        return response.choices[0].message.content
+        """Generate text using Gemini."""
+        if not self.client:
+            return "Gemini client not available"
+        
+        try:
+            # Use Gemini's native API
+            response_text = self.client.generate_content(
+                prompt,
+                temperature=0.7
+            )
+            return response_text
+        except Exception as e:
+            print(f"Error generating text with Gemini: {e}")
+            return f"Error: {str(e)}"
 
     def analyze(self, content, **kwargs):
         """
@@ -413,11 +411,21 @@ class ProjectAnalyzer(AnalyzerBase):
         return prompt
 
 def get_ai_response(prompt: str) -> str:
-    """Get response from the configured AI provider."""
-    from core.openai_client import client
-    response = client.chat_completions_create(
-        model=CHAT_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
-    )
-    return response.choices[0].message.content
+    """Get response from Gemini API."""
+    try:
+        from core.gemini_client import client
+        
+        if not client:
+            raise Exception("Gemini client not available")
+        
+        # Use Gemini's native API
+        response_text = client.generate_content(
+            prompt,
+            temperature=0.3
+        )
+        
+        return response_text
+        
+    except Exception as e:
+        print(f"Error getting AI response from Gemini: {e}")
+        return f"Error: {str(e)}"

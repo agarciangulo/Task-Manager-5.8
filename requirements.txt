@@ -13,3 +13,5 @@ PyYAML
 requests
 python-dotenv
 notion-client
+PyJWT
+bcrypt

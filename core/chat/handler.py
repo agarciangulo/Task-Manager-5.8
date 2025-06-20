@@ -19,9 +19,6 @@ from core.chat.verification import (
 from core.agents.notion_agent import NotionAgent
 from core.agents.task_processing_agent import TaskProcessingAgent
 
-notion_agent = NotionAgent()
-task_processing_agent = TaskProcessingAgent()
-
 def is_email_content(message):
     """
     Check if a message appears to be an email or task update.
@@ -56,7 +53,7 @@ def is_email_content(message):
         
     return False
 
-def process_email_tasks(email_content, user_id, chat_context):
+def process_email_tasks(email_content, user_id, chat_context, database_id: str):
     """
     Process tasks from email with verification for incomplete information.
     
@@ -64,6 +61,7 @@ def process_email_tasks(email_content, user_id, chat_context):
         email_content: Text content containing tasks.
         user_id: ID of the user.
         chat_context: Chat session context.
+        database_id: The user's task database ID.
         
     Returns:
         Dict: Result of processing.
@@ -92,15 +90,17 @@ def process_email_tasks(email_content, user_id, chat_context):
     # Normalize dates for all tasks
     for task in extracted_tasks:
         if "date" in task and task["date"]:
-            task["date"] = notion_agent.normalize_date_for_notion(task["date"])
+            # Use a local NotionService instance for date normalization
+            notion_service = NotionService()
+            task["date"] = notion_service.normalize_date_for_notion(task["date"])
     
     # Identify tasks needing verification using the integrated context evaluation
     complete_tasks = []
     incomplete_tasks = []
     processing_log = []  # Track processing results
     
-    # Get existing tasks for similarity matching
-    existing_tasks = fetch_notion_tasks()
+    # Get existing tasks for similarity matching from user's database
+    existing_tasks = fetch_notion_tasks(database_id=database_id)
     
     # First pass: Identify which tasks need verification
     for task in extracted_tasks:
@@ -142,7 +142,12 @@ def process_email_tasks(email_content, user_id, chat_context):
     for task in complete_tasks:
         try:
             task_log = []
-            success, result = task_processing_agent.process_task(task, existing_tasks, task_log)
+            success, result = insert_or_update_task(
+                database_id=database_id,
+                task=task, 
+                existing_tasks=existing_tasks, 
+                log_output=task_log
+            )
             processing_log.extend(task_log)
             
             if success:
@@ -166,7 +171,7 @@ def process_email_tasks(email_content, user_id, chat_context):
         "status": "complete"
     }
 
-def process_regular_chat(message, user_id, chat_context):
+def process_regular_chat(message, user_id, chat_context, database_id: str):
     """
     Process a regular chat message (not an email or verification response).
     
@@ -174,6 +179,7 @@ def process_regular_chat(message, user_id, chat_context):
         message: Message text.
         user_id: ID of the user.
         chat_context: Chat session context.
+        database_id: The user's task database ID.
         
     Returns:
         str: Response message.
@@ -186,191 +192,73 @@ def process_regular_chat(message, user_id, chat_context):
                 "I'll ask for clarification.")
     elif "list" in message.lower() and "categories" in message.lower():
         from core import list_all_categories
-        categories = list_all_categories()
+        categories = list_all_categories(database_id=database_id)
         return f"Here are the available categories: {', '.join(categories)}"
     else:
         return ("I'm here to help with task management. You can send me an email or update "
                 "with your tasks, and I'll process them for you. Type 'help' for more information.")
 
-def handle_chat_message(message, user_id, chat_context):
+def handle_chat_message(message, user_id, chat_context, database_id: str):
     """
-    Handle incoming chat messages with optimized API calls.
+    Main chat message handler.
     
     Args:
-        message: Message text.
-        user_id: ID of the user.
-        chat_context: Chat session context.
+        message: The chat message to process.
+        user_id: ID of the user sending the message.
+        chat_context: Chat session context for maintaining state.
+        database_id: The user's task database ID.
         
     Returns:
-        dict or str: Response data or message.
+        Dict: Response with message and any additional data.
     """
     try:
-        # Special command to get final results for display
-        if message == "get_final_results" and "processed_tasks" in chat_context:
-            try:
-                # OPTIMIZATION: Use combined coaching insights function
-                from core import fetch_notion_tasks, fetch_peer_feedback
-                
-                # Get person name from the first task
-                person_name = ""
-                if chat_context["processed_tasks"] and isinstance(chat_context["processed_tasks"][0], dict):
-                    person_name = chat_context["processed_tasks"][0].get("employee", "")
-                    
-                # Get existing tasks
-                existing_tasks = fetch_notion_tasks()
-                    
-                # Get peer feedback
-                peer_feedback = []
-                if person_name:
-                    try:
-                        peer_feedback = fetch_peer_feedback(person_name)
-                    except Exception as e:
-                        print(f"Error fetching peer feedback: {e}")
-                
-                # OPTIMIZATION: Generate combined insights
-                from core.chat.verification import generate_combined_coaching_insights
-                combined_results = generate_combined_coaching_insights(
-                    person_name,
-                    chat_context["processed_tasks"],
-                    existing_tasks,
-                    peer_feedback
-                )
-                
-                # Extract coaching insights
-                coaching = combined_results.get("coaching_insights", 
-                    "Unable to generate coaching insights at this time.")
-                
-                # Format tasks for display
-                tasks_formatted = []
-                for task in chat_context["processed_tasks"]:
-                    if isinstance(task, dict) and "task" in task and "status" in task:
-                        tasks_formatted.append({
-                            'task': task['task'],
-                            'status': task['status'],
-                            'employee': task.get('employee', ''),
-                            'category': task.get('category', '')
-                        })
-                        
-                return {
-                    "status": "complete",
-                    "processed_tasks": tasks_formatted,
-                    "coaching": coaching,
-                    "logs": chat_context.get("processing_logs", [])
-                }
-            except Exception as e:
-                print(f"Error generating final results: {e}")
-                print(traceback.format_exc())
-                return {
-                    "status": "error",
-                    "message": f"Error generating final results: {str(e)}"
-                }
-          
-        # Check if we're in the middle of a verification flow
-        if "pending_tasks" in chat_context and chat_context["pending_tasks"]:
+        # Check if this is a verification response
+        if chat_context.get("pending_tasks"):
             # Process verification response
-            result = parse_verification_response(message, chat_context)
+            result = parse_verification_response(message, chat_context["pending_tasks"])
             
             if result["status"] == "complete":
-                # All tasks verified and processed - now explicitly process all tasks
-                try:
-                    from core import fetch_notion_tasks, fetch_peer_feedback
-                    from core.openai_client import get_coaching_insight
-                    from core.task_processor import insert_or_update_task, batch_insert_tasks  # Import batch_insert_tasks
-                    from datetime import datetime, timedelta
-                    import pandas as pd
-
-                    # Get existing tasks from Notion
-                    existing_tasks = fetch_notion_tasks()
-                    
-                    # Merge complete tasks with newly verified tasks
-                    all_tasks = []
-                    
-                    # First add the original complete tasks
-                    complete_tasks = chat_context.get("complete_tasks", [])
-                    all_tasks.extend(complete_tasks)
-                    
-                    # Then add the verified tasks with their updated information
-                    verified_tasks = result.get("updated_tasks", [])  # Get the updated tasks from verification result
-                    
-                    # For each verified task, preserve the original date and employee
-                    for i, verified_task in enumerate(verified_tasks):
-                        # Get the original task from pending_tasks
-                        original_task = chat_context["pending_tasks"][i]
-                        # Preserve the original date and employee
-                        verified_task["date"] = original_task.get("date", datetime.now().strftime("%Y-%m-%d"))
-                        verified_task["employee"] = original_task.get("employee", "")
-                    
-                    all_tasks.extend(verified_tasks)
-                    
-                    # Store all tasks in context for future reference
-                    chat_context["processed_tasks"] = all_tasks
-                    
-                    log_output = []
-                    
-                    # Use batch insert to process all tasks together
-                    batch_result = batch_insert_tasks(all_tasks, existing_tasks)
-                    
-                    if batch_result["status"] == "complete":
-                        for log_msg in batch_result["results"]:
-                            log_output.append(f"✅ {log_msg}")
-                    else:
-                        log_output.append("❌ Error processing tasks in batch")
-                    
-                    # Get person name from the first task
-                    person_name = ""
-                    if all_tasks and isinstance(all_tasks[0], dict):
-                        person_name = all_tasks[0].get("employee", "")
-                        
-                    # Get recent tasks for coaching insights
-                    recent_tasks = pd.DataFrame()
+                # All tasks verified, process them
+                complete_tasks = chat_context.get("complete_tasks", [])
+                all_tasks = complete_tasks + result["verified_tasks"]
+                
+                # Get existing tasks for similarity matching
+                existing_tasks = fetch_notion_tasks(database_id=database_id)
+                
+                # Process all tasks
+                processing_log = []
+                for task in all_tasks:
                     try:
-                        recent_tasks = existing_tasks[existing_tasks['date'] >= datetime.now() - timedelta(days=14)]
-                        print(f"Retrieved {len(recent_tasks)} recent tasks for analysis")
-                    except Exception as e:
-                        print(f"Error retrieving recent tasks: {e}")
+                        task_log = []
+                        success, result_msg = insert_or_update_task(
+                            database_id=database_id,
+                            task=task, 
+                            existing_tasks=existing_tasks, 
+                            log_output=task_log
+                        )
+                        processing_log.extend(task_log)
                         
-                    # Get peer feedback
-                    peer_feedback = []
-                    if person_name:
-                        try:
-                            peer_feedback = fetch_peer_feedback(person_name)
-                        except Exception as e:
-                            print(f"Error fetching peer feedback: {e}")
-                            
-                    # Generate coaching insights
-                    print("Generating coaching insights...")
-                    coaching = get_coaching_insight(person_name, all_tasks, recent_tasks, peer_feedback)
-                    print("Generated coaching insights")
-                    
-                    # Format tasks for display
-                    tasks_formatted = []
-                    for task in all_tasks:
-                        if isinstance(task, dict) and "task" in task and "status" in task:
-                            tasks_formatted.append({
-                                'task': task['task'],
-                                'status': task['status'],
-                                'employee': task.get('employee', ''),
-                                'category': task.get('category', '')
-                            })
-                    
-                    # Return to chat a simple completion message, but include data for results box
-                    return {
-                        "message": result.get("message", "All tasks have been verified and updated successfully."),
-                        "status": "complete",
-                        "has_pending_tasks": False,
-                        "processed_tasks": tasks_formatted,
-                        "coaching": coaching,
-                        "logs": log_output + chat_context.get("processing_logs", [])
-                    }
-                    
-                except Exception as e:
-                    print(f"Error generating final results: {e}")
-                    print(traceback.format_exc())
-                    return {
-                        "message": result.get("message", "Tasks were verified but there was an error in processing."),
-                        "status": "complete",
-                        "has_pending_tasks": False
-                    }
+                        if success:
+                            processing_log.append(f"Task '{task['task']}' processed successfully")
+                        else:
+                            processing_log.append(f"Task '{task['task']}' failed to process: {result_msg}")
+                    except Exception as e:
+                        processing_log.append(f"Error processing task '{task['task']}': {e}")
+                        print(f"Error processing task: {e}")
+                        print(traceback.format_exc())
+                
+                # Clear pending tasks
+                chat_context.pop("pending_tasks", None)
+                chat_context.pop("complete_tasks", None)
+                chat_context["processing_logs"] = processing_log
+                chat_context["processed_tasks"] = all_tasks
+                
+                return {
+                    "message": f"All {len(all_tasks)} tasks have been processed successfully!",
+                    "logs": processing_log,
+                    "has_pending_tasks": False
+                }
+                
             elif result["status"] == "partial":
                 # Some tasks still need verification
                 return {
@@ -388,7 +276,7 @@ def handle_chat_message(message, user_id, chat_context):
         # Check if message contains an email to process
         elif is_email_content(message):
             # Process as email with tasks
-            result = process_email_tasks(message, user_id, chat_context)
+            result = process_email_tasks(message, user_id, chat_context, database_id)
             
             if result["status"] == "verification_needed":
                 return f"I've processed {result['complete_count']} tasks that had all the needed information.\n\n" + result["verification_message"]
@@ -402,7 +290,7 @@ def handle_chat_message(message, user_id, chat_context):
         # Handle other types of messages
         else:
             # Regular chat message processing
-            return process_regular_chat(message, user_id, chat_context)
+            return process_regular_chat(message, user_id, chat_context, database_id)
     except Exception as e:
         print(f"Error handling chat message: {e}")
         print(traceback.format_exc())

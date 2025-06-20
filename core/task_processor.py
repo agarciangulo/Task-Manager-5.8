@@ -31,7 +31,6 @@ from core.task_similarity import check_task_similarity
 from plugins import plugin_manager
 
 _embedding_manager = EmbeddingManager()
-notion_service = NotionService()
 
 def debug_print(message):
     """Print debug messages if DEBUG_MODE is True."""
@@ -80,11 +79,12 @@ def normalize_date_for_notion(date_value):
         # Fallback: just return the string as-is
         return str(date_value)
 
-def insert_or_update_task(task, existing_tasks, log_output=None, batch_mode=False):
+def insert_or_update_task(database_id: str, task: dict, existing_tasks, log_output=None, batch_mode=False):
     """
     Insert a new task or update existing similar task with intelligent matching.
     
     Args:
+        database_id: The ID of the Notion database to use.
         task: The task to process
         existing_tasks: Existing tasks to check against (DataFrame or list)
         log_output: List to append log messages to
@@ -147,6 +147,7 @@ def insert_or_update_task(task, existing_tasks, log_output=None, batch_mode=Fals
             
             # Update the existing task
             if not batch_mode:
+                notion_service = NotionService()
                 success, message = notion_service.update_task(matched_task["id"], task)
                 if success:
                     log_output.append(f"✅ Updated existing task: {task['task']}")
@@ -160,8 +161,8 @@ def insert_or_update_task(task, existing_tasks, log_output=None, batch_mode=Fals
             
             # Create new task
             if not batch_mode:
-                success = notion_service.insert_task(task)
-                message = "Inserted" if success else "Failed to insert"
+                notion_service = NotionService()
+                success, message = notion_service.insert_task(database_id, task)
                 if success:
                     log_output.append(f"✅ Created new task: {task['task']}")
                 else:
@@ -176,11 +177,12 @@ def insert_or_update_task(task, existing_tasks, log_output=None, batch_mode=Fals
         print(traceback.format_exc())
         return False, error_msg
 
-def batch_insert_tasks(tasks, existing_tasks):
+def batch_insert_tasks(database_id: str, tasks: list, existing_tasks: list):
     """
     Process multiple tasks efficiently in batch.
     
     Args:
+        database_id: The ID of the Notion database to use.
         tasks: List of tasks to process
         existing_tasks: Existing tasks to check against
         
@@ -194,7 +196,7 @@ def batch_insert_tasks(tasks, existing_tasks):
         # First pass: Verify all tasks
         for task in tasks:
             log_output = []
-            success, message = insert_or_update_task(task, existing_tasks, log_output, batch_mode=True)
+            success, message = insert_or_update_task(database_id, task, existing_tasks, log_output, batch_mode=True)
             
             if success:
                 processed_tasks.append(task)
@@ -205,7 +207,7 @@ def batch_insert_tasks(tasks, existing_tasks):
         # Second pass: Actually insert/update tasks
         for task in processed_tasks:
             log_output = []
-            success, message = insert_or_update_task(task, existing_tasks, log_output)
+            success, message = insert_or_update_task(database_id, task, existing_tasks, log_output)
             results.extend(log_output)
             
         return {

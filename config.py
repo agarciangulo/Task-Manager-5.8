@@ -11,10 +11,17 @@ load_dotenv()
 NOTION_TOKEN = os.getenv('NOTION_TOKEN')
 NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
 NOTION_FEEDBACK_DB_ID = os.getenv('NOTION_FEEDBACK_DB_ID')
+NOTION_USERS_DB_ID = os.getenv('NOTION_USERS_DB_ID')
+NOTION_PARENT_PAGE_ID = os.getenv('NOTION_PARENT_PAGE_ID')
 
 # API Keys
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+
+# Gmail Configuration
+GMAIL_ADDRESS = os.getenv('GMAIL_ADDRESS')
+GMAIL_APP_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
+GMAIL_SERVER = os.getenv('GMAIL_SERVER', 'imap.gmail.com')
 
 # Application Settings
 SIMILARITY_THRESHOLD = float(os.getenv('SIMILARITY_THRESHOLD', '0.70'))
@@ -23,6 +30,12 @@ ENABLE_CHAT_VERIFICATION = os.getenv('ENABLE_CHAT_VERIFICATION', 'True').lower()
 MIN_TASK_LENGTH = int(os.getenv('MIN_TASK_LENGTH', '3'))
 DAYS_THRESHOLD = int(os.getenv('DAYS_THRESHOLD', '2'))
 DEBUG_MODE = os.getenv('DEBUG_MODE', 'False') == 'True'
+
+# Authentication Settings
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
+JWT_EXPIRATION_HOURS = int(os.getenv('JWT_EXPIRATION_HOURS', '24'))
+ENABLE_AUTHENTICATION = os.getenv('ENABLE_AUTHENTICATION', 'True').lower() == 'true'
 
 # File paths
 EMBEDDING_CACHE_PATH = os.getenv('EMBEDDING_CACHE_PATH', 'embedding_cache.db')
@@ -64,6 +77,13 @@ if AI_PROVIDER == 'openai':
     required_vars.append('OPENAI_API_KEY')
 elif AI_PROVIDER == 'gemini':
     required_vars.append('GEMINI_API_KEY')
+
+# Add authentication requirements if enabled
+if ENABLE_AUTHENTICATION:
+    required_vars.extend([
+        'JWT_SECRET_KEY',
+        'NOTION_USERS_DB_ID'
+    ])
 
 missing_vars = [var for var in required_vars if not os.getenv(var)]
 

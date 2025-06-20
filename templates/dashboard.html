@@ -12,6 +12,8 @@
     <!-- Add custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <script src="/static/js/auth.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
@@ -33,6 +35,11 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="/dashboard">
                             <i class="bi bi-graph-up"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/tasks">
+                            <i class="bi bi-list-task"></i> My Tasks
                         </a>
                     </li>
                     <li class="nav-item">

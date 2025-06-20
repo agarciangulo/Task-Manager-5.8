@@ -7,9 +7,9 @@ class NotionAgent:
         self.service = NotionService()
 
     @handle_agent_errors("NotionAgent")
-    def fetch_tasks(self):
+    def fetch_tasks(self, database_id: str):
         try:
-            return self.service.fetch_tasks()
+            return self.service.fetch_tasks(database_id=database_id)
         except Exception as e:
             import traceback
             print(f"Error fetching tasks: {e}")
@@ -17,16 +17,16 @@ class NotionAgent:
             raise ValueError(f"Failed to fetch tasks: {str(e)}\n{traceback.format_exc()}")
 
     @handle_agent_errors("NotionAgent")
-    def insert_task(self, task):
+    def insert_task(self, database_id: str, task: dict):
         try:
-            return self.service.insert_task(task)
+            return self.service.insert_task(database_id=database_id, task_data=task)
         except Exception as e:
             raise NotionAgentError(f"Failed to insert task: {e}")
 
     @handle_agent_errors("NotionAgent")
-    def update_task(self, task_id, task):
+    def update_task(self, task_id: str, task: dict):
         try:
-            return self.service.update_task(task_id, task)
+            return self.service.update_task(task_id=task_id, updates=task)
         except Exception as e:
             raise NotionAgentError(f"Failed to update task: {e}")
 

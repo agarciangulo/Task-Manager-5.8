@@ -11,11 +11,10 @@ from core.task_extractor import extract_tasks_from_update
 from core.task_processor import insert_or_update_task
 from core import fetch_notion_tasks
 from core.ai.insights import get_coaching_insight
+from config import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, GMAIL_SERVER, NOTION_TOKEN, NOTION_USERS_DB_ID
 
-# Gmail settings - UPDATE THESE WITH YOUR INFO
-GMAIL_USER = "task.manager.mpiv@gmail.com"  # Replace with your Gmail address
-GMAIL_PASSWORD = "fjohbugkfbkpgahg"  # Replace with your App Password (no spaces)
-GMAIL_SERVER = "imap.gmail.com"
+# Import AuthService for user lookup
+from core.services.auth_service import AuthService
 
 def send_confirmation_email(recipient, tasks, coaching_insights=None):
     """
@@ -29,7 +28,7 @@ def send_confirmation_email(recipient, tasks, coaching_insights=None):
     try:
         # Create message
         msg = MIMEMultipart('alternative')
-        msg['From'] = GMAIL_USER
+        msg['From'] = GMAIL_ADDRESS
         msg['To'] = recipient
         msg['Subject'] = f"Task Manager: {len(tasks)} Tasks Processed"
         
@@ -120,7 +119,7 @@ def send_confirmation_email(recipient, tasks, coaching_insights=None):
         # Send email
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
             server.starttls()
-            server.login(GMAIL_USER, GMAIL_PASSWORD)
+            server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
             server.send_message(msg)
             
         print(f"Confirmation email sent to {recipient}")
@@ -134,13 +133,18 @@ def send_confirmation_email(recipient, tasks, coaching_insights=None):
 def check_gmail_for_updates():
     """Check Gmail for new emails and process them."""
     try:
+        # Initialize AuthService for user lookup
+        from core.security.jwt_utils import JWTManager
+        jwt_manager = JWTManager(secret_key="dummy", algorithm="HS256")  # We don't need real JWT for this
+        auth_service = AuthService(NOTION_TOKEN, NOTION_USERS_DB_ID, jwt_manager, None)
+        
         # Connect to Gmail
         print(f"Connecting to {GMAIL_SERVER}...")
         mail = imaplib.IMAP4_SSL(GMAIL_SERVER)
         
         # Login
-        print(f"Logging in as {GMAIL_USER}...")
-        mail.login(GMAIL_USER, GMAIL_PASSWORD)
+        print(f"Logging in as {GMAIL_ADDRESS}...")
+        mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
         
         # Select inbox
         mail.select("INBOX")
@@ -229,24 +233,47 @@ def check_gmail_for_updates():
             # Format the update text
             update_text = f"From: {sender_name}\nDate: {date_str}\n\nSubject: {subject}\n\n{body}"
             
-            print(f"Processing email from {sender_name} with subject: {subject}")
+            print(f"Processing email from {sender_name} ({sender_email}) with subject: {subject}")
+            
+            # Look up user by email address
+            user = auth_service.get_user_by_email(sender_email)
+            if not user:
+                print(f"No user found for email: {sender_email}. Skipping email.")
+                # Mark as read anyway to avoid reprocessing
+                mail.store(msg_id, "+FLAGS", "\\Seen")
+                continue
+                
+            if not user.task_database_id:
+                print(f"User {sender_email} does not have a task database configured. Skipping email.")
+                # Mark as read anyway to avoid reprocessing
+                mail.store(msg_id, "+FLAGS", "\\Seen")
+                continue
             
             try:
                 # Extract tasks
                 tasks = extract_tasks_from_update(update_text)
                 
                 if tasks:
-                    print(f"Extracted {len(tasks)} tasks")
+                    print(f"Extracted {len(tasks)} tasks for user {sender_email}")
                     
-                    # Get existing tasks
-                    existing_tasks = fetch_notion_tasks()
+                    # Get existing tasks from user's database
+                    existing_tasks = fetch_notion_tasks(database_id=user.task_database_id)
                     
                     # Process each task
                     log_output = []
                     for task in tasks:
-                        insert_or_update_task(task, existing_tasks, log_output)
+                        success, message = insert_or_update_task(
+                            database_id=user.task_database_id,
+                            task=task, 
+                            existing_tasks=existing_tasks, 
+                            log_output=log_output
+                        )
+                        if success:
+                            print(f"Successfully processed task: {task.get('task')}")
+                        else:
+                            print(f"Failed to process task: {task.get('task')} - {message}")
                     
-                    print(f"Successfully processed {len(tasks)} tasks")
+                    print(f"Successfully processed {len(tasks)} tasks for user {sender_email}")
                     
                     # Generate coaching insights
                     coaching_insights = None
@@ -257,7 +284,7 @@ def check_gmail_for_updates():
                             person_name = tasks[0].get("employee", "")
                             
                         if person_name:
-                            # Get recent tasks for this person
+                            # Get recent tasks for this person from user's database
                             recent_tasks = existing_tasks[existing_tasks['employee'] == person_name]
                             if len(recent_tasks) > 0:
                                 # Filter to recent tasks (last 14 days)

@@ -5,15 +5,43 @@ This module provides compatibility with the new structure.
 # Import from new locations
 from core.notion_service import NotionService
 
-# Create instance with default config
-notion_service = NotionService()
+# Functions from notion_service.py - updated to accept database_id
+def fetch_notion_tasks(database_id: str, days_back: int = 30):
+    """Fetch tasks from a specific database."""
+    service = NotionService()
+    return service.fetch_tasks(database_id=database_id, days_back=days_back)
 
-# Functions from notion_service.py
-fetch_notion_tasks = notion_service.fetch_tasks
-identify_stale_tasks = notion_service.identify_stale_tasks
-mark_task_as_reminded = notion_service.mark_task_as_reminded
-insert_task_to_notion = notion_service.insert_task
-update_task_in_notion = notion_service.update_task
-fetch_peer_feedback = notion_service.fetch_peer_feedback
-list_all_categories = notion_service.list_all_categories
-validate_notion_connection = notion_service.validate_connection
+def identify_stale_tasks(database_id: str, days: int = 7):
+    """Identify stale tasks in a specific database."""
+    service = NotionService()
+    return service.identify_stale_tasks(database_id=database_id, days=days)
+
+def mark_task_as_reminded(task_id: str):
+    """Mark a task as reminded."""
+    service = NotionService()
+    return service.mark_task_as_reminded(task_id)
+
+def insert_task_to_notion(database_id: str, task_data: dict):
+    """Insert a task into a specific database."""
+    service = NotionService()
+    return service.insert_task(database_id=database_id, task_data=task_data)
+
+def update_task_in_notion(task_id: str, updates: dict):
+    """Update a task in Notion."""
+    service = NotionService()
+    return service.update_task(task_id=task_id, updates=updates)
+
+def fetch_peer_feedback(person_name: str, days_back: int = 14):
+    """Fetch peer feedback."""
+    service = NotionService()
+    return service.fetch_peer_feedback(person_name, days_back)
+
+def list_all_categories(database_id: str):
+    """List all categories from a specific database."""
+    service = NotionService()
+    return service.list_all_categories(database_id=database_id)
+
+def validate_notion_connection():
+    """Validate Notion connection."""
+    service = NotionService()
+    return service.validate_connection()

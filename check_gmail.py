@@ -7,7 +7,7 @@ def main():
     interval_minutes = 5  # Check every 5 minutes
     
     print(f"Starting Gmail checker. Will check every {interval_minutes} minutes.")
-    print(f"Checking for emails sent to: {GMAIL_USER}")
+    print(f"Checking for emails sent to: {GMAIL_ADDRESS}")
     print("Press Ctrl+C to exit.")
     
     try:
@@ -34,5 +34,5 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    from gmail_processor import GMAIL_USER
+    from gmail_processor import GMAIL_ADDRESS
     main()

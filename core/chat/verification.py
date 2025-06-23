@@ -28,18 +28,27 @@ def generate_verification_questions(incomplete_tasks):
         # Create a list of what's needed for this task
         needs_list = []
         
-        # Ask for more details if needed
+        # Ask for more details if needed - use the AI-generated suggested question
         if task.get("needs_description"):
-            if task.get("suggested_question"):
+            if task.get("suggested_question") and task["suggested_question"].strip():
                 needs_list.append(f"❓ {task['suggested_question']}")
             else:
-                needs_list.append("❓ Could you tell me more about what this task involved?")
+                # Fallback question if no suggested question was generated
+                task_text = task['task'].lower().strip()
+                if len(task_text.split()) <= 2:
+                    needs_list.append(f"❓ Could you provide more details about '{task['task']}'? What specifically was accomplished?")
+                else:
+                    needs_list.append("❓ Could you tell me more about what this task involved? What were the specific outcomes?")
         
         # Ask about category if needed
-        if task.get("needs_category"):
+        if task.get("needs_category") or task.get("category") == "General":
             # Get suggested categories
-            suggested_categories = list_all_categories()[:5]  # Get top 5 categories
-            needs_list.append(f"📂 Which project does this belong to? (Some suggestions: {', '.join(suggested_categories)})")
+            try:
+                # For now, use an empty list since we don't have a specific database context
+                suggested_categories = []
+                needs_list.append(f"📂 Which project does this belong to?")
+            except:
+                needs_list.append("📂 Which project does this belong to?")
             
         # Ask about status if needed
         if task.get("needs_status"):
@@ -55,14 +64,16 @@ def generate_verification_questions(incomplete_tasks):
     verification_message += "You can respond in a natural way. For example:\n\n"
     
     # Generate example response based on actual tasks
-    example_task = incomplete_tasks[0]
-    verification_message += f"\"For task 1: {example_task.get('suggested_question', 'Here are more details...')} [your answer]. "
-    
-    if example_task.get("needs_category"):
-        verification_message += "It's part of [project name]. "
+    if incomplete_tasks:
+        example_task = incomplete_tasks[0]
+        example_question = example_task.get('suggested_question', 'Here are more details...')
+        verification_message += f"\"For task 1: {example_question} [your answer]. "
         
-    if example_task.get("needs_status"):
-        verification_message += "The status is [completed/in progress/pending].\"\n\n"
+        if example_task.get("needs_category") or example_task.get("category") == "General":
+            verification_message += "It's part of [project name]. "
+            
+        if example_task.get("needs_status"):
+            verification_message += "The status is [completed/in progress/pending].\"\n\n"
     
     verification_message += "Or you can use a more structured format if you prefer:\n"
     verification_message += "1. Details: [your detailed explanation], Category: [project], Status: [status]\n"

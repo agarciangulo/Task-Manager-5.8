@@ -164,14 +164,18 @@ window.authManager = authManager;
     // This script should be included in all protected pages.
     // It checks for a valid auth token and redirects to login if it's missing.
     
-    const protectedPaths = ['/dashboard', '/chat', '/'];
+    const protectedPaths = ['/dashboard', '/chat'];
     const currentPath = window.location.pathname;
 
     if (protectedPaths.includes(currentPath)) {
         const token = localStorage.getItem('authToken');
         if (!token) {
             // If no token, and we are on a protected page, redirect to login.
-            window.location.href = '/login';
+            console.log('No authentication token found, redirecting to login...');
+            // Add a small delay to ensure the page loads properly before redirect
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 100);
             return;
         }
 

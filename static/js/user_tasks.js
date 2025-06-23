@@ -79,7 +79,7 @@ function createTaskCard(task) {
         <div class="task-card">
             <div class="task-header">
                 <div class="flex-grow-1">
-                    <div class="task-title">${escapeHtml(task.task)}</div>
+                    <div class="task-title">${escapeHtml(task.title || task.task)}</div>
                     <div class="task-meta">
                         <span class="status-badge ${statusClass}">${task.status}</span>
                         <span class="priority-badge ${priorityClass} ms-2">${task.priority}</span>
@@ -89,6 +89,7 @@ function createTaskCard(task) {
                 </div>
             </div>
             
+            ${task.task && task.task !== (task.title || '') ? `<div class="task-description mt-2">${escapeHtml(task.task)}</div>` : ''}
             ${task.notes ? `<div class="task-notes mt-2">${escapeHtml(task.notes)}</div>` : ''}
             ${task.category ? `<div class="task-category mt-1"><small class="text-muted">Category: ${escapeHtml(task.category)}</small></div>` : ''}
             
@@ -159,7 +160,8 @@ function filterTasks() {
 
 function addTask() {
     const taskData = {
-        task: document.getElementById('taskTitle').value,
+        title: document.getElementById('taskTitle').value,
+        task: document.getElementById('taskDescription').value,
         notes: document.getElementById('taskDescription').value,
         status: document.getElementById('taskStatus').value,
         priority: document.getElementById('taskPriority').value,
@@ -167,7 +169,7 @@ function addTask() {
         due_date: document.getElementById('taskDueDate').value || null
     };
 
-    if (!taskData.task.trim()) {
+    if (!taskData.title.trim()) {
         showError('Task title is required');
         return;
     }
@@ -219,8 +221,8 @@ function editTask(taskId) {
 
     // Populate edit form
     document.getElementById('editTaskId').value = task.id;
-    document.getElementById('editTaskTitle').value = task.task;
-    document.getElementById('editTaskDescription').value = task.notes || '';
+    document.getElementById('editTaskTitle').value = task.title || task.task;
+    document.getElementById('editTaskDescription').value = task.task || task.notes || '';
     document.getElementById('editTaskStatus').value = task.status;
     document.getElementById('editTaskPriority').value = task.priority;
     document.getElementById('editTaskCategory').value = task.category || '';
@@ -234,7 +236,8 @@ function editTask(taskId) {
 function updateTask() {
     const taskId = document.getElementById('editTaskId').value;
     const taskData = {
-        task: document.getElementById('editTaskTitle').value,
+        title: document.getElementById('editTaskTitle').value,
+        task: document.getElementById('editTaskDescription').value,
         notes: document.getElementById('editTaskDescription').value,
         status: document.getElementById('editTaskStatus').value,
         priority: document.getElementById('editTaskPriority').value,
@@ -242,7 +245,7 @@ function updateTask() {
         due_date: document.getElementById('editTaskDueDate').value || null
     };
 
-    if (!taskData.task.trim()) {
+    if (!taskData.title.trim()) {
         showError('Task title is required');
         return;
     }
@@ -366,4 +369,4 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-} 
+}

@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-06-23T16:21:40.419772",
+  "test_user": {
+    "email": "core_test_20250623_162124@example.com",
+    "user_id": "3be42037-9bf1-4577-8830-ef9169da4d78",
+    "full_name": "Core Test User 162124",
+    "task_database_id": "21b5c6ec-3b80-81d5-ad58-f0365f95c1d3"
+  },
+  "results": {
+    "user_creation": true,
+    "task_database_creation": true,
+    "task_extraction": true,
+    "task_insertion": true,
+    "coaching_insights": false,
+    "email_simulation": true
+  },
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 5,
+    "success_rate": "83.3%"
+  }
+}

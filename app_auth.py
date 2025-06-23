@@ -309,7 +309,9 @@ def index():
     This route is public, but the page content is protected by a client-side auth guard.
     """
     try:
-        categories = list_all_categories()
+        # For the public index page, we'll use a default database or empty list
+        # since we don't have a specific user context
+        categories = []
         return render_template('index.html', categories=categories)
     except Exception as e:
         print(f"Error in index route: {e}")
@@ -408,13 +410,19 @@ def process_update(current_user):
         log_output.append(f"Extracted {len(extracted_tasks)} tasks.")
 
         if not extracted_tasks:
-            return jsonify({"message": "No tasks to process.", "log": log_output})
+            return jsonify({
+                "success": True,
+                "message": "No tasks to process.",
+                "processed_tasks": [],
+                "log": log_output
+            })
 
         # Step 2: Fetch existing tasks from user's DB to check for duplicates
         existing_tasks = notion_agent.fetch_tasks(database_id=user_task_db_id)
         log_output.append("Fetched existing tasks for similarity check.")
 
         # Step 3: Process each extracted task
+        processed_tasks = []
         for task in extracted_tasks:
             success, message = task_processing_agent.process_task(
                 database_id=user_task_db_id,
@@ -424,15 +432,44 @@ def process_update(current_user):
             )
             if success:
                 log_output.append(f"Successfully processed task: {task.get('task')}")
+                processed_tasks.append({
+                    "task": task.get('task', ''),
+                    "status": task.get('status', 'Not Started'),
+                    "employee": task.get('employee', ''),
+                    "category": task.get('category', '')
+                })
             else:
                 log_output.append(f"Failed to process task: {task.get('task')} - {message}")
 
-        return jsonify({"message": "Update processed successfully", "log": log_output})
+        # Generate coaching insights
+        coaching_insights = ""
+        try:
+            from core.ai.insights import get_coaching_insight
+            coaching_insights = get_coaching_insight(
+                current_user.get('full_name', 'User'),
+                processed_tasks,
+                existing_tasks,
+                []
+            )
+        except Exception as e:
+            log_output.append(f"Failed to generate coaching insights: {e}")
+
+        return jsonify({
+            "success": True,
+            "message": "Update processed successfully",
+            "processed_tasks": processed_tasks,
+            "coaching": coaching_insights,
+            "log": log_output
+        })
 
     except Exception as e:
         log_output.append(f"An error occurred: {e}")
         traceback.print_exc()
-        return jsonify({"error": f"An error occurred: {e}", "log": log_output}), 500
+        return jsonify({
+            "success": False,
+            "error": f"An error occurred: {e}",
+            "log": log_output
+        }), 500
 
 @app.route('/api/stale_tasks')
 @require_auth
@@ -761,6 +798,16 @@ def create_user_task_database(current_user):
     except Exception as e:
         print(f"Create user task database error: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/test_auth')
+@require_auth
+def test_auth(current_user):
+    """Test endpoint to verify authentication is working."""
+    return jsonify({
+        "success": True,
+        "message": "Authentication working!",
+        "user": current_user
+    })
 
 if __name__ == '__main__':
     # Validate authentication setup

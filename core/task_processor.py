@@ -25,12 +25,13 @@ from config import (
     ENABLE_CHAT_VERIFICATION,
     DAYS_THRESHOLD
 )
-from core.embedding_manager import EmbeddingManager
+from core.chroma_embedding_manager_simple import SimpleChromaEmbeddingManager
 from core.notion_service import NotionService
 from core.task_similarity import check_task_similarity
 from plugins import plugin_manager
 
-_embedding_manager = EmbeddingManager()
+# Initialize simplified Chroma-based embedding manager
+_chroma_manager = SimpleChromaEmbeddingManager()
 
 def debug_print(message):
     """Print debug messages if DEBUG_MODE is True."""

@@ -59,6 +59,9 @@ $(document).ready(function() {
             url: `/api/dashboard_data?${queryParams}`,
             type: 'GET',
             dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+            },
             success: function(response) {
                 if (response.success) {
                     updateDashboard(response);

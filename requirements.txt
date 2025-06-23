@@ -15,3 +15,7 @@ python-dotenv
 notion-client
 PyJWT
 bcrypt
+chromadb
+celery
+redis
+flower

@@ -93,169 +93,200 @@
                             <i class="bi bi-question-circle"></i> Help
                         </a>
                     </li>
+                    <li class="nav-item" id="logoutItem" style="display: none;">
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </header>
 
     <div class="container">
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="app-header text-center">
-                    <h1 class="display-5 mb-3">📝 Task Manager</h1>
-                    <p class="lead text-muted">AI-powered task tracking and productivity insights</p>
+        <!-- Login Prompt (shown when not authenticated) -->
+        <div id="loginPrompt" class="row mb-4" style="display: none;">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-lock-circle text-primary" style="font-size: 4rem;"></i>
+                        </div>
+                        <h3 class="mb-3">Welcome to Task Manager</h3>
+                        <p class="text-muted mb-4">Please log in to access your task management dashboard.</p>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a href="/login" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                            <a href="/register" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-person-plus"></i> Register
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Task Input Section -->
-            <div class="col-lg-6">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-pencil-square text-primary me-2"></i>
-                            Update Submission
-                        </h5>
+        <!-- Main Content (shown when authenticated) -->
+        <div id="mainContent" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="app-header text-center">
+                        <h1 class="display-5 mb-3">📝 Task Manager</h1>
+                        <p class="lead text-muted">AI-powered task tracking and productivity insights</p>
                     </div>
-                    <div class="card-body">
-                        <form id="updateForm">
-                            <div class="mb-3">
-                                <label for="updateText" class="form-label">Paste your daily update here</label>
-                                <textarea id="updateText" class="form-control" rows="10" 
-                                placeholder="Paste your email or daily status update here..."></textarea>
-                            </div>
-                            <div class="d-grid">
-                                <button id="submitBtn" type="submit" class="btn btn-primary">
-                                    <i class="bi bi-send"></i> Submit Update
-                                </button>
-                            </div>
-                            <div id="loadingIndicator" class="text-center mt-3" style="display: none;">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Task Input Section -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-pencil-square text-primary me-2"></i>
+                                Update Submission
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="updateForm">
+                                <div class="mb-3">
+                                    <label for="updateText" class="form-label">Paste your daily update here</label>
+                                    <textarea id="updateText" class="form-control" rows="10" 
+                                    placeholder="Paste your email or daily status update here..."></textarea>
                                 </div>
-                                <p class="text-muted">Processing your update...</p>
+                                <div class="d-grid">
+                                    <button id="submitBtn" type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send"></i> Submit Update
+                                    </button>
+                                </div>
+                                <div id="loadingIndicator" class="text-center mt-3" style="display: none;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="text-muted">Processing your update...</p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results Section -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                Results
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="results">
+                                <div class="placeholder-content text-center py-5">
+                                    <div class="placeholder-icon mb-3">
+                                        <i class="bi bi-arrow-left-circle text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5 class="text-muted">Submit an update to see results</h5>
+                                    <p class="text-muted small">
+                                        Paste your update text in the form and submit to extract tasks and get AI-powered insights.
+                                    </p>
+                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Results Section -->
-            <div class="col-lg-6">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-check-circle text-success me-2"></i>
-                            Results
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="results">
-                            <div class="placeholder-content text-center py-5">
-                                <div class="placeholder-icon mb-3">
-                                    <i class="bi bi-arrow-left-circle text-muted" style="font-size: 3rem;"></i>
-                                </div>
-                                <h5 class="text-muted">Submit an update to see results</h5>
-                                <p class="text-muted small">
-                                    Paste your update text in the form and submit to extract tasks and get AI-powered insights.
-                                </p>
-                            </div>
+            <!-- Chat Verification Section - initially hidden -->
+            <div id="chatVerificationContainer" class="row mb-4" style="display: none;">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-chat-dots text-primary me-2"></i>
+                                Task Verification
+                            </h5>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Chat Verification Section - initially hidden -->
-        <div id="chatVerificationContainer" class="row mb-4" style="display: none;">
-            <div class="col-lg-8 offset-lg-2">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-chat-dots text-primary me-2"></i>
-                            Task Verification
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chat-container">
-                            <div id="chatMessages" class="chat-messages">
-                                <!-- Messages will be displayed here -->
-                            </div>
-                            <div class="chat-input">
-                                <form id="chatForm">
-                                    <div class="input-group">
-                                        <textarea id="chatInput" class="form-control" placeholder="Type your response..." rows="2"></textarea>
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-send"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Task Management Tools -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
-                            <span>
-                                <i class="bi bi-tools text-warning me-2"></i>
-                                Task Management Tools
-                            </span>
-                            <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#toolsCollapse">
-                                <i class="bi bi-chevron-down"></i>
-                            </button>
-                        </h5>
-                    </div>
-                    <div class="collapse" id="toolsCollapse">
                         <div class="card-body">
-                            <div class="row">
-                                <!-- Overdue Tasks Section -->
-                                <div class="col-md-6">
-                                    <div class="tool-card mb-3">
-                                        <h6 class="tool-header">
-                                            <i class="bi bi-alarm text-danger me-2"></i>
-                                            Tasks Needing Follow-up
-                                        </h6>
-                                        <div id="reminderOutput" class="tool-content mb-3">
-                                            <p class="text-muted small">Click the button to check for overdue tasks.</p>
-                                        </div>
-                                        <div class="d-grid">
-                                            <button id="reminderBtn" class="btn btn-outline-danger">
-                                                <i class="bi bi-search"></i> Check Overdue Tasks
+                            <div class="chat-container">
+                                <div id="chatMessages" class="chat-messages">
+                                    <!-- Messages will be displayed here -->
+                                </div>
+                                <div class="chat-input">
+                                    <form id="chatForm">
+                                        <div class="input-group">
+                                            <textarea id="chatInput" class="form-control" placeholder="Type your response..." rows="2"></textarea>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-send"></i>
                                             </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Task Management Tools -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
+                                <span>
+                                    <i class="bi bi-tools text-warning me-2"></i>
+                                    Task Management Tools
+                                </span>
+                                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#toolsCollapse">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </h5>
+                        </div>
+                        <div class="collapse" id="toolsCollapse">
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Overdue Tasks Section -->
+                                    <div class="col-md-6">
+                                        <div class="tool-card mb-3">
+                                            <h6 class="tool-header">
+                                                <i class="bi bi-alarm text-danger me-2"></i>
+                                                Tasks Needing Follow-up
+                                            </h6>
+                                            <div id="reminderOutput" class="tool-content mb-3">
+                                                <p class="text-muted small">Click the button to check for overdue tasks.</p>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button id="reminderBtn" class="btn btn-outline-danger">
+                                                    <i class="bi bi-search"></i> Check Overdue Tasks
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <!-- Project Tasks Section -->
-                                <div class="col-md-6">
-                                    <div class="tool-card">
-                                        <h6 class="tool-header">
-                                            <i class="bi bi-kanban text-primary me-2"></i>
-                                            Project Tasks
-                                        </h6>
-                                        <div class="mb-3">
-                                            <label for="categoryDropdown" class="form-label small">Select a Project Category</label>
-                                            <select id="categoryDropdown" class="form-select">
-                                                {% for category in categories %}
-                                                <option value="{{ category }}">{{ category }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div id="categoryResult" class="tool-content mb-3">
-                                            <p class="text-muted small">Select a project and click the button to view tasks.</p>
-                                        </div>
-                                        <div class="d-grid">
-                                            <button id="categoryBtn" class="btn btn-outline-primary">
-                                                <i class="bi bi-filter"></i> View Tasks by Project
-                                            </button>
+                                    
+                                    <!-- Project Tasks Section -->
+                                    <div class="col-md-6">
+                                        <div class="tool-card">
+                                            <h6 class="tool-header">
+                                                <i class="bi bi-kanban text-primary me-2"></i>
+                                                Project Tasks
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label for="categoryDropdown" class="form-label small">Select a Project Category</label>
+                                                <select id="categoryDropdown" class="form-select">
+                                                    {% for category in categories %}
+                                                    <option value="{{ category }}">{{ category }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div id="categoryResult" class="tool-content mb-3">
+                                                <p class="text-muted small">Select a project and click the button to view tasks.</p>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button id="categoryBtn" class="btn btn-outline-primary">
+                                                    <i class="bi bi-filter"></i> View Tasks by Project
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -377,5 +408,60 @@ Project Beta:
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+        // Check authentication status and show appropriate content
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('authToken');
+            const loginPrompt = document.getElementById('loginPrompt');
+            const mainContent = document.getElementById('mainContent');
+            const logoutItem = document.getElementById('logoutItem');
+            
+            console.log('Auth token:', token ? 'Present' : 'Missing');
+            console.log('User data:', localStorage.getItem('user'));
+            
+            if (token) {
+                // User is authenticated, show main content and logout button
+                loginPrompt.style.display = 'none';
+                mainContent.style.display = 'block';
+                logoutItem.style.display = 'block';
+                
+                // Test authentication
+                fetch('/api/test_auth', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                .then(response => {
+                    console.log('Auth test response status:', response.status);
+                    if (response.status === 401) {
+                        console.log('Token is invalid, redirecting to login');
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('user');
+                        window.location.href = '/login';
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Auth test response:', data);
+                })
+                .catch(error => {
+                    console.error('Auth test error:', error);
+                });
+            } else {
+                // User is not authenticated, show login prompt and hide logout button
+                loginPrompt.style.display = 'block';
+                mainContent.style.display = 'none';
+                logoutItem.style.display = 'none';
+            }
+        });
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+    </script>
 </body>
 </html>

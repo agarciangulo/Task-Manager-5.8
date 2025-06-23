@@ -16,7 +16,7 @@ from config import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, GMAIL_SERVER, NOTION_TOKEN
 # Import AuthService for user lookup
 from core.services.auth_service import AuthService
 
-def send_confirmation_email(recipient, tasks, coaching_insights=None):
+def send_confirmation_email(recipient, tasks, coaching_insights=None, user_database_id=None):
     """
     Send a confirmation email with processed tasks and coaching insights.
     
@@ -24,8 +24,22 @@ def send_confirmation_email(recipient, tasks, coaching_insights=None):
         recipient: Email address to send to
         tasks: List of processed tasks
         coaching_insights: Optional coaching insights text
+        user_database_id: Optional database ID to fetch open tasks from
     """
     try:
+        # Get open tasks from user's database if database_id provided
+        open_tasks = []
+        if user_database_id:
+            try:
+                existing_tasks = fetch_notion_tasks(database_id=user_database_id)
+                if not existing_tasks.empty:
+                    # Filter for non-completed tasks
+                    open_tasks = existing_tasks[existing_tasks['status'] != 'Completed'].to_dict('records')
+                    # Limit to most recent 10 open tasks to avoid overwhelming the email
+                    open_tasks = open_tasks[:10]
+            except Exception as e:
+                print(f"Error fetching open tasks: {str(e)}")
+        
         # Create message
         msg = MIMEMultipart('alternative')
         msg['From'] = GMAIL_ADDRESS
@@ -36,9 +50,50 @@ def send_confirmation_email(recipient, tasks, coaching_insights=None):
         text_content = f"Hello,\n\nWe've processed your email and extracted {len(tasks)} tasks:\n\n"
         
         for i, task in enumerate(tasks, 1):
+            title = task.get('title', '')
+            task_desc = task.get('task', '')
             status = task.get('status', 'Unknown')
             category = task.get('category', 'Uncategorized')
-            text_content += f"{i}. {task['task']} ({status}) - {category}\n"
+            
+            if title:
+                text_content += f"{i}. {title}\n"
+                if task_desc and task_desc != title:
+                    text_content += f"   Description: {task_desc}\n"
+            else:
+                text_content += f"{i}. {task_desc}\n"
+            
+            text_content += f"   Status: {status} - Category: {category}\n\n"
+        
+        # Add open tasks section
+        if open_tasks:
+            text_content += "\n\n--- Your Open Tasks ---\n\n"
+            text_content += "Here are your current open tasks:\n\n"
+            
+            for i, task in enumerate(open_tasks, 1):
+                title = task.get('title', '')
+                task_desc = task.get('task', '')
+                status = task.get('status', 'Unknown')
+                category = task.get('category', 'Uncategorized')
+                date = task.get('date', '')
+                
+                # Format the date
+                formatted_date = "No date"
+                if date:
+                    try:
+                        from datetime import datetime
+                        dt = datetime.fromisoformat(date.replace('Z', '+00:00'))
+                        formatted_date = dt.strftime('%Y-%m-%d')
+                    except:
+                        formatted_date = "Invalid date"
+                
+                if title:
+                    text_content += f"{i}. {title}\n"
+                    if task_desc and task_desc != title:
+                        text_content += f"   Description: {task_desc}\n"
+                else:
+                    text_content += f"{i}. {task_desc}\n"
+                
+                text_content += f"   Status: {status} - Category: {category} - Date: {formatted_date}\n\n"
         
         # Add coaching insights if available
         if coaching_insights:
@@ -57,11 +112,13 @@ def send_confirmation_email(recipient, tasks, coaching_insights=None):
                 .header {{ background-color: #4361ee; color: white; padding: 20px; text-align: center; }}
                 .content {{ padding: 20px; }}
                 .task {{ margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #4361ee; }}
+                .open-task {{ margin-bottom: 10px; padding: 10px; background-color: #fff3cd; border-left: 4px solid #ffc107; }}
+                .section-header {{ margin-top: 30px; margin-bottom: 15px; padding: 10px; background-color: #e9ecef; border-radius: 5px; font-weight: bold; }}
                 .status {{ display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }}
                 .status-completed {{ background-color: #10b981; color: white; }}
                 .status-in-progress {{ background-color: #3b82f6; color: white; }}
-                .status-pending {{ background-color: #f59e0b; color: white; }}
-                .status-blocked {{ background-color: #ef4444; color: white; }}
+                .status-not-started {{ background-color: #6c757d; color: white; }}
+                .status-on-hold {{ background-color: #f59e0b; color: white; }}
                 .insights {{ margin-top: 30px; padding: 15px; background-color: #edf2fb; border-left: 4px solid #4361ee; }}
                 .footer {{ margin-top: 30px; font-size: 12px; color: #666; text-align: center; }}
             </style>
@@ -77,15 +134,89 @@ def send_confirmation_email(recipient, tasks, coaching_insights=None):
         """
         
         for i, task in enumerate(tasks, 1):
+            title = task.get('title', '')
+            task_desc = task.get('task', '')
             status = task.get('status', 'Unknown')
             category = task.get('category', 'Uncategorized')
             status_class = f"status-{status.lower().replace(' ', '-')}"
             
             html_content += f"""
                 <div class="task">
-                    <strong>{i}. {task['task']}</strong><br>
+            """
+            
+            if title:
+                html_content += f"""
+                    <strong>{i}. {title}</strong><br>
+                """
+                if task_desc and task_desc != title:
+                    html_content += f"""
+                    <em style="color: #666; font-size: 14px;">{task_desc}</em><br>
+                    """
+            else:
+                html_content += f"""
+                    <strong>{i}. {task_desc}</strong><br>
+                """
+            
+            html_content += f"""
                     <span class="status {status_class}">{status}</span>
                     <span style="margin-left: 10px; color: #666;">Category: {category}</span>
+                </div>
+            """
+        
+        # Add open tasks section
+        if open_tasks:
+            html_content += f"""
+                <div class="section-header">
+                    📋 Your Open Tasks ({len(open_tasks)} tasks)
+                </div>
+                <p>Here are your current open tasks:</p>
+                
+                <div class="open-tasks">
+            """
+            
+            for i, task in enumerate(open_tasks, 1):
+                title = task.get('title', '')
+                task_desc = task.get('task', '')
+                status = task.get('status', 'Unknown')
+                category = task.get('category', 'Uncategorized')
+                date = task.get('date', '')
+                status_class = f"status-{status.lower().replace(' ', '-')}"
+                
+                # Format the date
+                formatted_date = "No date"
+                if date:
+                    try:
+                        from datetime import datetime
+                        dt = datetime.fromisoformat(date.replace('Z', '+00:00'))
+                        formatted_date = dt.strftime('%Y-%m-%d')
+                    except:
+                        formatted_date = "Invalid date"
+                
+                html_content += f"""
+                    <div class="open-task">
+                """
+                
+                if title:
+                    html_content += f"""
+                        <strong>{i}. {title}</strong><br>
+                    """
+                    if task_desc and task_desc != title:
+                        html_content += f"""
+                        <em style="color: #666; font-size: 14px;">{task_desc}</em><br>
+                        """
+                else:
+                    html_content += f"""
+                        <strong>{i}. {task_desc}</strong><br>
+                    """
+                
+                html_content += f"""
+                        <span class="status {status_class}">{status}</span>
+                        <span style="margin-left: 10px; color: #666;">Category: {category}</span>
+                        <span style="margin-left: 10px; color: #666;">Date: {formatted_date}</span>
+                    </div>
+                """
+            
+            html_content += """
                 </div>
             """
         
@@ -283,12 +414,13 @@ def check_gmail_for_updates():
                         if tasks and "employee" in tasks[0]:
                             person_name = tasks[0].get("employee", "")
                             
-                        if person_name:
+                        if person_name and not existing_tasks.empty and "employee" in existing_tasks.columns:
                             # Get recent tasks for this person from user's database
                             recent_tasks = existing_tasks[existing_tasks['employee'] == person_name]
                             if len(recent_tasks) > 0:
                                 # Filter to recent tasks (last 14 days)
-                                recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
+                                if 'date' in recent_tasks.columns:
+                                    recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
                                 
                             # Get peer feedback
                             peer_feedback = []
@@ -301,12 +433,14 @@ def check_gmail_for_updates():
                             # Generate coaching insights
                             coaching_insights = get_coaching_insight(person_name, tasks, recent_tasks, peer_feedback)
                             print("Generated coaching insights successfully")
+                        else:
+                            print(f"Skipping coaching insights - person_name: {person_name}, DataFrame empty: {existing_tasks.empty}, has employee column: {'employee' in existing_tasks.columns if not existing_tasks.empty else 'N/A'}")
                     except Exception as e:
                         print(f"Error generating coaching insights: {str(e)}")
                         print(traceback.format_exc())
                         
                     # Send confirmation with coaching insights
-                    send_confirmation_email(sender_email, tasks, coaching_insights)
+                    send_confirmation_email(sender_email, tasks, coaching_insights, user.task_database_id)
                 else:
                     print("No tasks could be extracted from email")
             except Exception as e:

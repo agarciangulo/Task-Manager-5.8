@@ -137,7 +137,9 @@ def index():
     """Render main page."""
     try:
         print("\nFetching categories...")
-        categories = list_all_categories()
+        # For the public index page, we'll use a default database or empty list
+        # since we don't have a specific user context
+        categories = []
         print(f"Categories found: {categories}")
         return render_template('index.html', categories=categories)
     except Exception as e:
@@ -148,7 +150,9 @@ def index():
 @app.route('/dashboard')
 def dashboard():
     """Render dashboard page."""
-    categories = list_all_categories()
+    # For the public dashboard page, we'll use a default database or empty list
+    # since we don't have a specific user context
+    categories = []
     return render_template('dashboard.html', categories=categories)
 
 @app.route('/api/dashboard_data')
@@ -450,7 +454,9 @@ def api_tasks_by_category():
 def api_categories():
     """API endpoint to get all categories."""
     try:
-        categories = list_all_categories()
+        # For the public API, we'll use a default database or empty list
+        # since we don't have a specific user context
+        categories = []
         return jsonify({
             'success': True,
             'categories': categories

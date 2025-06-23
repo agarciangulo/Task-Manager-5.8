@@ -162,6 +162,9 @@ $(document).ready(function() {
             url: '/api/process_update',
             method: 'POST',
             contentType: 'application/json',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+            },
             data: JSON.stringify({
                 text: updateText
             }),
@@ -260,6 +263,9 @@ $(document).ready(function() {
             url: '/api/chat',
             type: 'POST',
             contentType: 'application/json',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+            },
             data: JSON.stringify({
                 message: message,
                 user_id: userId
@@ -331,8 +337,6 @@ $(document).ready(function() {
                                             <i class="bi bi-lightbulb text-warning me-2"></i>
                                             AI Assessment
                                         </h6>
-                                        <p>${response.coaching}</p>
-                                    </div>
                                 `;
                             }
                             
@@ -355,6 +359,9 @@ $(document).ready(function() {
                                 url: '/api/chat',
                                 type: 'POST',
                                 contentType: 'application/json',
+                                headers: {
+                                    'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                                },
                                 data: JSON.stringify({
                                     message: "get_final_results",
                                     user_id: userId

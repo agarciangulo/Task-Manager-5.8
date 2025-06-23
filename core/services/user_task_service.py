@@ -48,8 +48,11 @@ class UserTaskService:
                     }
                 ],
                 properties={
-                    "Task": {
+                    "Title": {
                         "title": {}
+                    },
+                    "Task": {
+                        "rich_text": {}
                     },
                     "Status": {
                         "select": {
@@ -98,6 +101,9 @@ class UserTaskService:
             database_id = database["id"]
             logger.info(f"Created task database for user {user.email}: {database_id}")
             
+            # Reorder properties to ensure Title comes first, then Task
+            self._reorder_database_properties(database_id)
+            
             return database_id
             
         except Exception as e:
@@ -143,8 +149,17 @@ class UserTaskService:
         try:
             # Format task properties for Notion
             properties = {
-                "Task": {
+                "Title": {
                     "title": [
+                        {
+                            "text": {
+                                "content": task_data.get("title", "")
+                            }
+                        }
+                    ]
+                },
+                "Task": {
+                    "rich_text": [
                         {
                             "text": {
                                 "content": task_data.get("task", "")
@@ -287,9 +302,20 @@ class UserTaskService:
             # Format updates for Notion
             properties = {}
             
+            if "title" in updates:
+                properties["Title"] = {
+                    "title": [
+                        {
+                            "text": {
+                                "content": updates["title"]
+                            }
+                        }
+                    ]
+                }
+            
             if "task" in updates:
                 properties["Task"] = {
-                    "title": [
+                    "rich_text": [
                         {
                             "text": {
                                 "content": updates["task"]
@@ -429,7 +455,8 @@ class UserTaskService:
             
             task = {
                 "id": page["id"],
-                "task": self._extract_title(properties.get("Task", {})),
+                "title": self._extract_title(properties.get("Title", {})),
+                "task": self._extract_rich_text(properties.get("Task", {})),
                 "status": self._extract_select(properties.get("Status", {}), "Not Started"),
                 "priority": self._extract_select(properties.get("Priority", {}), "Medium"),
                 "category": self._extract_rich_text(properties.get("Category", {})),
@@ -463,4 +490,54 @@ class UserTaskService:
     
     def _extract_date(self, property_data: Dict[str, Any]) -> Optional[str]:
         """Extract date from Notion property."""
-        return property_data.get("date", {}).get("start") 
+        return property_data.get("date", {}).get("start")
+
+    def _reorder_database_properties(self, database_id: str) -> None:
+        """
+        Reorder properties of the database to ensure Title comes first, then Task.
+        
+        Args:
+            database_id: The database ID to reorder properties for.
+        """
+        try:
+            # Define the desired property order
+            desired_order = [
+                "Title",
+                "Task", 
+                "Status",
+                "Priority",
+                "Category",
+                "Date",
+                "Due Date",
+                "Notes",
+                "Employee",
+                "Is Recurring",
+                "Reminder Sent"
+            ]
+            
+            # Get current database to see existing properties
+            database = self.notion_client.databases.retrieve(database_id=database_id)
+            current_properties = database.get("properties", {})
+            
+            # Create new properties dict in desired order
+            reordered_properties = {}
+            for prop_name in desired_order:
+                if prop_name in current_properties:
+                    reordered_properties[prop_name] = current_properties[prop_name]
+            
+            # Add any remaining properties that weren't in our desired order
+            for prop_name, prop_data in current_properties.items():
+                if prop_name not in reordered_properties:
+                    reordered_properties[prop_name] = prop_data
+            
+            # Update the database with reordered properties
+            self.notion_client.databases.update(
+                database_id=database_id,
+                properties=reordered_properties
+            )
+            
+            logger.info(f"Successfully reordered properties for database {database_id}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to reorder properties for database {database_id}: {str(e)}")
+            # Don't fail the entire operation if reordering fails 

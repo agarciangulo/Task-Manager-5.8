@@ -1,7 +1,7 @@
 import imaplib
 
 # Import from your processor to ensure credentials are correct
-from gmail_processor import GMAIL_USER, GMAIL_PASSWORD, GMAIL_SERVER
+from gmail_processor import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, GMAIL_SERVER
 
 def test_gmail_connection():
     """Test connection to Gmail."""
@@ -9,8 +9,8 @@ def test_gmail_connection():
         print(f"Connecting to {GMAIL_SERVER}...")
         mail = imaplib.IMAP4_SSL(GMAIL_SERVER)
         
-        print(f"Logging in as {GMAIL_USER}...")
-        mail.login(GMAIL_USER, GMAIL_PASSWORD)
+        print(f"Logging in as {GMAIL_ADDRESS}...")
+        mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
         
         print("Login successful!")
         

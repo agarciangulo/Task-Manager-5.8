@@ -184,7 +184,8 @@ class NotionService:
         # Build Notion properties dict from task fields (implement as needed)
         # This is a placeholder; adapt to your schema
         return {
-            "Task": {"title": [{"text": {"content": task.get("task", "")}}]},
+            "Title": {"title": [{"text": {"content": task.get("title", "")}}]},
+            "Task": {"rich_text": [{"text": {"content": task.get("task", "")}}]},
             "Status": {"select": {"name": task.get("status", "No Status")}},
             "Employee": {"rich_text": [{"text": {"content": task.get("employee", "")}}]},
             "Date": {"date": {"start": task.get("date")}},
@@ -223,6 +224,7 @@ class NotionService:
             # Extract task data
             task = {
                 "id": page["id"],
+                "title": self.get_title_content(properties, "Title"),
                 "task": self.get_title_content(properties, "Task"),
                 "status": self.get_select_value(properties, "Status", "Not Started"),
                 "employee": self.get_rich_text_content(properties, "Employee"),
@@ -256,10 +258,21 @@ class NotionService:
             Dict[str, Any]: Formatted properties.
         """
         properties = {}
-        # Task title
+        # Title
+        if "title" in task_data and task_data["title"]:
+            properties["Title"] = {
+                "title": [
+                    {
+                        "text": {
+                            "content": task_data["title"]
+                        }
+                    }
+                ]
+            }
+        # Task description (rich_text)
         if "task" in task_data:
             properties["Task"] = {
-                "title": [
+                "rich_text": [
                     {
                         "text": {
                             "content": task_data["task"]
@@ -286,7 +299,7 @@ class NotionService:
                 ]
             }
         # Date
-        if "date" in task_data:
+        if "date" in task_data and task_data["date"]:
             properties["Date"] = {
                 "date": {
                     "start": task_data["date"]
@@ -311,14 +324,14 @@ class NotionService:
                 }
             }
         # Due Date
-        if "due_date" in task_data:
+        if "due_date" in task_data and task_data["due_date"]:
             properties["Due Date"] = {
                 "date": {
                     "start": task_data["due_date"]
                 }
             }
         # Notes
-        if "notes" in task_data:
+        if "notes" in task_data and task_data["notes"]:
             properties["Notes"] = {
                 "rich_text": [
                     {

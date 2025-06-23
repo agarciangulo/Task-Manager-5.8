@@ -124,7 +124,14 @@ class EnhancedGeminiClient:
                     )
                 )
                 
-                return response.text
+                # Handle different response types
+                if hasattr(response, 'text'):
+                    return response.text
+                elif isinstance(response, str):
+                    return response
+                else:
+                    # Try to convert to string
+                    return str(response)
                 
             except Exception as e:
                 if "rate_limit" in str(e).lower() and attempt < self.max_retries:

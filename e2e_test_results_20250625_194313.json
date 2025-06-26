@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-06-25T19:43:13.830774",
+  "test_user": {
+    "email": "e2e_test_20250625_194252@example.com",
+    "user_id": "2d6c5c15-5194-4973-8c2f-d21622c6ad56",
+    "full_name": "E2E Test User 194252",
+    "task_database_id": "21d5c6ec-3b80-81b3-b3a0-e6b6160b2595"
+  },
+  "results": {
+    "user_creation": true,
+    "task_database_creation": true,
+    "email_processing": true,
+    "task_extraction": true,
+    "task_insertion": true,
+    "coaching_insights": false,
+    "confirmation_email": false
+  },
+  "summary": {
+    "total_tests": 7,
+    "passed_tests": 5,
+    "success_rate": "71.4%"
+  }
+}

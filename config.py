@@ -65,6 +65,16 @@ HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN')  # Add token support
 # Task matching settings
 USE_AI_MATCHING = os.getenv('USE_AI_MATCHING', 'True').lower() == 'true'
 
+# Database Configuration
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/email_archive')
+EMAIL_ARCHIVE_ENABLED = os.getenv('EMAIL_ARCHIVE_ENABLED', 'True').lower() == 'true'
+
+# Email Archive Settings
+HOT_STORAGE_DAYS = int(os.getenv('HOT_STORAGE_DAYS', '30'))  # Days to keep emails in hot storage
+COLD_STORAGE_DAYS = int(os.getenv('COLD_STORAGE_DAYS', '365'))  # Days to keep emails in cold storage
+EMAIL_COMPRESSION_ENABLED = os.getenv('EMAIL_COMPRESSION_ENABLED', 'True').lower() == 'true'
+ATTACHMENT_STORAGE_PATH = os.getenv('ATTACHMENT_STORAGE_PATH', 'attachments')
+
 # Validate required environment variables
 required_vars = [
     'NOTION_TOKEN',
@@ -84,6 +94,10 @@ if ENABLE_AUTHENTICATION:
         'JWT_SECRET_KEY',
         'NOTION_USERS_DB_ID'
     ])
+
+# Add database requirements if email archive is enabled
+if EMAIL_ARCHIVE_ENABLED:
+    required_vars.append('DATABASE_URL')
 
 missing_vars = [var for var in required_vars if not os.getenv(var)]
 

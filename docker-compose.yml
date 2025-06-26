@@ -5,31 +5,43 @@ services:
     build: .
     ports:
       - "5001:5001"
+    env_file:
+      - .env
     environment:
       - REDIS_URL=redis://redis:6379/0
       - FLASK_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/email_archive
     depends_on:
       - redis
+      - postgres
     volumes:
       - .:/app
-    command: python app_flask.py
+    command: python app_auth.py
 
   celery-worker:
     build: .
+    env_file:
+      - .env
     environment:
       - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/email_archive
     depends_on:
       - redis
+      - postgres
     volumes:
       - .:/app
     command: celery -A celery_config worker --loglevel=info --concurrency=4
 
   celery-beat:
     build: .
+    env_file:
+      - .env
     environment:
       - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/email_archive
     depends_on:
       - redis
+      - postgres
     volumes:
       - .:/app
     command: celery -A celery_config beat --loglevel=info
@@ -38,13 +50,34 @@ services:
     build: .
     ports:
       - "5555:5555"
+    env_file:
+      - .env
     environment:
       - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/email_archive
     depends_on:
       - redis
+      - postgres
     volumes:
       - .:/app
     command: celery -A celery_config flower --port=5555
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=email_archive
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -54,4 +87,5 @@ services:
       - redis_data:/data
 
 volumes:
-  redis_data: 
+  redis_data:
+  postgres_data: 

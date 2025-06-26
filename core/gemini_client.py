@@ -231,7 +231,14 @@ def setup_embedding_cache():
     conn.commit()
     conn.close()
     
-    print(f"✅ Embedding cache initialized with {count} existing entries")
+    # Only log if there are actually entries (to avoid confusion)
+    if count > 0:
+        print(f"✅ SQLite embedding cache initialized with {count} existing entries")
+    else:
+        # Suppress the "0 entries" message since it's misleading
+        # The actual similarity matching uses Chroma, not this SQLite cache
+        pass
+    
     return EMBEDDING_CACHE_PATH
 
 # Initialize the cache on module load

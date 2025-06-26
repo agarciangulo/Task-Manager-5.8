@@ -6,15 +6,20 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import traceback
 from datetime import datetime, timedelta
+import pandas as pd
 
 from core.task_extractor import extract_tasks_from_update
 from core.task_processor import insert_or_update_task
 from core import fetch_notion_tasks
 from core.ai.insights import get_coaching_insight
-from config import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, GMAIL_SERVER, NOTION_TOKEN, NOTION_USERS_DB_ID
+from config import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, GMAIL_SERVER, NOTION_TOKEN, NOTION_USERS_DB_ID, EMAIL_ARCHIVE_ENABLED
 
 # Import AuthService for user lookup
 from core.services.auth_service import AuthService
+
+# Import EmailArchiveService for email archiving
+if EMAIL_ARCHIVE_ENABLED:
+    from core.services.email_archive_service import EmailArchiveService
 
 def send_confirmation_email(recipient, tasks, coaching_insights=None, user_database_id=None):
     """
@@ -366,16 +371,73 @@ def check_gmail_for_updates():
             
             print(f"Processing email from {sender_name} ({sender_email}) with subject: {subject}")
             
+            # Archive email immediately (async) - before user lookup and task processing
+            email_id = None
+            if EMAIL_ARCHIVE_ENABLED:
+                try:
+                    # Prepare email data for archiving
+                    email_data = {
+                        'message_id': msg_id.decode(),
+                        'thread_id': msg.get('In-Reply-To') or msg.get('References'),
+                        'sender_email': sender_email,
+                        'sender_name': sender_name,
+                        'recipient_email': GMAIL_ADDRESS,
+                        'subject': subject,
+                        'body_text': body,
+                        'body_html': body,  # Could extract HTML if needed
+                        'received_date': email_date if 'email_date' in locals() else datetime.now(),
+                        'user_id': None,  # Will be updated after user lookup
+                        'task_database_id': None,  # Will be updated after user lookup
+                        'email_size_bytes': len(raw_email),
+                        'has_attachments': bool(msg.get_payload()),
+                        'attachment_count': 0,  # Could count attachments if needed
+                        'priority': 'normal',
+                        'labels': [],
+                        'is_read': False,
+                        'is_archived': False,
+                        'processing_status': 'processing',
+                        'processing_metadata': {
+                            'source': 'gmail_processor',
+                            'parsed_at': datetime.now().isoformat(),
+                            'original_message_id': msg_id.decode()
+                        }
+                    }
+                    
+                    # Store email in hot storage
+                    archive_service = EmailArchiveService()
+                    email_id = archive_service.store_email(email_data, 'hot')
+                    print(f"✅ Email archived with ID: {email_id}")
+                    
+                except Exception as e:
+                    print(f"⚠️ Email archiving failed: {e}")
+                    print(traceback.format_exc())
+                    # Continue with task processing anyway
+                    email_id = None
+            
             # Look up user by email address
             user = auth_service.get_user_by_email(sender_email)
             if not user:
                 print(f"No user found for email: {sender_email}. Skipping email.")
+                # Update email record with failure status if archived
+                if email_id and EMAIL_ARCHIVE_ENABLED:
+                    try:
+                        archive_service = EmailArchiveService()
+                        archive_service.update_email_status(email_id, 'failed', {'error': 'User not found'})
+                    except Exception as e:
+                        print(f"⚠️ Failed to update email status: {e}")
                 # Mark as read anyway to avoid reprocessing
                 mail.store(msg_id, "+FLAGS", "\\Seen")
                 continue
                 
             if not user.task_database_id:
                 print(f"User {sender_email} does not have a task database configured. Skipping email.")
+                # Update email record with failure status if archived
+                if email_id and EMAIL_ARCHIVE_ENABLED:
+                    try:
+                        archive_service = EmailArchiveService()
+                        archive_service.update_email_status(email_id, 'failed', {'error': 'No task database configured'})
+                    except Exception as e:
+                        print(f"⚠️ Failed to update email status: {e}")
                 # Mark as read anyway to avoid reprocessing
                 mail.store(msg_id, "+FLAGS", "\\Seen")
                 continue
@@ -392,6 +454,7 @@ def check_gmail_for_updates():
                     
                     # Process each task
                     log_output = []
+                    successful_tasks = 0
                     for task in tasks:
                         success, message = insert_or_update_task(
                             database_id=user.task_database_id,
@@ -401,10 +464,11 @@ def check_gmail_for_updates():
                         )
                         if success:
                             print(f"Successfully processed task: {task.get('task')}")
+                            successful_tasks += 1
                         else:
                             print(f"Failed to process task: {task.get('task')} - {message}")
                     
-                    print(f"Successfully processed {len(tasks)} tasks for user {sender_email}")
+                    print(f"Successfully processed {successful_tasks} tasks for user {sender_email}")
                     
                     # Generate coaching insights
                     coaching_insights = None
@@ -420,7 +484,16 @@ def check_gmail_for_updates():
                             if len(recent_tasks) > 0:
                                 # Filter to recent tasks (last 14 days)
                                 if 'date' in recent_tasks.columns:
-                                    recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
+                                    # Fix: Convert date column to datetime if it's not already
+                                    try:
+                                        if recent_tasks['date'].dtype == 'object':
+                                            recent_tasks = recent_tasks.copy()
+                                            recent_tasks['date'] = pd.to_datetime(recent_tasks['date'], errors='coerce')
+                                        recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
+                                    except Exception as date_error:
+                                        print(f"Error processing dates for coaching insights: {date_error}")
+                                        # If date processing fails, use all recent tasks
+                                        recent_tasks = recent_tasks
                                 
                             # Get peer feedback
                             peer_feedback = []
@@ -441,8 +514,38 @@ def check_gmail_for_updates():
                         
                     # Send confirmation with coaching insights
                     send_confirmation_email(sender_email, tasks, coaching_insights, user.task_database_id)
+                    
+                    # Update email record with completion status and task metadata
+                    if email_id and EMAIL_ARCHIVE_ENABLED:
+                        try:
+                            archive_service = EmailArchiveService()
+                            # Update with user info and task results
+                            update_data = {
+                                'user_id': user.user_id if hasattr(user, 'user_id') else sender_email,
+                                'task_database_id': user.task_database_id,
+                                'processing_status': 'completed',
+                                'processing_metadata': {
+                                    'source': 'gmail_processor',
+                                    'tasks_extracted': len(tasks),
+                                    'tasks_processed': successful_tasks,
+                                    'coaching_insights_generated': coaching_insights is not None,
+                                    'completed_at': datetime.now().isoformat(),
+                                    'user_email': sender_email
+                                }
+                            }
+                            archive_service.update_email(email_id, update_data)
+                            print(f"✅ Email record updated with completion status")
+                        except Exception as e:
+                            print(f"⚠️ Failed to update email completion status: {e}")
                 else:
                     print("No tasks could be extracted from email")
+                    # Update email record with no-tasks status
+                    if email_id and EMAIL_ARCHIVE_ENABLED:
+                        try:
+                            archive_service = EmailArchiveService()
+                            archive_service.update_email_status(email_id, 'completed', {'tasks_extracted': 0, 'reason': 'No tasks found'})
+                        except Exception as e:
+                            print(f"⚠️ Failed to update email status: {e}")
             except Exception as e:
                 print(f"Error processing email: {str(e)}")
                 print(traceback.format_exc())

@@ -8,6 +8,8 @@ from celery import current_task
 from celery_config import celery_app
 from core.logging_config import get_logger
 from config import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, GMAIL_SERVER
+import pandas as pd
+from datetime import datetime, timedelta
 
 logger = get_logger(__name__)
 
@@ -245,7 +247,6 @@ def process_single_email_async(self, email_data: Dict[str, Any]) -> Dict[str, An
         if processed_tasks:
             try:
                 from core.ai.insights import get_coaching_insight
-                from datetime import timedelta
                 
                 # Get person name from the first task
                 person_name = ""
@@ -256,7 +257,16 @@ def process_single_email_async(self, email_data: Dict[str, Any]) -> Dict[str, An
                     # Get recent tasks for this person
                     recent_tasks = existing_tasks[existing_tasks['employee'] == person_name]
                     if len(recent_tasks) > 0:
-                        recent_tasks = recent_tasks[recent_tasks['date'] >= 'now' - timedelta(days=14)]
+                        # Fix: Convert date column to datetime if it's not already
+                        try:
+                            if recent_tasks['date'].dtype == 'object':
+                                recent_tasks = recent_tasks.copy()
+                                recent_tasks['date'] = pd.to_datetime(recent_tasks['date'], errors='coerce')
+                            recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
+                        except Exception as date_error:
+                            logger.warning(f"Error processing dates for coaching insights: {date_error}")
+                            # If date processing fails, use all recent tasks
+                            recent_tasks = recent_tasks
                     
                     # Get peer feedback
                     peer_feedback = []

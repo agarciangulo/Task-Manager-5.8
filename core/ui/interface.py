@@ -66,6 +66,10 @@ def process_freeform_input(update_text):
         # Get recent tasks for coaching insights
         recent_tasks = pd.DataFrame()
         try:
+            # Fix: Convert date column to datetime if it's not already
+            if existing_tasks['date'].dtype == 'object':
+                existing_tasks = existing_tasks.copy()
+                existing_tasks['date'] = pd.to_datetime(existing_tasks['date'], errors='coerce')
             recent_tasks = existing_tasks[existing_tasks['date'] >= datetime.now() - timedelta(days=14)]
             log_output.append(f"✅ Retrieved {len(recent_tasks)} recent tasks for analysis")
         except Exception as e:

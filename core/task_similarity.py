@@ -18,6 +18,13 @@ from core.ai.analyzers import TaskAnalyzer
 # Initialize simplified Chroma-based embedding manager
 _chroma_manager = SimpleChromaEmbeddingManager()
 
+# Log the actual embedding count for clarity
+try:
+    stats = _chroma_manager.get_collection_stats()
+    print(f"✅ Chroma similarity system initialized with {stats.get('total_embeddings', 0)} task embeddings")
+except Exception as e:
+    print(f"⚠️ Could not get Chroma stats: {e}")
+
 def debug_print(message):
     """Print debug messages if DEBUG_MODE is True."""
     if DEBUG_MODE:

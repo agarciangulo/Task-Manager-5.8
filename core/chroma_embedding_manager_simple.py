@@ -111,7 +111,7 @@ class SimpleChromaEmbeddingManager:
                 include=["embeddings"]
             )
             
-            if existing["ids"] and len(existing["ids"]) > 0:
+            if existing["ids"] is not None and len(existing["ids"]) > 0:
                 # Return existing embedding
                 embedding = np.array(existing["embeddings"][0])
                 logger.debug(f"Retrieved cached embedding for text: {text[:50]}...")
@@ -126,7 +126,7 @@ class SimpleChromaEmbeddingManager:
                 include=["embeddings"]
             )
             
-            if new_embedding["embeddings"] and len(new_embedding["embeddings"]) > 0:
+            if new_embedding["embeddings"] is not None and len(new_embedding["embeddings"]) > 0:
                 embedding = np.array(new_embedding["embeddings"][0])
                 logger.debug(f"Generated and stored new embedding for text: {text[:50]}...")
                 return embedding
@@ -172,7 +172,7 @@ class SimpleChromaEmbeddingManager:
                 )
                 
                 # Map existing embeddings
-                if existing["metadatas"] and len(existing["metadatas"]) > 0:
+                if existing["metadatas"] is not None and len(existing["metadatas"]) > 0:
                     for j, text in enumerate(batch_texts):
                         # Find the text in existing metadata
                         text_found = False
@@ -201,7 +201,7 @@ class SimpleChromaEmbeddingManager:
                 )
                 
                 # Add to results
-                if new_embeddings_data["metadatas"] and len(new_embeddings_data["metadatas"]) > 0:
+                if new_embeddings_data["metadatas"] is not None and len(new_embeddings_data["metadatas"]) > 0:
                     for i, text in enumerate(texts_to_generate):
                         # Find the text in new metadata
                         for k, metadata in enumerate(new_embeddings_data["metadatas"]):
@@ -257,7 +257,7 @@ class SimpleChromaEmbeddingManager:
             
             # Process results
             similar_texts = []
-            if results["documents"] and results["distances"]:
+            if results["documents"] is not None and results["distances"] is not None:
                 for i, (text, distance) in enumerate(zip(
                     results["documents"][0], 
                     results["distances"][0]
@@ -362,7 +362,7 @@ class SimpleChromaEmbeddingManager:
             # Get sample embeddings to determine dimension
             sample = self.collection.peek(limit=1)
             dimension = 0
-            if sample["embeddings"] and len(sample["embeddings"]) > 0:
+            if sample["embeddings"] is not None and len(sample["embeddings"]) > 0:
                 dimension = len(sample["embeddings"][0])
             
             return {

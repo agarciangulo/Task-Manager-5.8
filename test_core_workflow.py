@@ -8,6 +8,7 @@ import sys
 import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+import pandas as pd
 
 # Add the project root to the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -285,7 +286,15 @@ Best regards,
             
             if len(recent_tasks) > 0:
                 # Filter to recent tasks (last 14 days)
-                recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
+                try:
+                    if recent_tasks['date'].dtype == 'object':
+                        recent_tasks = recent_tasks.copy()
+                        recent_tasks['date'] = pd.to_datetime(recent_tasks['date'], errors='coerce')
+                    recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
+                except Exception as date_error:
+                    print(f"Error processing dates for coaching insights: {date_error}")
+                    # If date processing fails, use all recent tasks
+                    recent_tasks = recent_tasks
             
             # Get peer feedback (empty for test)
             peer_feedback = []

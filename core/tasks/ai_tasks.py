@@ -4,13 +4,14 @@ Handles AI operations without blocking the main application.
 """
 import traceback
 from typing import Dict, List, Any, Optional
-from celery import current_task
+from celery import current_task, group
 from celery_config import celery_app
 from core.gemini_client import client as gemini_client
 from core.openai_client import client as openai_client
 from core.ai.insights import get_coaching_insight, get_project_insight
 from core.logging_config import get_logger
 from config import AI_PROVIDER
+from core.ai.extractors import chunk_email_text
 
 logger = get_logger(__name__)
 
@@ -386,6 +387,60 @@ def extract_tasks_async(self, update_text: str) -> Dict[str, Any]:
         if self.request.retries < self.max_retries:
             raise self.retry(countdown=60 * (2 ** self.request.retries))
         
+        return {
+            'success': False,
+            'error': str(e),
+            'text_length': len(update_text)
+        }
+
+@celery_app.task(bind=True, name='core.tasks.ai_tasks.extract_tasks_chunked_async')
+def extract_tasks_chunked_async(self, update_text: str, max_chunk_size: int = 30) -> Dict[str, Any]:
+    """
+    Asynchronously extract tasks from a long update text by chunking and parallelizing extraction.
+    Args:
+        update_text: The full email or update text
+        max_chunk_size: Max lines per chunk (default: 30)
+    Returns:
+        Dict with success status and all extracted tasks/error
+    """
+    try:
+        self.update_state(
+            state='PROGRESS',
+            meta={'current': 0, 'total': 100, 'status': 'Chunking text...'}
+        )
+        chunks = chunk_email_text(update_text, max_chunk_size=max_chunk_size)
+        if not chunks:
+            return {'success': True, 'tasks': [], 'count': 0, 'text_length': len(update_text)}
+        self.update_state(
+            state='PROGRESS',
+            meta={'current': 10, 'total': 100, 'status': f'Processing {len(chunks)} chunks...'}
+        )
+        # Launch parallel extraction tasks for each chunk
+        job = group(extract_tasks_async.s(chunk) for chunk in chunks)
+        result = job.apply_async()
+        all_tasks = []
+        errors = []
+        for chunk_result in result.get():
+            if chunk_result.get('success'):
+                all_tasks.extend(chunk_result.get('tasks', []))
+            else:
+                errors.append(chunk_result.get('error'))
+        self.update_state(
+            state='PROGRESS',
+            meta={'current': 100, 'total': 100, 'status': 'Extraction complete'}
+        )
+        return {
+            'success': True if not errors else False,
+            'tasks': all_tasks,
+            'count': len(all_tasks),
+            'errors': errors,
+            'text_length': len(update_text)
+        }
+    except Exception as e:
+        logger.error(f"Error in chunked extraction: {str(e)}")
+        logger.error(traceback.format_exc())
+        if self.request.retries < self.max_retries:
+            raise self.retry(countdown=60 * (2 ** self.request.retries))
         return {
             'success': False,
             'error': str(e),

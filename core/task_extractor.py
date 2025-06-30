@@ -226,7 +226,7 @@ Remember:
             try:
                 print("Attempting to extract complete JSON objects from truncated response...")
                 # Find all complete JSON objects in the array
-                # Pattern to match complete JSON objects
+                # Pattern to match complete JSON objects with all required fields
                 object_pattern = r'\{\s*"[^"]+"\s*:\s*(?:"[^"]*"|null|true|false|\d+)\s*(?:,\s*"[^"]+"\s*:\s*(?:"[^"]*"|null|true|false|\d+)\s*)*\}'
                 matches = re.findall(object_pattern, content)
                 
@@ -240,36 +240,88 @@ Remember:
             except Exception as e:
                 print(f"Complete object extraction failed: {e}")
                 
-                # Method 3: Extract array with regex
+                # Method 3: More aggressive JSON extraction
                 try:
-                    print("Attempting to extract JSON array with regex...")
-                    match = re.search(r'\[\s*{.*}\s*\]', content, re.DOTALL)
-                    if match:
-                        json_array = match.group(0).replace("'", '"')
-                        tasks = json.loads(json_array)
-                        print("Regex extraction successful!")
-                    else:
-                        print("No JSON array found in content")
-                except Exception as e:
-                    print(f"Regex extraction failed: {e}")
-                    
-                    # Method 4: Fall back to safer eval
-                    try:
-                        print("Attempting eval with ast...")
-                        tasks = ast.literal_eval(content)
-                        print("AST literal_eval successful!")
-                    except Exception as e:
-                        print(f"AST literal_eval failed: {e}")
+                    print("Attempting aggressive JSON extraction...")
+                    # Look for the start of the array and extract everything until we hit a parsing error
+                    start_idx = content.find('[')
+                    if start_idx != -1:
+                        # Try to find the end of the array by counting brackets
+                        bracket_count = 0
+                        end_idx = start_idx
+                        for i, char in enumerate(content[start_idx:], start_idx):
+                            if char == '[':
+                                bracket_count += 1
+                            elif char == ']':
+                                bracket_count -= 1
+                                if bracket_count == 0:
+                                    end_idx = i + 1
+                                    break
                         
-                        # Final fallback: Try eval directly
+                        if end_idx > start_idx:
+                            json_content = content[start_idx:end_idx]
+                            # Try to fix common JSON issues
+                            json_content = json_content.replace("'", '"')  # Replace single quotes
+                            json_content = re.sub(r',\s*}', '}', json_content)  # Remove trailing commas
+                            json_content = re.sub(r',\s*]', ']', json_content)  # Remove trailing commas in arrays
+                            
+                            tasks = json.loads(json_content)
+                            print(f"Aggressive extraction successful! Found {len(tasks)} tasks")
+                        else:
+                            print("Could not find end of JSON array")
+                    else:
+                        print("No JSON array start found")
+                except Exception as e:
+                    print(f"Aggressive extraction failed: {e}")
+                    
+                    # Method 4: Handle specific truncation pattern
+                    try:
+                        print("Attempting to handle specific truncation pattern...")
+                        # Look for the pattern where the JSON is cut off mid-object
+                        # Find all complete objects before the truncation
+                        object_pattern = r'\{\s*"[^"]+"\s*:\s*(?:"[^"]*"|null|true|false|\d+)\s*(?:,\s*"[^"]+"\s*:\s*(?:"[^"]*"|null|true|false|\d+)\s*)*\}'
+                        matches = re.findall(object_pattern, content)
+                        
+                        if matches:
+                            # Reconstruct a valid JSON array
+                            json_array = '[' + ','.join(matches) + ']'
+                            tasks = json.loads(json_array)
+                            print(f"Truncation pattern extraction successful! Found {len(tasks)} tasks")
+                        else:
+                            print("No complete objects found in truncation pattern")
+                    except Exception as e:
+                        print(f"Truncation pattern extraction failed: {e}")
+                        
+                        # Method 5: Extract array with regex
                         try:
-                            print("Last resort: direct eval...")
-                            tasks = eval(content)
-                            print("Direct eval successful!")
+                            print("Attempting to extract JSON array with regex...")
+                            match = re.search(r'\[\s*{.*}\s*\]', content, re.DOTALL)
+                            if match:
+                                json_array = match.group(0).replace("'", '"')
+                                tasks = json.loads(json_array)
+                                print("Regex extraction successful!")
+                            else:
+                                print("No JSON array found in content")
                         except Exception as e:
-                            print(f"All parsing methods failed: {e}")
-                            print(f"Final content that couldn't be parsed: {repr(content)}")
-                            return []
+                            print(f"Regex extraction failed: {e}")
+                            
+                            # Method 6: Fall back to safer eval
+                            try:
+                                print("Attempting eval with ast...")
+                                tasks = ast.literal_eval(content)
+                                print("AST literal_eval successful!")
+                            except Exception as e:
+                                print(f"AST literal_eval failed: {e}")
+                                
+                                # Final fallback: Try eval directly
+                                try:
+                                    print("Last resort: direct eval...")
+                                    tasks = eval(content)
+                                    print("Direct eval successful!")
+                                except Exception as e:
+                                    print(f"All parsing methods failed: {e}")
+                                    print(f"Final content that couldn't be parsed: {repr(content)}")
+                                    return []
 
         # Ensure tasks is a list
         if not isinstance(tasks, list):

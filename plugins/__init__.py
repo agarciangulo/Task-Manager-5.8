@@ -1,10 +1,7 @@
 """
 Plugin configuration for Task Manager.
 """
-from core.adapters.plugin_manager import PluginManager
-
-# Initialize plugin manager
-plugin_manager = PluginManager()
+from plugin_manager_instance import plugin_manager
 
 # Define plugin directories to search
 PLUGIN_DIRECTORIES = [

@@ -21,13 +21,28 @@ from core.services.auth_service import AuthService
 if EMAIL_ARCHIVE_ENABLED:
     from core.services.email_archive_service import EmailArchiveService
 
+from core.ai.extractors import chunk_email_text
+from plugin_manager_instance import plugin_manager
+
+# Discover and initialize plugins
+PLUGIN_DIRECTORIES = [
+    'plugins/guidelines',
+    'plugins/feedback', 
+    'plugins/integrations',
+    'plugins/security'
+]
+plugin_manager.discover_plugins(PLUGIN_DIRECTORIES)
+# Register all discovered plugins
+for plugin_name in plugin_manager.plugin_classes:
+    plugin_manager.register_plugin_by_name(plugin_name)
+
 def send_confirmation_email(recipient, tasks, coaching_insights=None, user_database_id=None):
     """
     Send a confirmation email with processed tasks and coaching insights.
     
     Args:
         recipient: Email address to send to
-        tasks: List of processed tasks
+        tasks: List of processed tasks (should be unprotected for user display)
         coaching_insights: Optional coaching insights text
         user_database_id: Optional database ID to fetch open tasks from
     """
@@ -42,6 +57,20 @@ def send_confirmation_email(recipient, tasks, coaching_insights=None, user_datab
                     open_tasks = existing_tasks[existing_tasks['status'] != 'Completed'].to_dict('records')
                     # Limit to most recent 10 open tasks to avoid overwhelming the email
                     open_tasks = open_tasks[:10]
+                    
+                    # Unprotect open tasks as well
+                    protection_plugin = plugin_manager.get_plugin('ProjectProtectionPlugin')
+                    if protection_plugin and protection_plugin.enabled:
+                        # Temporarily set preserve_tokens_in_ui to False for email display
+                        original_preserve_setting = protection_plugin.security_manager.preserve_tokens_in_ui
+                        protection_plugin.security_manager.preserve_tokens_in_ui = False
+                        
+                        for task in open_tasks:
+                            unprotected_task = protection_plugin.unprotect_task(task)
+                            task.update(unprotected_task)
+                        
+                        # Restore original setting
+                        protection_plugin.security_manager.preserve_tokens_in_ui = original_preserve_setting
             except Exception as e:
                 print(f"Error fetching open tasks: {str(e)}")
         
@@ -375,38 +404,45 @@ def check_gmail_for_updates():
             email_id = None
             if EMAIL_ARCHIVE_ENABLED:
                 try:
-                    # Prepare email data for archiving
-                    email_data = {
-                        'message_id': msg_id.decode(),
-                        'thread_id': msg.get('In-Reply-To') or msg.get('References'),
-                        'sender_email': sender_email,
-                        'sender_name': sender_name,
-                        'recipient_email': GMAIL_ADDRESS,
-                        'subject': subject,
-                        'body_text': body,
-                        'body_html': body,  # Could extract HTML if needed
-                        'received_date': email_date if 'email_date' in locals() else datetime.now(),
-                        'user_id': None,  # Will be updated after user lookup
-                        'task_database_id': None,  # Will be updated after user lookup
-                        'email_size_bytes': len(raw_email),
-                        'has_attachments': bool(msg.get_payload()),
-                        'attachment_count': 0,  # Could count attachments if needed
-                        'priority': 'normal',
-                        'labels': [],
-                        'is_read': False,
-                        'is_archived': False,
-                        'processing_status': 'processing',
-                        'processing_metadata': {
-                            'source': 'gmail_processor',
-                            'parsed_at': datetime.now().isoformat(),
-                            'original_message_id': msg_id.decode()
-                        }
-                    }
-                    
-                    # Store email in hot storage
+                    # Check if email already exists in archive
                     archive_service = EmailArchiveService()
-                    email_id = archive_service.store_email(email_data, 'hot')
-                    print(f"✅ Email archived with ID: {email_id}")
+                    existing_email = archive_service.get_email_by_message_id(msg_id.decode())
+                    
+                    if existing_email:
+                        print(f"📧 Email with message_id {msg_id.decode()} already archived, skipping...")
+                        email_id = existing_email.get('id')
+                    else:
+                        # Prepare email data for archiving
+                        email_data = {
+                            'message_id': msg_id.decode(),
+                            'thread_id': msg.get('In-Reply-To') or msg.get('References'),
+                            'sender_email': sender_email,
+                            'sender_name': sender_name,
+                            'recipient_email': GMAIL_ADDRESS,
+                            'subject': subject,
+                            'body_text': body,
+                            'body_html': body,  # Could extract HTML if needed
+                            'received_date': email_date if 'email_date' in locals() else datetime.now(),
+                            'user_id': None,  # Will be updated after user lookup
+                            'task_database_id': None,  # Will be updated after user lookup
+                            'email_size_bytes': len(raw_email),
+                            'has_attachments': bool(msg.get_payload()),
+                            'attachment_count': 0,  # Could count attachments if needed
+                            'priority': 'normal',
+                            'labels': [],
+                            'is_read': False,
+                            'is_archived': False,
+                            'processing_status': 'processing',
+                            'processing_metadata': {
+                                'source': 'gmail_processor',
+                                'parsed_at': datetime.now().isoformat(),
+                                'original_message_id': msg_id.decode()
+                            }
+                        }
+                        
+                        # Store email in hot storage
+                        email_id = archive_service.store_email(email_data, 'hot')
+                        print(f"✅ Email archived with ID: {email_id}")
                     
                 except Exception as e:
                     print(f"⚠️ Email archiving failed: {e}")
@@ -444,108 +480,254 @@ def check_gmail_for_updates():
             
             try:
                 # Extract tasks
-                tasks = extract_tasks_from_update(update_text)
+                print(f"\n🔍 DEBUG: Starting task extraction for email from {sender_name}")
+                print(f"📧 Email body length: {len(body)} characters")
                 
-                if tasks:
-                    print(f"Extracted {len(tasks)} tasks for user {sender_email}")
+                chunks = chunk_email_text(body, 20)
+                print(f"📦 DEBUG: Email split into {len(chunks)} chunks")
+                
+                tasks = []  # Initialize the tasks list
+                
+                for i, chunk in enumerate(chunks):
+                    print(f"\n📋 DEBUG: Processing chunk {i+1}/{len(chunks)}")
+                    print(f"   Chunk length: {len(chunk)} characters")
+                    print(f"   Chunk preview: {chunk[:200]}...")
                     
-                    # Get existing tasks from user's database
-                    existing_tasks = fetch_notion_tasks(database_id=user.task_database_id)
+                    # Create context-enriched chunk with email metadata
+                    enriched_chunk = f"""From: {sender_name}
+Date: {date_str}
+Subject: {subject}
+
+{chunk}"""
                     
-                    # Process each task
-                    log_output = []
-                    successful_tasks = 0
-                    for task in tasks:
-                        success, message = insert_or_update_task(
-                            database_id=user.task_database_id,
-                            task=task, 
-                            existing_tasks=existing_tasks, 
-                            log_output=log_output
-                        )
-                        if success:
-                            print(f"Successfully processed task: {task.get('task')}")
-                            successful_tasks += 1
-                        else:
-                            print(f"Failed to process task: {task.get('task')} - {message}")
+                    print(f"   📧 DEBUG: Enriched chunk with context:")
+                    print(f"     Sender: {sender_name}")
+                    print(f"     Date: {date_str}")
+                    print(f"     Subject: {subject}")
                     
-                    print(f"Successfully processed {successful_tasks} tasks for user {sender_email}")
+                    # Extract tasks from this enriched chunk
+                    chunk_tasks = extract_tasks_from_update(enriched_chunk)
+                    print(f"   ✅ Extracted {len(chunk_tasks)} tasks from chunk {i+1}")
                     
-                    # Generate coaching insights
-                    coaching_insights = None
-                    try:
-                        # Get person name from the first task
-                        person_name = ""
-                        if tasks and "employee" in tasks[0]:
-                            person_name = tasks[0].get("employee", "")
-                            
-                        if person_name and not existing_tasks.empty and "employee" in existing_tasks.columns:
-                            # Get recent tasks for this person from user's database
-                            recent_tasks = existing_tasks[existing_tasks['employee'] == person_name]
-                            if len(recent_tasks) > 0:
-                                # Filter to recent tasks (last 14 days)
-                                if 'date' in recent_tasks.columns:
-                                    # Fix: Convert date column to datetime if it's not already
-                                    try:
-                                        if recent_tasks['date'].dtype == 'object':
-                                            recent_tasks = recent_tasks.copy()
-                                            recent_tasks['date'] = pd.to_datetime(recent_tasks['date'], errors='coerce')
-                                        recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
-                                    except Exception as date_error:
-                                        print(f"Error processing dates for coaching insights: {date_error}")
-                                        # If date processing fails, use all recent tasks
-                                        recent_tasks = recent_tasks
-                                
-                            # Get peer feedback
-                            peer_feedback = []
-                            try:
-                                from core import fetch_peer_feedback
-                                peer_feedback = fetch_peer_feedback(person_name)
-                            except Exception as e:
-                                print(f"Error fetching peer feedback: {str(e)}")
-                                
-                            # Generate coaching insights
-                            coaching_insights = get_coaching_insight(person_name, tasks, recent_tasks, peer_feedback)
-                            print("Generated coaching insights successfully")
-                        else:
-                            print(f"Skipping coaching insights - person_name: {person_name}, DataFrame empty: {existing_tasks.empty}, has employee column: {'employee' in existing_tasks.columns if not existing_tasks.empty else 'N/A'}")
-                    except Exception as e:
-                        print(f"Error generating coaching insights: {str(e)}")
-                        print(traceback.format_exc())
-                        
-                    # Send confirmation with coaching insights
-                    send_confirmation_email(sender_email, tasks, coaching_insights, user.task_database_id)
+                    # Apply fallback values for missing fields
+                    for task in chunk_tasks:
+                        if not task.get('employee') or task.get('employee') == 'Unknown':
+                            task['employee'] = sender_name
+                            print(f"     🔧 Applied fallback employee: {sender_name}")
+                        if not task.get('date') or task.get('date') == 'Unknown':
+                            task['date'] = date_str
+                            print(f"     🔧 Applied fallback date: {date_str}")
                     
-                    # Update email record with completion status and task metadata
-                    if email_id and EMAIL_ARCHIVE_ENABLED:
-                        try:
-                            archive_service = EmailArchiveService()
-                            # Update with user info and task results
-                            update_data = {
-                                'user_id': user.user_id if hasattr(user, 'user_id') else sender_email,
-                                'task_database_id': user.task_database_id,
-                                'processing_status': 'completed',
-                                'processing_metadata': {
-                                    'source': 'gmail_processor',
-                                    'tasks_extracted': len(tasks),
-                                    'tasks_processed': successful_tasks,
-                                    'coaching_insights_generated': coaching_insights is not None,
-                                    'completed_at': datetime.now().isoformat(),
-                                    'user_email': sender_email
-                                }
-                            }
-                            archive_service.update_email(email_id, update_data)
-                            print(f"✅ Email record updated with completion status")
-                        except Exception as e:
-                            print(f"⚠️ Failed to update email completion status: {e}")
+                    if chunk_tasks:
+                        for j, task in enumerate(chunk_tasks):
+                            print(f"     Task {j+1}: {task.get('task', 'No task field')[:100]}...")
+                            print(f"       Employee: {task.get('employee', 'Missing')}")
+                            print(f"       Date: {task.get('date', 'Missing')}")
+                    else:
+                        print(f"     ⚠️ No tasks extracted from chunk {i+1}")
+                    
+                    tasks.extend(chunk_tasks)
+                
+                print(f"\n📊 DEBUG: Total tasks extracted across all chunks: {len(tasks)}")
+                
+                # Apply protection to tasks if ProjectProtectionPlugin is enabled
+                protection_plugin = plugin_manager.get_plugin('ProjectProtectionPlugin')
+                print(f"🔍 DEBUG: Protection plugin check:")
+                print(f"   Plugin found: {protection_plugin is not None}")
+                if protection_plugin:
+                    print(f"   Plugin enabled: {protection_plugin.enabled}")
+                    print(f"   Plugin config: {protection_plugin.config}")
                 else:
-                    print("No tasks could be extracted from email")
-                    # Update email record with no-tasks status
-                    if email_id and EMAIL_ARCHIVE_ENABLED:
+                    print(f"   ❌ ProjectProtectionPlugin not found!")
+                    print(f"   Available plugins: {list(plugin_manager.plugins.keys())}")
+                
+                if protection_plugin and protection_plugin.enabled:
+                    print(f"🛡️ DEBUG: Applying task protection...")
+                    try:
+                        # Force token creation for any new category before protection
+                        for i, task in enumerate(tasks):
+                            if 'category' in task and task['category'] and task['category'] != 'Uncategorized':
+                                token = protection_plugin.security_manager.tokenize_project(task['category'])
+                                print(f"   🏷️ Token for category '{task['category']}': {token}")
+                        # Protect each task to tokenize categories
+                        for i, task in enumerate(tasks):
+                            protected_task = protection_plugin.protect_task(task)
+                            tasks[i] = protected_task
+                            print(f"   🔒 Protected task {i+1}: category '{task.get('category')}' -> '{protected_task.get('category')}'")
+                        print(f"   🗺️ Token map after protection: {protection_plugin.security_manager.token_map}")
+                    except Exception as e:
+                        print(f"⚠️ Error protecting tasks: {e}")
+                        # Continue with unprotected tasks if protection fails
+                
+                print(f"Extracted {len(tasks)} tasks for user {sender_name}")
+                
+                # Get existing tasks from user's database
+                existing_tasks = fetch_notion_tasks(database_id=user.task_database_id)
+                print(f"📋 DEBUG: Found {len(existing_tasks)} existing tasks in database")
+                
+                # Process each task
+                log_output = []
+                successful_tasks = 0
+                failed_tasks = 0
+                
+                print(f"\n🔄 DEBUG: Starting task insertion process...")
+                for i, task in enumerate(tasks):
+                    print(f"\n📝 DEBUG: Processing task {i+1}/{len(tasks)}")
+                    print(f"   Task data: {task}")
+                    
+                    # Validate task data before insertion
+                    print(f"   🔍 DEBUG: Task validation:")
+                    print(f"     - task: '{task.get('task', 'MISSING')}'")
+                    print(f"     - employee: '{task.get('employee', 'MISSING')}'")
+                    print(f"     - date: '{task.get('date', 'MISSING')}'")
+                    print(f"     - status: '{task.get('status', 'MISSING')}'")
+                    print(f"     - category: '{task.get('category', 'MISSING')}'")
+                    
+                    # Check for null/empty values that might cause Notion API errors
+                    validation_errors = []
+                    if not task.get('task') or not task['task'].strip():
+                        validation_errors.append("Empty task description")
+                    if not task.get('employee') or not task['employee'].strip():
+                        validation_errors.append("Empty employee field")
+                    if not task.get('date'):
+                        validation_errors.append("Missing date")
+                    if not task.get('status'):
+                        validation_errors.append("Missing status")
+                    
+                    if validation_errors:
+                        print(f"   ⚠️ Validation errors: {validation_errors}")
+                    
+                    # Use the protected task as the base for task_fixed
+                    task_fixed = task.copy()
+                    if not task_fixed.get('task') or not task_fixed['task'].strip():
+                        task_fixed['task'] = "Untitled Task"
+                        print(f"   🔧 Applied fallback task: 'Untitled Task'")
+                    if not task_fixed.get('employee') or not task_fixed['employee'].strip():
+                        task_fixed['employee'] = sender_name
+                        print(f"   🔧 Applied fallback employee: {sender_name}")
+                    if not task_fixed.get('date'):
+                        task_fixed['date'] = date_str
+                        print(f"   🔧 Applied fallback date: {date_str}")
+                    if not task_fixed.get('status'):
+                        task_fixed['status'] = "Not Started"
+                        print(f"   🔧 Applied fallback status: 'Not Started'")
+                    if not task_fixed.get('category'):
+                        task_fixed['category'] = "Uncategorized"
+                        print(f"   🔧 Applied fallback category: 'Uncategorized'")
+                    print(f"   🛡️ DEBUG: Category before Notion insert: '{task_fixed.get('category')}'")
+                    
+                    success, message = insert_or_update_task(
+                        database_id=user.task_database_id,
+                        task=task_fixed, 
+                        existing_tasks=existing_tasks, 
+                        log_output=log_output
+                    )
+                    
+                    if success:
+                        print(f"   ✅ Successfully processed task: {task.get('task')}")
+                        successful_tasks += 1
+                    else:
+                        print(f"   ❌ Failed to process task: {task.get('task')}")
+                        print(f"   Error message: {message}")
+                        print(f"   🔍 DEBUG: Full error details:")
+                        print(f"     Task data that failed: {task}")
+                        print(f"     Error message: {message}")
+                        failed_tasks += 1
+                
+                print(f"\n📈 DEBUG: Task processing summary:")
+                print(f"   Total tasks: {len(tasks)}")
+                print(f"   Successful: {successful_tasks}")
+                print(f"   Failed: {failed_tasks}")
+                
+                print(f"Successfully processed {successful_tasks} tasks for user {sender_name}")
+                
+                # Create unprotected versions of tasks for user-facing content
+                unprotected_tasks = []
+                if protection_plugin and protection_plugin.enabled:
+                    print(f"📧 DEBUG: Creating unprotected tasks for user display...")
+                    # Temporarily set preserve_tokens_in_ui to False for email display
+                    original_preserve_setting = protection_plugin.security_manager.preserve_tokens_in_ui
+                    protection_plugin.security_manager.preserve_tokens_in_ui = False
+                    
+                    for task in tasks:
+                        unprotected_task = protection_plugin.unprotect_task(task)
+                        unprotected_tasks.append(unprotected_task)
+                        print(f"   🔓 Unprotected task: category '{task.get('category')}' -> '{unprotected_task.get('category')}'")
+                    
+                    # Restore original setting
+                    protection_plugin.security_manager.preserve_tokens_in_ui = original_preserve_setting
+                else:
+                    unprotected_tasks = tasks
+                
+                # Generate coaching insights
+                coaching_insights = None
+                try:
+                    # Get person name from the first task
+                    person_name = ""
+                    if unprotected_tasks and "employee" in unprotected_tasks[0]:
+                        person_name = unprotected_tasks[0].get("employee", "")
+                        
+                    if person_name and not existing_tasks.empty and "employee" in existing_tasks.columns:
+                        # Get recent tasks for this person from user's database
+                        recent_tasks = existing_tasks[existing_tasks['employee'] == person_name]
+                        if len(recent_tasks) > 0:
+                            # Filter to recent tasks (last 14 days)
+                            if 'date' in recent_tasks.columns:
+                                # Fix: Convert date column to datetime if it's not already
+                                try:
+                                    if recent_tasks['date'].dtype == 'object':
+                                        recent_tasks = recent_tasks.copy()
+                                        recent_tasks['date'] = pd.to_datetime(recent_tasks['date'], errors='coerce')
+                                    recent_tasks = recent_tasks[recent_tasks['date'] >= datetime.now() - timedelta(days=14)]
+                                except Exception as date_error:
+                                    print(f"Error processing dates for coaching insights: {date_error}")
+                                    # If date processing fails, use all recent tasks
+                                    recent_tasks = recent_tasks
+                            
+                        # Get peer feedback
+                        peer_feedback = []
                         try:
-                            archive_service = EmailArchiveService()
-                            archive_service.update_email_status(email_id, 'completed', {'tasks_extracted': 0, 'reason': 'No tasks found'})
+                            from core import fetch_peer_feedback
+                            peer_feedback = fetch_peer_feedback(person_name)
                         except Exception as e:
-                            print(f"⚠️ Failed to update email status: {e}")
+                            print(f"Error fetching peer feedback: {str(e)}")
+                            
+                        # Generate coaching insights using unprotected tasks
+                        coaching_insights = get_coaching_insight(person_name, unprotected_tasks, recent_tasks, peer_feedback)
+                        print("Generated coaching insights successfully")
+                    else:
+                        print(f"Skipping coaching insights - person_name: {person_name}, DataFrame empty: {existing_tasks.empty}, has employee column: {'employee' in existing_tasks.columns if not existing_tasks.empty else 'N/A'}")
+                except Exception as e:
+                    print(f"Error generating coaching insights: {str(e)}")
+                    print(traceback.format_exc())
+                    
+                # Send confirmation with coaching insights using unprotected tasks
+                send_confirmation_email(sender_email, unprotected_tasks, coaching_insights, user.task_database_id)
+                
+                # Update email record with completion status and task metadata
+                if email_id and EMAIL_ARCHIVE_ENABLED:
+                    try:
+                        archive_service = EmailArchiveService()
+                        # Update with user info and task results
+                        update_data = {
+                            'user_id': user.user_id if hasattr(user, 'user_id') else sender_email,
+                            'task_database_id': user.task_database_id,
+                            'processing_status': 'completed',
+                            'processing_metadata': {
+                                'source': 'gmail_processor',
+                                'tasks_extracted': len(tasks),
+                                'tasks_processed': successful_tasks,
+                                'tasks_failed': failed_tasks,
+                                'chunks_processed': len(chunks),
+                                'coaching_insights_generated': coaching_insights is not None,
+                                'completed_at': datetime.now().isoformat(),
+                                'user_email': sender_email
+                            }
+                        }
+                        archive_service.update_email(email_id, update_data)
+                        print(f"✅ Email record updated with completion status")
+                    except Exception as e:
+                        print(f"⚠️ Failed to update email completion status: {e}")
             except Exception as e:
                 print(f"Error processing email: {str(e)}")
                 print(traceback.format_exc())

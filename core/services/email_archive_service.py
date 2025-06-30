@@ -504,4 +504,30 @@ class EmailArchiveService:
                 logger.warning(f"Could not merge metadata for email {email_id}: {e}")
                 update_data['processing_metadata'] = metadata
         
-        return self.update_email(email_id, update_data, storage_type) 
+        return self.update_email(email_id, update_data, storage_type)
+
+    def get_email_by_message_id(self, message_id: str, storage_type: str = 'hot') -> Optional[Dict[str, Any]]:
+        """
+        Get an email by its message_id.
+        
+        Args:
+            message_id: Email message ID
+            storage_type: 'hot' or 'cold'
+            
+        Returns:
+            Optional[Dict]: Email data or None if not found
+        """
+        try:
+            with self._get_session() as session:
+                if storage_type == 'hot':
+                    email = session.query(HotEmail).filter(HotEmail.message_id == message_id).first()
+                else:
+                    email = session.query(ColdEmail).filter(ColdEmail.message_id == message_id).first()
+                
+                if email:
+                    return email.to_dict()
+                return None
+                
+        except Exception as e:
+            logger.error(f"Failed to get email by message_id {message_id}: {str(e)}")
+            return None 

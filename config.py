@@ -75,6 +75,9 @@ COLD_STORAGE_DAYS = int(os.getenv('COLD_STORAGE_DAYS', '365'))  # Days to keep e
 EMAIL_COMPRESSION_ENABLED = os.getenv('EMAIL_COMPRESSION_ENABLED', 'True').lower() == 'true'
 ATTACHMENT_STORAGE_PATH = os.getenv('ATTACHMENT_STORAGE_PATH', 'attachments')
 
+# Security Settings
+PRESERVE_TOKENS_IN_UI = os.getenv('PRESERVE_TOKENS_IN_UI', 'False').lower() == 'true'
+
 # Validate required environment variables
 required_vars = [
     'NOTION_TOKEN',

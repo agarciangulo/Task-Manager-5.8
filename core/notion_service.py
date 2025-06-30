@@ -12,6 +12,7 @@ from config import (
     DAYS_THRESHOLD
 )
 from core.logging_config import get_logger
+from plugin_manager_instance import plugin_manager
 
 logger = get_logger(__name__)
 
@@ -23,6 +24,9 @@ class NotionService:
         self._cache = {}
         self._cache_timestamp = None
         self._cache_valid_duration = timedelta(minutes=5)
+        
+        # Get the project protection plugin
+        self.protection_plugin = plugin_manager.get_plugin('ProjectProtectionPlugin')
 
     def debug_print(self, message):
         if DEBUG_MODE:
@@ -239,6 +243,10 @@ class NotionService:
                 "last_edited_time": page.get("last_edited_time")
             }
             
+            # Restore original project names from tokens
+            if self.protection_plugin and self.protection_plugin.enabled:
+                task = self.protection_plugin.unprotect_task(task)
+            
             return task
             
         except Exception as e:
@@ -257,102 +265,107 @@ class NotionService:
         Returns:
             Dict[str, Any]: Formatted properties.
         """
+        # Apply protection to task data before sending to Notion
+        protected_task_data = task_data
+        if self.protection_plugin and self.protection_plugin.enabled:
+            protected_task_data = self.protection_plugin.protect_task(task_data)
+        
         properties = {}
         # Title
-        if "title" in task_data and task_data["title"]:
+        if "title" in protected_task_data and protected_task_data["title"]:
             properties["Title"] = {
                 "title": [
                     {
                         "text": {
-                            "content": task_data["title"]
+                            "content": protected_task_data["title"]
                         }
                     }
                 ]
             }
         # Task description (rich_text)
-        if "task" in task_data:
+        if "task" in protected_task_data:
             properties["Task"] = {
                 "rich_text": [
                     {
                         "text": {
-                            "content": task_data["task"]
+                            "content": protected_task_data["task"]
                         }
                     }
                 ]
             }
         # Status
-        if "status" in task_data:
+        if "status" in protected_task_data:
             properties["Status"] = {
                 "select": {
-                    "name": task_data["status"]
+                    "name": protected_task_data["status"]
                 }
             }
         # Employee
-        if "employee" in task_data:
+        if "employee" in protected_task_data:
             properties["Employee"] = {
                 "rich_text": [
                     {
                         "text": {
-                            "content": task_data["employee"]
+                            "content": protected_task_data["employee"]
                         }
                     }
                 ]
             }
         # Date
-        if "date" in task_data and task_data["date"]:
+        if "date" in protected_task_data and protected_task_data["date"]:
             properties["Date"] = {
                 "date": {
-                    "start": task_data["date"]
+                    "start": protected_task_data["date"]
                 }
             }
         # Category
-        if "category" in task_data:
+        if "category" in protected_task_data:
             properties["Category"] = {
                 "rich_text": [
                     {
                         "text": {
-                            "content": task_data["category"]
+                            "content": protected_task_data["category"]
                         }
                     }
                 ]
             }
         # Priority
-        if "priority" in task_data:
+        if "priority" in protected_task_data:
             properties["Priority"] = {
                 "select": {
-                    "name": task_data["priority"]
+                    "name": protected_task_data["priority"]
                 }
             }
         # Due Date
-        if "due_date" in task_data and task_data["due_date"]:
+        if "due_date" in protected_task_data and protected_task_data["due_date"]:
             properties["Due Date"] = {
                 "date": {
-                    "start": task_data["due_date"]
+                    "start": protected_task_data["due_date"]
                 }
             }
         # Notes
-        if "notes" in task_data and task_data["notes"]:
+        if "notes" in protected_task_data and protected_task_data["notes"]:
             properties["Notes"] = {
                 "rich_text": [
                     {
                         "text": {
-                            "content": task_data["notes"]
+                            "content": protected_task_data["notes"]
                         }
                     }
                 ]
             }
         # Is Recurring
-        if "is_recurring" in task_data:
+        if "is_recurring" in protected_task_data:
             properties["Is Recurring"] = {
-                "checkbox": task_data["is_recurring"]
+                "checkbox": protected_task_data["is_recurring"]
             }
         # Reminder Sent
-        if "reminder_sent" in task_data:
+        if "reminder_sent" in protected_task_data:
             properties["Reminder Sent"] = {
-                "checkbox": task_data["reminder_sent"]
+                "checkbox": protected_task_data["reminder_sent"]
             }
         
-        logger.debug(f"Formatting task properties. Input: {task_data}, Output: {properties}")
+        logger.debug(f"Formatting task properties. Input: {task_data}, Protected: {protected_task_data}, Output: {properties}")
         return properties
 
     def identify_stale_tasks(self, database_id: str, days: int = 7) -> list:

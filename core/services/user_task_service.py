@@ -8,6 +8,7 @@ from datetime import datetime
 
 from core.models.user import User
 from core.logging_config import get_logger
+from plugin_manager_instance import plugin_manager
 
 logger = get_logger(__name__)
 
@@ -23,6 +24,9 @@ class UserTaskService:
             notion_token: Notion API token.
         """
         self.notion_client = Client(auth=notion_token)
+        
+        # Get the project protection plugin
+        self.protection_plugin = plugin_manager.get_plugin('ProjectProtectionPlugin')
     
     def create_user_task_database(self, user: User, parent_page_id: str) -> str:
         """
@@ -147,13 +151,18 @@ class UserTaskService:
             raise ValueError("User does not have a task database assigned")
         
         try:
+            # Apply protection to task data before sending to Notion
+            protected_task_data = task_data
+            if self.protection_plugin and self.protection_plugin.enabled:
+                protected_task_data = self.protection_plugin.protect_task(task_data)
+            
             # Format task properties for Notion
             properties = {
                 "Title": {
                     "title": [
                         {
                             "text": {
-                                "content": task_data.get("title", "")
+                                "content": protected_task_data.get("title", "")
                             }
                         }
                     ]
@@ -162,45 +171,45 @@ class UserTaskService:
                     "rich_text": [
                         {
                             "text": {
-                                "content": task_data.get("task", "")
+                                "content": protected_task_data.get("task", "")
                             }
                         }
                     ]
                 },
                 "Status": {
                     "select": {
-                        "name": task_data.get("status", "Not Started")
+                        "name": protected_task_data.get("status", "Not Started")
                     }
                 },
                 "Priority": {
                     "select": {
-                        "name": task_data.get("priority", "Medium")
+                        "name": protected_task_data.get("priority", "Medium")
                     }
                 },
                 "Category": {
                     "rich_text": [
                         {
                             "text": {
-                                "content": task_data.get("category", "")
+                                "content": protected_task_data.get("category", "")
                             }
                         }
                     ]
                 },
                 "Date": {
                     "date": {
-                        "start": task_data.get("date")
-                    } if task_data.get("date") else None
+                        "start": protected_task_data.get("date")
+                    } if protected_task_data.get("date") else None
                 },
                 "Due Date": {
                     "date": {
-                        "start": task_data.get("due_date")
-                    } if task_data.get("due_date") else None
+                        "start": protected_task_data.get("due_date")
+                    } if protected_task_data.get("due_date") else None
                 },
                 "Notes": {
                     "rich_text": [
                         {
                             "text": {
-                                "content": task_data.get("notes", "")
+                                "content": protected_task_data.get("notes", "")
                             }
                         }
                     ]
@@ -209,16 +218,16 @@ class UserTaskService:
                     "rich_text": [
                         {
                             "text": {
-                                "content": task_data.get("employee", user.full_name)
+                                "content": protected_task_data.get("employee", user.full_name)
                             }
                         }
                     ]
                 },
                 "Is Recurring": {
-                    "checkbox": task_data.get("is_recurring", False)
+                    "checkbox": protected_task_data.get("is_recurring", False)
                 },
                 "Reminder Sent": {
-                    "checkbox": task_data.get("reminder_sent", False)
+                    "checkbox": protected_task_data.get("reminder_sent", False)
                 }
             }
             
@@ -230,7 +239,7 @@ class UserTaskService:
                 properties=properties
             )
             
-            # Return the created task data
+            # Return the created task data (with original names, not tokens)
             created_task = {
                 "id": response["id"],
                 "task": task_data.get("task", ""),
@@ -299,100 +308,105 @@ class UserTaskService:
             return False
         
         try:
+            # Apply protection to updates before sending to Notion
+            protected_updates = updates
+            if self.protection_plugin and self.protection_plugin.enabled:
+                protected_updates = self.protection_plugin.protect_task(updates)
+            
             # Format updates for Notion
             properties = {}
             
-            if "title" in updates:
+            if "title" in protected_updates:
                 properties["Title"] = {
                     "title": [
                         {
                             "text": {
-                                "content": updates["title"]
+                                "content": protected_updates["title"]
                             }
                         }
                     ]
                 }
             
-            if "task" in updates:
+            if "task" in protected_updates:
                 properties["Task"] = {
                     "rich_text": [
                         {
                             "text": {
-                                "content": updates["task"]
+                                "content": protected_updates["task"]
                             }
                         }
                     ]
                 }
             
-            if "status" in updates:
+            if "status" in protected_updates:
                 properties["Status"] = {
                     "select": {
-                        "name": updates["status"]
+                        "name": protected_updates["status"]
                     }
                 }
             
-            if "priority" in updates:
+            if "priority" in protected_updates:
                 properties["Priority"] = {
                     "select": {
-                        "name": updates["priority"]
+                        "name": protected_updates["priority"]
                     }
                 }
             
-            if "category" in updates:
+            if "category" in protected_updates:
                 properties["Category"] = {
                     "rich_text": [
                         {
                             "text": {
-                                "content": updates["category"]
+                                "content": protected_updates["category"]
                             }
                         }
                     ]
                 }
             
-            if "due_date" in updates:
+            if "due_date" in protected_updates:
                 properties["Due Date"] = {
                     "date": {
-                        "start": updates["due_date"]
-                    } if updates["due_date"] else None
+                        "start": protected_updates["due_date"]
+                    } if protected_updates["due_date"] else None
                 }
             
-            if "date" in updates:
+            if "date" in protected_updates:
                 properties["Date"] = {
                     "date": {
-                        "start": updates["date"]
-                    } if updates["date"] else None
+                        "start": protected_updates["date"]
+                    } if protected_updates["date"] else None
                 }
             
-            if "notes" in updates:
+            if "notes" in protected_updates:
                 properties["Notes"] = {
                     "rich_text": [
                         {
                             "text": {
-                                "content": updates["notes"]
+                                "content": protected_updates["notes"]
                             }
                         }
                     ]
                 }
             
-            if "employee" in updates:
+            if "employee" in protected_updates:
                 properties["Employee"] = {
                     "rich_text": [
                         {
                             "text": {
-                                "content": updates["employee"]
+                                "content": protected_updates["employee"]
                             }
                         }
                     ]
                 }
             
-            if "is_recurring" in updates:
+            if "is_recurring" in protected_updates:
                 properties["Is Recurring"] = {
-                    "checkbox": updates["is_recurring"]
+                    "checkbox": protected_updates["is_recurring"]
                 }
             
-            if "reminder_sent" in updates:
+            if "reminder_sent" in protected_updates:
                 properties["Reminder Sent"] = {
-                    "checkbox": updates["reminder_sent"]
+                    "checkbox": protected_updates["reminder_sent"]
                 }
             
             # Remove None values
@@ -469,6 +483,10 @@ class UserTaskService:
                 "created_time": page.get("created_time"),
                 "last_edited_time": page.get("last_edited_time")
             }
+            
+            # Restore original project names from tokens
+            if self.protection_plugin and self.protection_plugin.enabled:
+                task = self.protection_plugin.unprotect_task(task)
             
             return task
             

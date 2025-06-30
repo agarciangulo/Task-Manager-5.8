@@ -16,16 +16,19 @@ class SecurityManager:
     like project names before they're sent to external services.
     """
     
-    def __init__(self, token_file_path: str = "security_tokens.json"):
+    def __init__(self, token_file_path: str = "security_tokens.json", preserve_tokens_in_ui: bool = False):
         """
         Initialize the security manager.
         
         Args:
             token_file_path: Path to the token mapping file.
+            preserve_tokens_in_ui: If True, keep tokens visible in UI instead of detokenizing.
+                                  This provides better security but reduces usability.
         """
         self.token_file_path = token_file_path
         self.token_map = {}
         self.reverse_map = {}
+        self.preserve_tokens_in_ui = preserve_tokens_in_ui
         
         # Load any existing token mappings
         self._load_tokens()
@@ -107,20 +110,24 @@ class SecurityManager:
     
     def detokenize_project(self, token: str) -> str:
         """
-        Replace a token with the original project name.
-        
+        Replace a token with the original project name, recursively if needed.
         Args:
             token: The token to convert back.
-            
         Returns:
-            str: The original project name.
+            str: The original project name or token if preserve_tokens_in_ui is True.
         """
-        # If it's not a token or not in our mapping, return as is
-        if not token or not isinstance(token, str) or not token.startswith("PROJ_"):
+        # If preserve_tokens_in_ui is True, return the token as-is for UI display
+        if self.preserve_tokens_in_ui:
             return token
-            
-        # Look up the original project name
-        return self.reverse_map.get(token, token)
+        # Recursively resolve tokens until we reach a non-token or a value not in the reverse map
+        current = token
+        seen = set()
+        while (
+            current and isinstance(current, str) and current.startswith("PROJ_") and current in self.reverse_map and current not in seen
+        ):
+            seen.add(current)
+            current = self.reverse_map[current]
+        return current
     
     def protect_task_data(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -157,9 +164,13 @@ class SecurityManager:
             protected_data: The protected task data.
             
         Returns:
-            Dict[str, Any]: Original task data.
+            Dict[str, Any]: Original task data or protected data if preserve_tokens_in_ui is True.
         """
         original = protected_data.copy()
+        
+        # If preserve_tokens_in_ui is True, return protected data as-is
+        if self.preserve_tokens_in_ui:
+            return original
         
         # Detokenize the category/project
         if 'category' in original and original['category']:
@@ -224,12 +235,15 @@ class SecurityManager:
             protected_text: The protected text.
             
         Returns:
-            str: Original text.
+            str: Original text or protected text if preserve_tokens_in_ui is True.
         """
-        text = protected_text
-        
-        # Replace tokens with project names
+        # If preserve_tokens_in_ui is True, return protected text as-is
+        if self.preserve_tokens_in_ui:
+            return protected_text
+            
+        # Replace any tokens with their original project names
         for token, project_name in self.reverse_map.items():
-            text = text.replace(token, project_name)
+            if token in protected_text:
+                protected_text = protected_text.replace(token, project_name)
         
-        return text
+        return protected_text

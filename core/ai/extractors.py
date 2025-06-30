@@ -14,7 +14,8 @@ from config import (
     MIN_TASK_LENGTH, 
     DEBUG_MODE,
     CHAT_MODEL,
-    AI_PROVIDER
+    AI_PROVIDER,
+    PRESERVE_TOKENS_IN_UI
 )
 
 # Import security manager for protecting sensitive data
@@ -86,7 +87,7 @@ Extract ONLY the actionable tasks from the provided work log, which may contain 
    - Look for explicit "Completed Activities" or "Completed Tasks" sections first
    - Extract from "Planned Activities" only if corresponding completed activities are not found
    - Recognize tasks in bullet points, numbered lists, paragraphs, and project sections
-   - Parse tasks across different formatting styles (dashes, asterisks, paragraphs)
+   - Parse tasks across different formatting styles (dashes, asterisk, paragraphs)
    - Identify action verbs to determine what work was performed
    - Ignore email headers, greetings, and signatures that don't contain task information
 
@@ -102,11 +103,14 @@ Extract ONLY the actionable tasks from the provided work log, which may contain 
    - Standardize all dates to YYYY-MM-DD format
    - For emails with multiple dates, use the most recent relevant date for each task
 
-6. CATEGORIZATION:
-   - Assign each task to the correct project/category based on context
-   - Use section headers, indentation, or prefix labels to determine categories
-   - If a task mentions multiple projects, prefer the most specific one
-   - If no category is explicitly mentioned, use "Uncategorized"
+6. CATEGORIZATION - CRITICAL RULES:
+   - ALWAYS use the specific project name mentioned in the task as the category
+   - If a task mentions "Project Alpha", use "Project Alpha" as the category, NOT "Projects" or "Alpha"
+   - If a task mentions "Secret Initiative Beta", use "Secret Initiative Beta" as the category
+   - Do NOT group tasks under generic categories like "New Projects", "Development", "Meetings"
+   - Use the exact project name as it appears in the text
+   - If no specific project is mentioned, use "Uncategorized"
+   - If a task mentions multiple projects, use the most specific/relevant one mentioned in that task
 
 7. TASK ENHANCEMENT:
    - Ensure each task has a clear action verb
@@ -130,15 +134,24 @@ SPECIAL CASES TO HANDLE:
 Now extract the tasks from this input: {protected_text}"""
 
     try:
-        print("Calling OpenAI API...")
-        response = client.chat_completions_create(
-            model=CHAT_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
-        )
+        print("Calling AI API...")
+        if AI_PROVIDER == 'gemini':
+            from core.gemini_client import client as gemini_client
+            response_text = gemini_client.generate_content(prompt, temperature=0.3)
+            content = response_text
+        elif AI_PROVIDER == 'openai':
+            from core.openai_client import client as openai_client
+            response = openai_client.chat.completions.create(
+                model=CHAT_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3
+            )
+            content = response.choices[0].message.content
+        else:
+            raise ValueError(f"Unsupported AI_PROVIDER: {AI_PROVIDER}")
 
-        content = response.choices[0].message.content
-        print(f"Received response from OpenAI. Length: {len(content)}")
+        print(f"Received response from AI. Length: {len(content)}")
+        print(f"🔍 DEBUG: AI Response preview: {content[:500]}...")
 
         # Remove markdown code blocks if present
         if "```" in content:
@@ -147,6 +160,7 @@ Now extract the tasks from this input: {protected_text}"""
 
         content = content.strip()
         print(f"Cleaned content. Now parsing...")
+        print(f"🔍 DEBUG: Cleaned content preview: {content[:500]}...")
 
         # Try multiple parsing methods in sequence
         tasks = None
@@ -189,12 +203,16 @@ Now extract the tasks from this input: {protected_text}"""
                         print("Direct eval successful!")
                     except Exception as e:
                         print(f"All parsing methods failed: {e}")
+                        print(f"🔍 DEBUG: Full content that failed to parse: {content}")
                         raise ValueError("Could not parse AI response as valid task data")
 
         # Ensure tasks is a list of dictionaries
         if not isinstance(tasks, list):
             print(f"Parsed result is not a list: {type(tasks)}")
+            print(f"🔍 DEBUG: Parsed result: {tasks}")
             raise ValueError(f"Expected a list of tasks, got {type(tasks)}")
+
+        print(f"🔍 DEBUG: Successfully parsed {len(tasks)} raw tasks")
 
         # Type checking for each task
         valid_tasks = []
@@ -202,6 +220,7 @@ Now extract the tasks from this input: {protected_text}"""
             try:
                 if not isinstance(task, dict):
                     print(f"Task {i} is not a dictionary: {type(task)}")
+                    print(f"🔍 DEBUG: Task {i} content: {task}")
                     continue
 
                 # Ensure all required keys exist
@@ -209,6 +228,7 @@ Now extract the tasks from this input: {protected_text}"""
                 if not all(key in task for key in required_keys):
                     missing = [key for key in required_keys if key not in task]
                     print(f"Task {i} missing keys: {missing}")
+                    print(f"🔍 DEBUG: Task {i} content: {task}")
                     continue
 
                 # Ensure task description has minimum length
@@ -227,14 +247,16 @@ Now extract the tasks from this input: {protected_text}"""
                         task["date"] = datetime.now().strftime("%Y-%m-%d")
 
                 valid_tasks.append(task)
+                print(f"✅ Task {i+1} validated: {task.get('task', '')[:50]}...")
             except Exception as e:
                 print(f"Error validating task {i}: {e}")
+                print(f"🔍 DEBUG: Task {i} that caused error: {task}")
                 continue
 
         print(f"Successfully validated {len(valid_tasks)} tasks")
         
-        # Unprotect tasks if protection was applied
-        if protection_plugin and protection_plugin.enabled:
+        # Unprotect tasks if protection was applied and PRESERVE_TOKENS_IN_UI is False
+        if protection_plugin and protection_plugin.enabled and not PRESERVE_TOKENS_IN_UI:
             try:
                 # First, process the tasks to add any new project categories to the security manager
                 for task in valid_tasks:
@@ -248,6 +270,7 @@ Now extract the tasks from this input: {protected_text}"""
             except Exception as e:
                 print(f"Error unprotecting tasks: {e}")
         
+        print(f"🔍 DEBUG: Final result: {len(valid_tasks)} tasks ready for return")
         return valid_tasks
 
     except Exception as e:
@@ -265,3 +288,68 @@ def get_ai_response(prompt: str) -> str:
         temperature=0.3
     )
     return response.choices[0].message.content
+
+def chunk_email_text(text, max_chunk_size=30):
+    """
+    Flexibly chunk email text by project/section headers, with fallbacks for unstructured text.
+    Args:
+        text: The full email text
+        max_chunk_size: Max lines per chunk if no headers found
+    Returns:
+        List of text chunks
+    """
+    print(f"\n🔪 DEBUG: Starting email chunking...")
+    print(f"   Input text length: {len(text)} characters")
+    
+    # Normalize line endings
+    lines = text.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+    print(f"   Total lines: {len(lines)}")
+    
+    chunks = []
+    current_chunk = []
+    header_pattern = re.compile(r"^(\s*[-*]?\s*[A-Z][A-Za-z0-9 &()'\-]+:)")
+    
+    print(f"   Scanning for headers...")
+    header_count = 0
+    
+    for i, line in enumerate(lines):
+        if header_pattern.match(line):
+            header_count += 1
+            print(f"     Found header at line {i+1}: {line.strip()}")
+            # Start a new chunk if current chunk is not empty
+            if current_chunk:
+                chunk_text = '\n'.join(current_chunk).strip()
+                chunks.append(chunk_text)
+                print(f"     Created chunk {len(chunks)} with {len(current_chunk)} lines ({len(chunk_text)} chars)")
+                current_chunk = []
+        current_chunk.append(line)
+    
+    # Add the last chunk
+    if current_chunk:
+        chunk_text = '\n'.join(current_chunk).strip()
+        chunks.append(chunk_text)
+        print(f"     Created final chunk {len(chunks)} with {len(current_chunk)} lines ({len(chunk_text)} chars)")
+    
+    print(f"   Found {header_count} headers, created {len(chunks)} chunks")
+    
+    # Fallback: If only one chunk and it's too large, split by max_chunk_size
+    if len(chunks) == 1 and len(lines) > max_chunk_size:
+        print(f"   ⚠️ Only one chunk created, but text is large ({len(lines)} lines)")
+        print(f"   🔄 Applying fallback chunking by {max_chunk_size} lines...")
+        
+        fallback_chunks = []
+        for i in range(0, len(lines), max_chunk_size):
+            fallback_chunk = '\n'.join(lines[i:i+max_chunk_size]).strip()
+            fallback_chunks.append(fallback_chunk)
+            print(f"     Created fallback chunk {len(fallback_chunks)}: lines {i+1}-{min(i+max_chunk_size, len(lines))} ({len(fallback_chunk)} chars)")
+        
+        print(f"   ✅ Fallback created {len(fallback_chunks)} chunks")
+        return fallback_chunks
+    
+    final_chunks = [c for c in chunks if c]
+    print(f"   ✅ Final result: {len(final_chunks)} chunks")
+    
+    for i, chunk in enumerate(final_chunks):
+        print(f"     Chunk {i+1}: {len(chunk)} characters")
+    
+    return final_chunks

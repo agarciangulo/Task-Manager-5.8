@@ -6,6 +6,7 @@ This version does not require the cryptography package.
 from typing import Dict, List, Any, Optional
 from core.adapters.plugin_base import PluginBase
 from core.security.security_manager import SecurityManager
+from config import PRESERVE_TOKENS_IN_UI
 
 class ProjectProtectionPlugin(PluginBase):
     """Plugin for protecting sensitive project names."""
@@ -22,7 +23,10 @@ class ProjectProtectionPlugin(PluginBase):
         # Initialize the security manager
         token_file = self.config.get('token_file_path', 'security_tokens.json')
         
-        self.security_manager = SecurityManager(token_file)
+        self.security_manager = SecurityManager(
+            token_file_path=token_file,
+            preserve_tokens_in_ui=PRESERVE_TOKENS_IN_UI
+        )
         self.enabled = self.config.get('enabled', True)
     
     def initialize(self):

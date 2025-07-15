@@ -28,12 +28,15 @@ wheels/
 # Virtual Environment
 venv/
 ENV/
+env/
+.venv/
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+*~
 
 # Docker
 .docker/
@@ -41,22 +44,83 @@ ENV/
 # Logs
 *.log
 logs/
+log/
 
 # Cache
 .cache/
 __pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
 
 # OS
 .DS_Store
 Thumbs.db
+*.tmp
+*.temp
 
 # Project specific
 *.db
 *.sqlite
-*.log 
+*.log
+chroma_db/
+embedding_cache.db
+email_storage/
+*.json.gz
 
 # Security
 security_tokens.json
 *.pem
 *.key
-*.cert 
+*.cert
+*.jwt
+
+# Test results and reports
+test_*.json
+*_results_*.json
+e2e_test_results_*.json
+core_workflow_results_*.json
+task_similarity_results_*.json
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Documentation build
+docs/_build/
+docs/build/
+
+# Performance test results
+performance_results/
+benchmark_results/
+
+# Database dumps
+*.dump
+*.sql
+
+# Email storage (if not needed in repo)
+email_storage/emails/
+email_storage/archive/
+
+# Chroma database files
+chroma_db/
+*.chroma
+
+# Embedding cache
+embeddings_cache.db
+embedding_cache/
+
+# Plugin cache
+plugin_cache/
+plugins/__pycache__/
+
+# API documentation
+api_docs/
+swagger/
+
+# Backup files
+*.backup
+*.old
+*.orig 

@@ -1,0 +1,300 @@
+/* Dashboard specific styles with filter support */
+
+/* Dashboard title */
+.dashboard-title {
+    font-weight: 700;
+    background: linear-gradient(90deg, #4361ee, #4cc9f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Metric cards */
+.metric-card {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    height: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.metric-card p {
+    font-size: 1rem;
+    margin-bottom: 0;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Animation for metrics */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse-animation {
+    animation: pulse 0.6s ease-in-out;
+}
+
+/* Project health cards */
+#projectHealthContainer .project-card {
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+#projectHealthContainer .project-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.project-card.health-healthy {
+    border-color: #10b981;
+}
+
+.project-card.health-needs-attention {
+    border-color: #f59e0b;
+}
+
+.project-card.health-at-risk {
+    border-color: #ef4444;
+}
+
+.project-card.health-unknown {
+    border-color: #6b7280;
+}
+
+.project-card h6 {
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+}
+
+.project-card .progress {
+    height: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 1rem;
+    background-color: #f3f4f6;
+}
+
+.project-card .progress-bar {
+    border-radius: 1rem;
+}
+
+.health-score {
+    font-weight: bold;
+}
+
+.health-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-healthy {
+    background-color: #10b981;
+    color: white;
+}
+
+.status-needs-attention {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.status-at-risk {
+    background-color: #ef4444;
+    color: white;
+}
+
+.status-unknown {
+    background-color: #6b7280;
+    color: white;
+}
+
+/* Employee productivity cards */
+#employeeStatsContainer .employee-card {
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+#employeeStatsContainer .employee-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.employee-card h6 {
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+}
+
+.employee-card .progress {
+    height: 0.5rem;
+    border-radius: 1rem;
+    background-color: #f3f4f6;
+}
+
+.employee-card .progress-bar {
+    background-color: #4361ee;
+    border-radius: 1rem;
+}
+
+.completion-badge {
+    font-weight: bold;
+}
+
+.completion-high {
+    color: #10b981;
+}
+
+.completion-medium {
+    color: #f59e0b;
+}
+
+.completion-low {
+    color: #ef4444;
+}
+
+/* Chart overlay for empty charts */
+.chart-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+    border-radius: 0.5rem;
+}
+
+.chart-overlay-content {
+    text-align: center;
+    padding: 1rem;
+    max-width: 80%;
+}
+
+.chart-overlay-content i {
+    font-size: 2rem;
+    display: block;
+}
+
+.chart-overlay-content p {
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+/* Filter styles */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: #4b5563;
+}
+
+.form-select {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    border-color: #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+}
+
+.form-select:focus {
+    border-color: #4361ee;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+#applyFilterBtn {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* Active filter badge */
+.filter-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #EFF6FF;
+    color: #2563EB;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+.filter-badge .badge-clear {
+    cursor: pointer;
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.filter-badge .badge-clear:hover {
+    opacity: 1;
+}
+
+.toast {
+    z-index: 1100;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .metric-card {
+        padding: 1rem 0.5rem;
+    }
+    
+    .metric-card h3 {
+        font-size: 1.75rem;
+    }
+    
+    .metric-card p {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-title {
+        font-size: 1.75rem;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+    }
+    
+    .filter-controls .form-group {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}

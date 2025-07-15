@@ -1,0 +1,1 @@
+from src.config.settings import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, GMAIL_SERVER 

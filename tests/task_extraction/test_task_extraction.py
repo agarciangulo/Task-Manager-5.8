@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from core.task_extractor import extract_tasks_from_update
 from core.gemini_client import client
-from config import CHAT_MODEL
+from config.settings import CHAT_MODEL
 
 def split_test_files(input_file, output_dir):
     """Split a master test file into individual test files."""

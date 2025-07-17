@@ -6,7 +6,7 @@ import re
 from typing import Dict, List, Any, Optional, Union
 import traceback
 
-from core import list_all_categories
+from src.core import list_all_categories
 from src.core.task_processor import insert_or_update_task
 
 def generate_verification_questions(incomplete_tasks):
@@ -91,7 +91,7 @@ def extract_task_info_from_response(task, response_text):
     Returns:
         Dict: Updated task information
     """
-    from src.core.openai_client import client, CHAT_MODEL
+    from src.core.gemini_client import client, CHAT_MODEL
     
     prompt = f"""You are a task information extractor. Given a vague task and a user's response providing more details, extract the complete task information.
 
@@ -121,7 +121,31 @@ Return the information in this JSON format:
         )
         
         import json
-        result = json.loads(response.choices[0].message.content)
+        # Handle both OpenAI and Gemini response formats
+        if hasattr(response, 'choices'):
+            # OpenAI format
+            content = response.choices[0].message.content
+        else:
+            # Gemini format (response is already a dict)
+            content = response['choices'][0]['message']['content']
+        
+        # Debug: Print the actual content
+        print(f"🔍 DEBUG: Gemini response content: '{content}'")
+        print(f"🔍 DEBUG: Content length: {len(content)}")
+        
+        # Check if content is empty
+        if not content or not content.strip():
+            print(f"⚠️ Empty response content from Gemini")
+            return task
+        
+        # Extract JSON from markdown code blocks if present
+        import re
+        json_match = re.search(r'```(?:json)?\s*\n(.*?)\n```', content, re.DOTALL)
+        if json_match:
+            content = json_match.group(1).strip()
+            print(f"🔍 DEBUG: Extracted JSON from markdown: '{content}'")
+        
+        result = json.loads(content)
         
         # Update the task with the extracted information
         updated_task = task.copy()
@@ -278,7 +302,7 @@ def generate_combined_coaching_insights(person_name, processed_tasks, existing_t
     Returns:
         Dict containing coaching insights and verification status
     """
-    from src.core.openai_client import client, CHAT_MODEL
+    from src.core.gemini_client import client, CHAT_MODEL
     
     # Filter recent tasks
     from datetime import datetime, timedelta

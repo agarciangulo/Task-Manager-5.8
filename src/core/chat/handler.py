@@ -9,7 +9,7 @@ import traceback
 from src.core.task_extractor import extract_tasks_from_update
 from src.core.task_processor import insert_or_update_task, batch_insert_tasks
 from src.core.notion_service import NotionService
-from core import fetch_notion_tasks
+from src.core import fetch_notion_tasks
 
 from src.core.chat.verification import (
     generate_verification_questions,
@@ -198,6 +198,83 @@ def process_regular_chat(message, user_id, chat_context, database_id: str):
         return ("I'm here to help with task management. You can send me an email or update "
                 "with your tasks, and I'll process them for you. Type 'help' for more information.")
 
+def handle_rag_query(message, user_id, chat_context, database_id: str):
+    """
+    Handle RAG queries using the /ask command.
+    
+    Args:
+        message: The chat message containing the /ask command
+        user_id: ID of the user sending the message
+        chat_context: Chat session context
+        database_id: The user's task database ID
+        
+    Returns:
+        Dict: Response with RAG-generated answer
+    """
+    try:
+        # Extract the actual question from the /ask command
+        question = message.strip()[4:].strip()  # Remove '/ask' and whitespace
+        
+        if not question:
+            return {
+                "message": "Please provide a question after /ask. For example: /ask How do I handle a client complaint?",
+                "type": "error"
+            }
+        
+        # Initialize knowledge base and query guidelines
+        from src.core.knowledge.knowledge_base import KnowledgeBase
+        
+        kb = KnowledgeBase(name="guidelines")
+        retrieved_chunks = kb.query_guidelines(question, top_k=4)
+        
+        if not retrieved_chunks:
+            return {
+                "message": "I couldn't find relevant information in our guidelines for your question. Please try rephrasing or ask about a different topic.",
+                "type": "no_results"
+            }
+        
+        # Construct the context string
+        context_string = "\n\n---\n\n".join(retrieved_chunks)
+        
+        # Create the RAG prompt
+        prompt = f"""You are PrismaBot, an expert AI assistant for our consultants. Your tone should be helpful, professional, and authoritative. Answer the user's question based *only* on the following context provided from our internal field guides and runbooks. If the context does not contain the answer, you must state that the information is not available in your knowledge base.
+
+CONTEXT:
+{context_string}
+
+QUESTION:
+{question}
+
+ANSWER:
+"""
+        
+        # Get AI response using the existing AI client
+        from src.core.ai_client import call_ai_api
+        
+        response = call_ai_api(prompt)
+        
+        if not response:
+            return {
+                "message": "I'm having trouble generating a response right now. Please try again later.",
+                "type": "error"
+            }
+        
+        return {
+            "message": response,
+            "type": "rag_response",
+            "context_sources": len(retrieved_chunks),
+            "question": question
+        }
+        
+    except Exception as e:
+        print(f"Error in RAG query: {e}")
+        import traceback
+        print(traceback.format_exc())
+        return {
+            "message": f"I encountered an error while searching our guidelines: {str(e)}. Please try again.",
+            "type": "error"
+        }
+
 def handle_chat_message(message, user_id, chat_context, database_id: str):
     """
     Main chat message handler.
@@ -212,6 +289,10 @@ def handle_chat_message(message, user_id, chat_context, database_id: str):
         Dict: Response with message and any additional data.
     """
     try:
+        # Check for /ask command for RAG queries
+        if message.strip().startswith('/ask'):
+            return handle_rag_query(message, user_id, chat_context, database_id)
+        
         # Check if this is a verification response
         if chat_context.get("pending_tasks"):
             # Process verification response

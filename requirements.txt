@@ -22,3 +22,10 @@ flower
 psycopg2-binary
 SQLAlchemy
 alembic
+# RAG System Dependencies
+langchain
+unstructured
+pypdf
+python-docx
+markdown
+sentence-transformers

@@ -1,0 +1,90 @@
+Actionable Plan: RAG System for Guidelines (Enhanced)
+
+Objective: To build a Retrieval-Augmented Generation (RAG) system that allows the AI agent to answer user questions by retrieving information directly from a knowledge base of consultant guideline documents. This corresponds to Initiative #7 on our strategic roadmap.
+
+Architectural Approach: We will create a two-part system. First, a standalone "ingestion pipeline" will read multiple document types (.md, .pdf, .docx), intelligently split them into context-aware chunks, and store their embeddings in specialized ChromaDB collections. Second, a "query service" will retrieve the most relevant document chunks for a given user question and use them to construct a context-rich, persona-driven prompt for the Gemini model.
+
+Phase 1: The Ingestion Pipeline
+Goal: To create a reusable script that populates our vector database with the knowledge from our guideline documents.
+
+Step 1.1: Setup and Dependencies
+This step prepares the project for robust, multi-format document processing.
+
+▶️ Prompt for Cursor:
+"Hello! I need to set up the project for an advanced RAG system that can handle multiple document types. Please perform the following actions:
+
+Add Dependencies: In requirements.txt, please add the following libraries: langchain, unstructured, pypdf, python-docx, and markdown. These will allow us to process PDF, Word, and Markdown files.
+
+Create Document Directory: In the root of the project, please create a new directory named docs/guidelines/. This is where we will store all our source knowledge documents."
+
+After Cursor runs this, you should manually place your guideline documents (.pdf, .docx, etc.) into the new docs/guidelines/ directory.
+
+Step 1.2: Create the Ingestion Script
+This script will be the heart of the pipeline, now with more intelligent document handling.
+
+▶️ Prompt for Cursor:
+"Now, let's build the script that will ingest our guideline documents into ChromaDB.
+
+Create New File: Create a new file at scripts/ingest_guidelines.py.
+
+Implement the Ingestion Logic: Inside this file, please write a script that performs the following steps:
+a. Import necessary libraries, including os, LangChain document loaders for different file types, langchain.text_splitter, core.embedding_manager, and core.chroma_client.
+b. Create a function run_ingestion().
+c. Inside this function, instantiate our EmbeddingManager and ChromaClient.
+d. Crucially, in the ChromaClient, get or create two separate, dedicated collections: guidelines_technical (for things like the Field Guide) and guidelines_process (for things like Runbooks and SDLC guides).
+e. Use DirectoryLoader from LangChain to load all files from the docs/guidelines/ directory.
+f. Use RecursiveCharacterTextSplitter to split the loaded documents into smaller chunks (e.g., with a chunk_size of 1000 and chunk_overlap of 100). For markdown files, consider using MarkdownHeaderTextSplitter to create more contextually aware chunks.
+g. Loop through the text chunks. For each chunk:
+i. Get its vector embedding using the EmbeddingManager.
+ii. Based on the source filename (e.g., if 'Field Guide' is in the name, use the 'technical' collection), add the embedding to the appropriate ChromaDB collection (guidelines_technical or guidelines_process).
+iii. The metadata for each vector should include the original page_content (the text chunk) and the source filename.
+h. Add a main execution block (if __name__ == "__main__":) to call run_ingestion()."
+
+Phase 2: Query Service and Chat Integration
+Goal: To allow users to ask questions and get answers from the newly ingested knowledge base.
+
+Step 2.1: Create the Knowledge Base Query Service
+This service will provide a clean interface for searching the specialized guideline collections.
+
+▶️ Prompt for Cursor:
+"Next, let's build the service that will allow our application to query the new knowledge base.
+
+Modify KnowledgeBase: Open the file core/knowledge/knowledge_base.py.
+
+Implement Query Method: Inside the KnowledgeBase class, create a new method query_guidelines(self, query_text: str) -> list[str]. This method should:
+a. Instantiate the EmbeddingManager and ChromaClient.
+b. Use the EmbeddingManager to get a vector embedding for the query_text.
+c. Use the ChromaClient to query both the guidelines_technical and guidelines_process collections for the top 2 most relevant document chunks from each.
+d. Combine the results, re-rank them by similarity score, and extract the original text content from the metadata.
+e. Return a list containing the top 3-4 overall best text chunks."
+
+Step 2.2: Integrate the RAG System with the Chat Interface
+This final step exposes the new capability to your users with an enhanced, persona-driven prompt.
+
+▶️ Prompt for Cursor:
+"Finally, let's connect our new RAG system to the user-facing chat.
+
+Modify Chat Handler: Open the file core/chat/handler.py.
+
+Implement /ask Command: Inside the ChatHandler class, create a new method to handle a command like /ask. This method should:
+a. Take the user's full input (e.g., /ask How do I handle a client complaint?).
+b. Extract the actual question part of the text.
+c. Instantiate the KnowledgeBase and call the new query_guidelines() method with the user's question to get the relevant context chunks.
+d. Construct a final, high-quality prompt for our Gemini model. The prompt should be structured like this:
+
+context_string = "\\n\\n---\\n\\n".join(retrieved_chunks)
+prompt = f\"\"\"You are PrismaBot, an expert AI assistant for our consultants. Your tone should be helpful, professional, and authoritative. Answer the user's question based *only* on the following context provided from our internal field guides and runbooks. If the context does not contain the answer, you must state that the information is not available in your knowledge base.
+
+CONTEXT:
+{context_string}
+
+QUESTION:
+{user_question}
+
+ANSWER:
+\"\"\"
+
+e. Send this complete prompt to our get_ai_response function and return the result to the user."
+
+By following these updated prompts, you will guide Cursor to build a more sophisticated and powerful RAG system that fully leverages the rich context of your guideline documents.
+

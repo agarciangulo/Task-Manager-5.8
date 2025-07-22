@@ -218,3 +218,74 @@ class KnowledgeBase:
             Optional[datetime]: The time, or None if not loaded.
         """
         return self.last_loaded
+    
+    def query_guidelines(self, query_text: str, top_k: int = 4) -> List[str]:
+        """
+        Query the guideline documents using ChromaDB for semantic search.
+        
+        This method retrieves the most relevant document chunks from the
+        ingested guideline collections and returns them as context for RAG.
+        
+        Args:
+            query_text: The user's question or query
+            top_k: Number of most relevant chunks to retrieve
+            
+        Returns:
+            List of relevant text chunks from guideline documents
+        """
+        try:
+            from src.core.chroma_embedding_manager_simple import SimpleChromaEmbeddingManager
+            
+            # Initialize embedding manager for query
+            query_manager = SimpleChromaEmbeddingManager()
+            
+            # Get query embedding
+            query_embedding = query_manager.get_embedding(query_text)
+            if query_embedding is None:
+                print(f"Failed to generate embedding for query: {query_text}")
+                return []
+            
+            # Query both guideline collections
+            relevant_chunks = []
+            
+            # Collection names from the ingestion pipeline
+            collections = ['guidelines_technical', 'guidelines_process']
+            
+            for collection_name in collections:
+                try:
+                    # Create collection-specific manager
+                    collection_manager = SimpleChromaEmbeddingManager(
+                        collection_name=collection_name
+                    )
+                    
+                    # Query the collection
+                    results = collection_manager.collection.query(
+                        query_embeddings=[query_embedding.tolist()],
+                        n_results=top_k // 2,  # Get half from each collection
+                        include=['documents', 'metadatas', 'distances']
+                    )
+                    
+                    # Extract relevant chunks
+                    if results and 'documents' in results and results['documents']:
+                        for i, doc in enumerate(results['documents'][0]):
+                            if doc:  # Ensure document is not empty
+                                relevant_chunks.append({
+                                    'content': doc,
+                                    'metadata': results['metadatas'][0][i] if results['metadatas'] and results['metadatas'][0] else {},
+                                    'distance': results['distances'][0][i] if results['distances'] and results['distances'][0] else 1.0
+                                })
+                                
+                except Exception as e:
+                    print(f"Error querying collection {collection_name}: {e}")
+                    continue
+            
+            # Sort by similarity score (lower distance = more similar)
+            relevant_chunks.sort(key=lambda x: x['distance'])
+            
+            # Return top chunks as text
+            top_chunks = relevant_chunks[:top_k]
+            return [chunk['content'] for chunk in top_chunks]
+            
+        except Exception as e:
+            print(f"Error in query_guidelines: {e}")
+            return []

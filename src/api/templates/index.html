@@ -426,28 +426,9 @@ Project Beta:
                 mainContent.style.display = 'block';
                 logoutItem.style.display = 'block';
                 
-                // Test authentication
-                fetch('/api/test_auth', {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                })
-                .then(response => {
-                    console.log('Auth test response status:', response.status);
-                    if (response.status === 401) {
-                        console.log('Token is invalid, redirecting to login');
-                        localStorage.removeItem('authToken');
-                        localStorage.removeItem('user');
-                        window.location.href = '/login';
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Auth test response:', data);
-                })
-                .catch(error => {
-                    console.error('Auth test error:', error);
-                });
+                // Don't immediately test authentication to avoid redirect loops
+                // The token will be tested when making actual API calls
+                console.log('User authenticated, showing main content');
             } else {
                 // User is not authenticated, show login prompt and hide logout button
                 loginPrompt.style.display = 'block';

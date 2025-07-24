@@ -139,8 +139,14 @@ def require_auth(f):
             # Get JWT manager from app context
             jwt_manager = current_app.jwt_manager
             
+            # Debug: Print token and secret key
+            print(f"Token: {token[:20]}...")
+            print(f"JWT Manager Secret: {jwt_manager.secret_key[:8]}..." if jwt_manager.secret_key else "Not found")
+            
             # Decode and validate the token
             payload = jwt_manager.decode_token(token)
+            
+            print(f"Token payload: {payload}")
             
             # Add user info to request context
             request.user_id = payload['user_id']
@@ -149,9 +155,11 @@ def require_auth(f):
             
             return f(*args, **kwargs)
             
-        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
+            print(f"JWT Error: {str(e)}")
             return handle_unauthenticated()
         except Exception as e:
+            print(f"Authentication error: {str(e)}")
             if is_browser_request:
                 return redirect(url_for('login_page'))
             else:

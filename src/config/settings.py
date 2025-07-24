@@ -80,6 +80,12 @@ ATTACHMENT_STORAGE_PATH = os.getenv('ATTACHMENT_STORAGE_PATH', 'attachments')
 # Security Settings
 PRESERVE_TOKENS_IN_UI = os.getenv('PRESERVE_TOKENS_IN_UI', 'False').lower() == 'true'
 
+# Activity Recognition Settings
+ACTIVITY_RECOGNITION_ENABLED = os.getenv('ACTIVITY_RECOGNITION_ENABLED', 'True').lower() == 'true'
+ACTIVITY_SIMILARITY_THRESHOLD = float(os.getenv('ACTIVITY_SIMILARITY_THRESHOLD', '0.7'))
+ACTIVITY_MAX_REPRESENTATIVE_TASKS = int(os.getenv('ACTIVITY_MAX_REPRESENTATIVE_TASKS', '10'))
+ACTIVITY_CLEANUP_DAYS = int(os.getenv('ACTIVITY_CLEANUP_DAYS', '180'))  # 6 months
+
 # Validate required environment variables
 required_vars = [
     'NOTION_TOKEN',

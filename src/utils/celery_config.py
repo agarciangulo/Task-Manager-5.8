@@ -18,7 +18,8 @@ celery_app = Celery(
         'core.tasks.notion_tasks',
         'core.tasks.ai_tasks', 
         'core.tasks.email_tasks',
-        'core.tasks.dashboard_tasks'
+        'core.tasks.dashboard_tasks',
+        'core.tasks.activity_tasks'
     ]
 )
 
@@ -30,6 +31,7 @@ celery_app.conf.update(
         'core.tasks.ai_tasks.*': {'queue': 'ai'},
         'core.tasks.email_tasks.*': {'queue': 'email'},
         'core.tasks.dashboard_tasks.*': {'queue': 'dashboard'},
+        'core.tasks.activity_tasks.*': {'queue': 'activity'},
     },
     
     # Task execution settings
@@ -53,6 +55,7 @@ celery_app.conf.update(
         'core.tasks.notion_tasks.*': {'rate_limit': '10/m'},  # 10 tasks per minute
         'core.tasks.ai_tasks.*': {'rate_limit': '30/m'},      # 30 tasks per minute
         'core.tasks.email_tasks.*': {'rate_limit': '5/m'},    # 5 tasks per minute
+        'core.tasks.activity_tasks.*': {'rate_limit': '20/m'}, # 20 tasks per minute
     },
     
     # Result expiration

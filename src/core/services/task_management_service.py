@@ -239,6 +239,26 @@ class TaskManagementService(ITaskService, LoggingMixin):
                 self.log_info("create_task_success", 
                              user_id=user_id,
                              task_title=task_data.get('task', '')[:50])
+                
+                # Schedule activity recognition in the background
+                try:
+                    from src.core.tasks.activity_tasks import recognize_activity_for_task
+                    
+                    # Extract task ID from the response if available
+                    task_id = task_data.get('id') or 'unknown'
+                    task_title = task_data.get('task', '')
+                    
+                    # Schedule the activity recognition task
+                    recognize_activity_for_task.delay(user_id, task_id, task_title)
+                    
+                    self.log_info("activity_recognition_scheduled", 
+                                 user_id=user_id,
+                                 task_id=task_id)
+                    
+                except Exception as e:
+                    # Don't fail the main task creation if activity recognition fails
+                    self.log_error("activity_recognition_scheduling_failed", 
+                                  e, user_id=user_id)
             else:
                 self.log_error("create_task_failed", 
                               Exception(message), 

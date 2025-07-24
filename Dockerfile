@@ -30,16 +30,16 @@ RUN pip install --no-cache /wheels/*
 COPY . .
 
 # Create necessary directories
-RUN mkdir -p logs cache
+RUN mkdir -p logs cache chroma_db email_storage
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV FLASK_APP=app_flask.py
-ENV FLASK_ENV=development
-ENV FLASK_DEBUG=1
+ENV FLASK_APP=src.api.app_auth
+ENV FLASK_ENV=production
+ENV FLASK_DEBUG=0
 
-# Expose port
+# Expose port (standardized to 5000 for Google Cloud)
 EXPOSE 5000
 
 # Run the application
-CMD ["flask", "run", "--host=0.0.0.0"] 
+CMD ["python", "-m", "src.api.app_auth"] 

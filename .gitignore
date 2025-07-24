@@ -2,6 +2,10 @@
 .env*
 !.env.example
 
+# Deployment environment files (contain sensitive data)
+deployment/env.yaml
+deployment/env-secure.yaml
+
 # Python
 __pycache__/
 *.py[cod]
@@ -74,6 +78,8 @@ security_tokens.json
 *.key
 *.cert
 *.jwt
+pending_conversations*.json
+recurring_task.txt
 
 # Test results and reports
 test_*.json
@@ -81,6 +87,8 @@ test_*.json
 e2e_test_results_*.json
 core_workflow_results_*.json
 task_similarity_results_*.json
+test_activity_recognition.py
+test_user_separation.py
 
 # Temporary files
 *.tmp
@@ -115,6 +123,9 @@ embedding_cache/
 # Plugin cache
 plugin_cache/
 plugins/__pycache__/
+
+# Development/Testing files
+src/api/app_auth_simple.py
 
 # API documentation
 api_docs/

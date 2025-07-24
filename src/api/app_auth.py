@@ -14,6 +14,11 @@ import logging
 # Load environment variables first
 load_dotenv()
 
+# Add current directory to Python path for local testing
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 # Debug: Print environment variables (only first few characters for security)
 print("\nEnvironment Variables Loaded:")
 print(f"GEMINI_API_KEY: {os.getenv('GEMINI_API_KEY')[:8]}..." if os.getenv('GEMINI_API_KEY') else "Not found")
@@ -88,18 +93,18 @@ from src.core.agents.task_extraction_agent import TaskExtractionAgent
 from src.core.agents.task_processing_agent import TaskProcessingAgent
 from src.core.ai.analyzers import TaskAnalyzer, ProjectAnalyzer
 from src.core.ai.insights import get_project_insight
-from core import identify_stale_tasks, list_all_categories
+from src.core import identify_stale_tasks, list_all_categories
 
 # Import authentication components
 from src.core.security.jwt_utils import JWTManager, require_auth, require_role
 from src.core.services.auth_service import AuthService
 
 # Import from plugins
-from plugins import initialize_all_plugins, plugin_manager
+from src.plugins import initialize_all_plugins, plugin_manager
 
 # Import from config
 from src.config.settings import *
-from config.config import *
+from src.config.config import *
 
 # Initialize plugins
 initialize_all_plugins()
@@ -115,6 +120,11 @@ CORS(app)
 # Initialize JWT Manager
 jwt_manager = JWTManager(secret_key=JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 app.jwt_manager = jwt_manager
+
+# Debug: Print JWT configuration
+print(f"JWT Secret Key: {JWT_SECRET_KEY[:8]}..." if JWT_SECRET_KEY else "Not found")
+print(f"JWT Algorithm: {JWT_ALGORITHM}")
+print(f"JWT Manager Secret: {jwt_manager.secret_key[:8]}..." if jwt_manager.secret_key else "Not found")
 
 # Initialize Authentication Service
 auth_service = AuthService(NOTION_TOKEN, NOTION_USERS_DB_ID, jwt_manager, NOTION_PARENT_PAGE_ID)
@@ -789,6 +799,7 @@ def create_user_task_database(current_user):
 @require_auth
 def test_auth(current_user):
     """Test endpoint to verify authentication is working."""
+    print(f"Test auth called with user: {current_user}")
     return jsonify({
         "success": True,
         "message": "Authentication working!",
@@ -809,4 +820,5 @@ if __name__ == '__main__':
         print("✅ Authentication system initialized successfully!")
     
     # Run the application
-    app.run(debug=DEBUG_MODE, host='0.0.0.0', port=5001) 
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=DEBUG_MODE, host='0.0.0.0', port=port) 

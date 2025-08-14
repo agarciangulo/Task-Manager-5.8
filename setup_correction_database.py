@@ -17,8 +17,9 @@ def setup_correction_database():
     # Check if DATABASE_URL is set
     database_url = os.getenv('DATABASE_URL')
     if not database_url:
-        print("❌ DATABASE_URL not set. Please set it first:")
-        print("   export DATABASE_URL='postgresql://postgres:S2uwupRe@34.58.40.214:5432/email_archive'")
+        print("❌ DATABASE_URL not configured in settings")
+        print("   Add it to your .env file or environment variables")
+        print("   Example: DATABASE_URL=postgresql://postgres:password@localhost:5432/email_archive")
         return False
     
     print(f"✅ Using database: {database_url[:30]}...")

@@ -18,10 +18,26 @@ def test_consolidated_reminders():
     print("\n📋 Step 1: Environment Setup")
     print("-" * 30)
     
-    os.environ['GMAIL_ADDRESS'] = 'task.manager.mpiv@gmail.com'
-    os.environ['GMAIL_APP_PASSWORD'] = 'your_app_password_here'
-    
-    print("✅ Environment variables set")
+    # Load configuration from existing config system
+    try:
+        from src.config.settings import GMAIL_ADDRESS, GMAIL_APP_PASSWORD
+        
+        # Check if required values are set
+        if not GMAIL_ADDRESS:
+            print("❌ GMAIL_ADDRESS not configured in settings")
+            print("   Add it to your .env file or environment variables")
+            return False
+            
+        if not GMAIL_APP_PASSWORD:
+            print("❌ GMAIL_APP_PASSWORD not configured in settings")
+            print("   Add it to your .env file or environment variables")
+            return False
+            
+        print("✅ Configuration loaded from settings")
+        
+    except ImportError as e:
+        print(f"❌ Could not import settings: {e}")
+        return False
     
     # Test the consolidated reminder function
     print("\n📋 Step 2: Test Consolidated Reminder Function")

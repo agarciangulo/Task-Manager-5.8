@@ -1,0 +1,46 @@
+Objective: To build a robust, secure, and user-friendly agentic workflow that allows users to correct AI-extracted tasks by replying to a summary email with natural language instructions.
+
+Architectural Approach: This feature will use a two-mailbox system to clearly separate new task submissions from correction replies. The workflow is fully asynchronous. When a summary email is sent, a correlation_id is logged to a PostgreSQL table, linking the email to the specific tasks and user it contains. A new, dedicated correction_processor.py script will poll the corrections mailbox and schedule a background job for each reply. This job will authenticate the sender, use a new CorrectionAgent to interpret the user's natural language commands, apply the necessary updates, and send a detailed confirmation.
+
+Phase 1: Setup & Data-Rich Notifications
+Goal: To prepare the system to handle corrections by embedding necessary data in outbound emails and setting up a new, dedicated ingestion point for replies.
+
+I am building a new feature to allow users to correct AI-extracted tasks via email. Let's start with the setup.
+
+1. Create a TaskCorrectionLog Model: In core/models/, create a new SQLAlchemy model TaskCorrectionLog. It should store the link between a notification email and the tasks it contains. Columns should include: id, correlation_id (String, Unique, Indexed), user_id (String, Indexed), task_ids (JSONB), and created_at (DateTime, default=datetime.utcnow).
+
+2. Update Notification Service: In core/notifications/notification_service.py, modify the email sending logic.
+    a. It should first generate a unique correlation_id (e.g., f"corr-{uuid.uuid4()}").
+    b. It must save a record to the new task_correction_logs table, storing this ID, the user_id, and the list of task_ids being sent in the email.
+    c. The subject line of the email it sends must now include this ID, like: Subject: Your Daily Summary [Ref: {correlation_id}].
+    d. The 'From' address for this specific type of email should be set to a new 'corrections' email address, which I will configure in my environment variables.
+
+3. Create a New Processor: Create a new file, correction_processor.py. This should be a simple, perpetual polling script (using a while True loop with a time.sleep). Its job is to connect to a new, dedicated 'corrections' mailbox (configured via new .env variables), find unread emails, extract the correlation_id from the subject line, and for each email, schedule a new Celery task: process_correction.delay(email_body, correlation_id, sender_email)."
+
+Phase 2: The Correction Agent & Asynchronous Task
+Goal: To build the AI-powered agent that interprets the user's reply and the background task that orchestrates the entire correction workflow with enhanced security and reliability.
+
+Now, let's build the intelligent agent and the background task that will handle the user's corrections.
+
+1. Create the CorrectionAgent: Create a new file at core/agents/correction_agent.py.
+    a. Inside, create a class CorrectionAgent.
+    b. Create a method interpret_corrections(self, reply_text: str, original_tasks: list[dict]) -> dict.
+    c. The core of this method is a complex LLM prompt. Enhance this prompt with few-shot examples: Show the AI 2-3 examples of a user reply and the exact JSON output you expect. The prompt must include the reply_text and a numbered list of the original_tasks. It should instruct the Gemini model to return a JSON object with a single key, corrections, which is a list of objects. Each object in the list should have target_task_index (the 1-based index from the original list) and an updates dictionary containing the fields to be changed (e.g., {'due_date': 'YYYY-MM-DD', 'category': 'New Category'}).
+
+2. Create the Celery Task: In core/background_tasks.py, create a new Celery task process_correction(correlation_id: str, email_body: str, sender_email: str).
+    a. Inside this task, first use the correlation_id to query the task_correction_logs table and retrieve the log record, which includes the original user_id and task_ids.
+    b. Add a security check: Compare the sender_email of the reply with the user_id from the log. If they do not match, abort the task and log a security warning.
+    c. Fetch the details of the original tasks from the main tasks database (PostgreSQL).
+    d. Instantiate the new CorrectionAgent and call interpret_corrections.
+    e. Add robust error handling: Wrap the parsing of the agent's response in a try...except JSONDecodeError block. If parsing fails, send an email to the user asking them to clarify their instructions and then end the task.
+    f. Loop through the corrections list. For each item, find the correct task_id based on the index and call the existing task_service.update_task() method with the updates payload.
+    g. Send a detailed confirmation email: Use the NotificationService to send a final email back to the user. This email should explicitly list the changes that were made (e.g., "Confirmation: For task 'Follow up with Client A', I have changed the due_date to '2025-07-28'.")."
+
+Phase 3: Maintenance & Data Management
+Goal: To ensure the long-term health of the system by managing the data generated by this new feature.
+
+Finally, let's add a simple data cleanup mechanism.
+
+1. Create a Scheduled Cleanup Job: In app_auth.py where the APScheduler is configured, create a new scheduled job function cleanup_correction_logs().
+
+2. Implement Logic: This job should be scheduled to run once a month. It should connect to the PostgreSQL database and delete all records from the task_correction_logs table that are older than 30 days. This ensures the table does not grow indefinitely with data that is no longer needed."

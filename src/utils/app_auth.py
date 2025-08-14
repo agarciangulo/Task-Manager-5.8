@@ -154,6 +154,54 @@ try:
 except Exception as e:
     print(f"⚠️ Warning: Notion connection validation failed: {e}")
 
+# Add the cleanup job for correction logs
+def cleanup_correction_logs():
+    """Scheduled cleanup job for old correction logs."""
+    try:
+        from src.core.services.correction_service import CorrectionService
+        from src.core.logging_config import get_logger
+        
+        logger = get_logger(__name__)
+        logger.info("Starting scheduled cleanup of old correction logs")
+        
+        correction_service = CorrectionService()
+        deleted_count = correction_service.cleanup_old_logs(days_old=30)
+        
+        logger.info(f"Cleanup completed: {deleted_count} old correction logs deleted")
+        
+        # Also cleanup old security events if using secure service
+        try:
+            from src.core.services.secure_correction_service import SecureCorrectionService
+            secure_service = SecureCorrectionService()
+            security_cleaned = secure_service.cleanup_old_security_events(days=30)
+            logger.info(f"Security events cleanup completed: {security_cleaned} old events deleted")
+        except Exception as e:
+            logger.warning(f"Security events cleanup failed: {e}")
+        
+        # Also cleanup old metrics if using metrics service
+        try:
+            from src.core.services.correction_metrics import CorrectionMetrics
+            metrics_service = CorrectionMetrics()
+            metrics_cleaned = metrics_service.cleanup_old_metrics(days=30)
+            logger.info(f"Metrics cleanup completed: {metrics_cleaned} old metric points deleted")
+        except Exception as e:
+            logger.warning(f"Metrics cleanup failed: {e}")
+            
+    except Exception as e:
+        logger.error(f"Correction logs cleanup failed: {e}")
+
+# Add the cleanup job to the scheduler
+scheduler.add_job(
+    func=cleanup_correction_logs,
+    trigger='cron',
+    day='1st',  # Run on the 1st of every month
+    hour=2,     # At 2 AM
+    minute=0,
+    id='cleanup_correction_logs',
+    name='Cleanup old correction logs',
+    replace_existing=True
+)
+
 # Authentication Routes
 @app.route('/api/register', methods=['POST'])
 def register():

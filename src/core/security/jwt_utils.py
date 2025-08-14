@@ -25,7 +25,7 @@ class JWTManager:
             raise ValueError("JWT_SECRET_KEY environment variable must be set")
         self.algorithm = algorithm
     
-    def generate_token(self, user_id: str, role: str, email: str, expires_in: int = 3600) -> str:
+    def generate_token(self, user_id: str, role: str, email: str, expires_in: int = 86400) -> str:
         """
         Generate a JWT token for a user.
         
@@ -33,7 +33,7 @@ class JWTManager:
             user_id: The user's internal ID (UUID).
             role: The user's role.
             email: The user's email address.
-            expires_in: Token expiration time in seconds (default: 1 hour).
+            expires_in: Token expiration time in seconds (default: 24 hours).
             
         Returns:
             str: The JWT token.
@@ -70,7 +70,7 @@ class JWTManager:
         except jwt.InvalidTokenError as e:
             raise jwt.InvalidTokenError(f"Invalid token: {str(e)}")
     
-    def refresh_token(self, token: str, expires_in: int = 3600) -> str:
+    def refresh_token(self, token: str, expires_in: int = 86400) -> str:
         """
         Refresh a JWT token.
         
@@ -153,7 +153,25 @@ def require_auth(f):
             request.user_role = payload['role']
             request.user_email = payload.get('email')
             
-            return f(*args, **kwargs)
+            # Create current_user dict for the function
+            current_user = {
+                'user_id': payload['user_id'],
+                'role': payload['role'],
+                'email': payload.get('email')
+            }
+            
+            # Get user's task database ID from auth service
+            try:
+                auth_service = current_app.auth_service
+                user = auth_service.get_user_by_id(payload['user_id'])
+                if user and hasattr(user, 'task_database_id'):
+                    current_user['task_database_id'] = user.task_database_id
+                if user and hasattr(user, 'full_name'):
+                    current_user['full_name'] = user.full_name
+            except Exception as e:
+                print(f"Warning: Could not fetch user details: {e}")
+            
+            return f(current_user, *args, **kwargs)
             
         except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
             print(f"JWT Error: {str(e)}")

@@ -128,6 +128,7 @@ print(f"JWT Manager Secret: {jwt_manager.secret_key[:8]}..." if jwt_manager.secr
 
 # Initialize Authentication Service
 auth_service = AuthService(NOTION_TOKEN, NOTION_USERS_DB_ID, jwt_manager, NOTION_PARENT_PAGE_ID)
+app.auth_service = auth_service
 
 # Initialize User Task Service
 from src.core.services.user_task_service import UserTaskService
@@ -404,6 +405,12 @@ def process_update(current_user):
         # Step 1: Extract tasks from text
         extracted_tasks = task_extraction_agent.extract_tasks(text_update)
         log_output.append(f"Extracted {len(extracted_tasks)} tasks.")
+        
+        # Step 1.5: Set employee field to current user for app-based submissions
+        user_name = current_user.get('full_name', 'Unknown User')
+        for task in extracted_tasks:
+            task['employee'] = user_name
+        log_output.append(f"Set employee field to current user: {user_name}")
 
         if not extracted_tasks:
             return jsonify({

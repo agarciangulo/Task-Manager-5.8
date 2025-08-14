@@ -1,6 +1,7 @@
 # Environment variables
 .env*
 !.env.example
+local_env.txt
 
 # Deployment environment files (contain sensitive data)
 deployment/env.yaml

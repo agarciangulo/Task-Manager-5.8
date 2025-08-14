@@ -22,14 +22,14 @@ def test_notion_service():
     
     if not notion_token:
         print("❌ NOTION_TOKEN not set")
-        print("   Set it with: export NOTION_TOKEN='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'")
+        print("   Set it with: export NOTION_TOKEN='your_notion_token_here'")
         return False
     else:
         print(f"✅ NOTION_TOKEN is set: {notion_token[:10]}...")
     
     if not notion_database_id:
         print("❌ NOTION_DATABASE_ID not set")
-        print("   Set it with: export NOTION_DATABASE_ID='1e35c6ec3b80804f922ce6cc63d0c36b'")
+        print("   Set it with: export NOTION_DATABASE_ID='your_database_id_here'")
         return False
     else:
         print(f"✅ NOTION_DATABASE_ID is set: {notion_database_id}")

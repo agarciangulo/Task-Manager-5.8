@@ -38,10 +38,10 @@ from src.core.chat.verification import generate_verification_questions, parse_ve
 
 # Discover and initialize plugins
 PLUGIN_DIRECTORIES = [
-    'plugins/guidelines',
-    'plugins/feedback', 
-    'plugins/integrations',
-    'plugins/security'
+    'src/plugins/guidelines',
+    'src/plugins/feedback', 
+    'src/plugins/integrations',
+    'src/plugins/security'
 ]
 plugin_manager.discover_plugins(PLUGIN_DIRECTORIES)
 # Register all discovered plugins
@@ -57,14 +57,86 @@ CONTEXT_REMINDER_INTERVAL_HOURS = 24  # Send reminder after 24 hours
 TASK_REMINDER_INTERVAL_HOURS = 72     # Send task reminder after 3 days (for future use)
 
 # Persistence configuration
-PERSISTENCE_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "pending_conversations.json")
-PERSISTENCE_BACKUP_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "pending_conversations.backup.json")
-PERSISTENCE_TEMP_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "pending_conversations.tmp.json")
+PERSISTENCE_FILE = "pending_conversations.json"
+PERSISTENCE_BACKUP_FILE = "pending_conversations_backup.json"
+PERSISTENCE_TEMP_FILE = "pending_conversations_temp.json"
 
-# Normalize paths to absolute paths
-PERSISTENCE_FILE = os.path.abspath(PERSISTENCE_FILE)
-PERSISTENCE_BACKUP_FILE = os.path.abspath(PERSISTENCE_BACKUP_FILE)
-PERSISTENCE_TEMP_FILE = os.path.abspath(PERSISTENCE_TEMP_FILE)
+# Outstanding tasks tracking
+OUTSTANDING_TASKS = {}
+
+def extract_reply_from_email_body(body: str) -> str:
+    """
+    Extract just the reply part from an email body that contains a full thread.
+    
+    Args:
+        body: Full email body containing thread history
+        
+    Returns:
+        str: Just the reply part, or original body if no clear reply detected
+    """
+    if not body:
+        return body
+    
+    # Common patterns that indicate the start of quoted/replied content
+    quote_patterns = [
+        r'^>.*$',  # Lines starting with >
+        r'^On .* wrote:$',  # "On [date] [person] wrote:"
+        r'^From:.*$',  # "From: [email]"
+        r'^Sent:.*$',  # "Sent: [date]"
+        r'^To:.*$',    # "To: [email]"
+        r'^Subject:.*$',  # "Subject: [subject]"
+        r'^-{3,}.*$',  # Separator lines (---)
+        r'^_{3,}.*$',  # Separator lines (___)
+        r'^\*{3,}.*$',  # Separator lines (***)
+        r'^From:.*\nSent:.*\nTo:.*\nSubject:.*',  # Outlook style headers
+        r'^Le .* a écrit :$',  # French "On [date] wrote:"
+        r'^El .* escribió:$',  # Spanish "On [date] wrote:"
+        r'^Am .* schrieb .*:$',  # German "On [date] wrote:"
+    ]
+    
+    lines = body.split('\n')
+    reply_lines = []
+    
+    for i, line in enumerate(lines):
+        # Check if this line matches any quote pattern
+        is_quote_start = False
+        for pattern in quote_patterns:
+            if re.match(pattern, line.strip(), re.IGNORECASE):
+                is_quote_start = True
+                break
+        
+        if is_quote_start:
+            # Found the start of quoted content, return everything before this
+            reply_lines = lines[:i]
+            break
+        else:
+            reply_lines.append(line)
+    
+    # Join the reply lines and clean up
+    reply_text = '\n'.join(reply_lines).strip()
+    
+    # If we didn't find any quote patterns, try to find the last non-empty line
+    # that doesn't look like a quote
+    if not reply_text:
+        for i in range(len(lines) - 1, -1, -1):
+            line = lines[i].strip()
+            if line and not any(re.match(pattern, line, re.IGNORECASE) for pattern in quote_patterns):
+                # Found a non-quote line, take everything up to this point
+                reply_lines = lines[:i+1]
+                reply_text = '\n'.join(reply_lines).strip()
+                break
+    
+    # If still no reply found, return the first few lines (likely the actual reply)
+    if not reply_text:
+        # Take first 10 lines or until we hit a quote pattern
+        reply_lines = []
+        for line in lines[:10]:
+            if any(re.match(pattern, line.strip(), re.IGNORECASE) for pattern in quote_patterns):
+                break
+            reply_lines.append(line)
+        reply_text = '\n'.join(reply_lines).strip()
+    
+    return reply_text if reply_text else body
 
 def load_persistent_state():
     """
@@ -179,9 +251,6 @@ def cleanup_old_conversations():
             del PENDING_CONTEXT_CONVERSATIONS[conv_id]
         print(f"🗑️ Cleaned up {len(conversations_to_remove)} old conversations")
         save_persistent_state()
-
-# Global storage for outstanding tasks
-OUTSTANDING_TASKS = {}
 
 def track_outstanding_task(task_id, user_email, task_data, user_database_id):
     """

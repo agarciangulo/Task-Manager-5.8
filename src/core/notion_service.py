@@ -124,7 +124,10 @@ class NotionService:
             logger.info(f"Successfully inserted task into {database_id}", extra={"task_id": task["id"]})
             return True, "Task inserted successfully"
         except Exception as e:
-            logger.error(f"Error inserting task into {database_id}", extra={"error": str(e)})
+            import traceback
+            error_details = f"Error inserting task into {database_id}: {str(e)}\nTask data: {task_data}\nTraceback: {traceback.format_exc()}"
+            logger.error(error_details)
+            print(f"❌ {error_details}")  # Also print to console for debugging
             return False, str(e)
 
     def update_task(self, task_id: str, updates: Dict[str, Any]) -> tuple:
@@ -149,6 +152,63 @@ class NotionService:
             return True, "Task updated successfully"
         except Exception as e:
             logger.error("Error updating task", 
+                        extra={
+                            "task_id": task_id,
+                            "error": str(e)
+                        })
+            return False, str(e)
+
+    def get_task(self, task_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a specific task by ID from Notion.
+        
+        Args:
+            task_id: The Notion page ID of the task.
+            
+        Returns:
+            Optional[Dict[str, Any]]: Task data if found, None otherwise.
+        """
+        try:
+            response = self.client.pages.retrieve(page_id=task_id)
+            task = self._process_notion_page(response)
+            
+            if task:
+                logger.info("Successfully retrieved task", extra={"task_id": task_id})
+                return task
+            else:
+                logger.warning("Task not found or could not be processed", extra={"task_id": task_id})
+                return None
+                
+        except Exception as e:
+            logger.error("Error retrieving task", 
+                        extra={
+                            "task_id": task_id,
+                            "error": str(e)
+                        })
+            return None
+
+    def delete_task(self, task_id: str) -> tuple:
+        """
+        Delete (archive) a task in Notion.
+        
+        Args:
+            task_id: The Notion page ID of the task to delete.
+            
+        Returns:
+            tuple: (True, message) if successful, (False, error message) otherwise.
+        """
+        try:
+            # In Notion, "deleting" is actually archiving the page
+            response = self.client.pages.update(
+                page_id=task_id,
+                archived=True
+            )
+            
+            logger.info("Successfully archived task", extra={"task_id": task_id})
+            return True, "Task archived successfully"
+            
+        except Exception as e:
+            logger.error("Error archiving task", 
                         extra={
                             "task_id": task_id,
                             "error": str(e)
@@ -285,7 +345,7 @@ class NotionService:
                 ]
             }
         # Task description (rich_text)
-        if "task" in protected_task_data:
+        if "task" in protected_task_data and protected_task_data["task"]:
             properties["Task"] = {
                 "rich_text": [
                     {
@@ -303,7 +363,7 @@ class NotionService:
                 }
             }
         # Employee
-        if "employee" in protected_task_data:
+        if "employee" in protected_task_data and protected_task_data["employee"]:
             properties["Employee"] = {
                 "rich_text": [
                     {
@@ -321,7 +381,7 @@ class NotionService:
                 }
             }
         # Category
-        if "category" in protected_task_data:
+        if "category" in protected_task_data and protected_task_data["category"]:
             properties["Category"] = {
                 "rich_text": [
                     {

@@ -20,8 +20,8 @@ class ConsultantGuidelinesPlugin(PluginBase):
         """
         super().__init__(config)
         self.guidelines = []
-        self.guideline_source = self.config.get('guideline_source', 'file')
-        self.guideline_file = self.config.get('guideline_file', 'plugins/guidelines/consultant_guidelines.txt')
+        self.guideline_source = self.config.get('guideline_source', 'embedded')  # Default to embedded since docs are processed separately
+        self.guideline_file = self.config.get('guideline_file', 'docs/guidelines/process/project_management.md')
         
     def initialize(self):
         """
@@ -54,36 +54,84 @@ class ConsultantGuidelinesPlugin(PluginBase):
     
     def _get_embedded_guidelines(self) -> List[Dict[str, Any]]:
         """
-        Get the embedded consultant guidelines.
+        Get the embedded consultant guidelines based on actual project management and technical standards.
         
         Returns:
             List[Dict[str, Any]]: List of guideline dictionaries.
         """
-        # This is a starter set of guidelines that can be expanded
+        # Guidelines based on actual project management and technical field guide documents
         return [
             {
-                "id": "documentation",
+                "id": "requirements_gathering",
                 "category": "Project Management",
-                "title": "Documentation Standard",
-                "description": "All tasks should include appropriate documentation with context, purpose, and outcomes.",
-                "check": lambda task: len(task.description) >= 20 and ":" in task.description
-            },
-            {
-                "id": "clarity",
-                "category": "Communication",
-                "title": "Task Clarity",
-                "description": "Task descriptions should clearly state the action taken or required.",
-                "check": lambda task: any(verb in task.description.lower() for verb in [
-                    "created", "developed", "analyzed", "prepared", "reviewed", 
-                    "completed", "implemented", "designed", "tested"
+                "title": "Requirements Gathering",
+                "description": "Tasks should demonstrate proper requirements gathering including stakeholder interviews, functional requirements, and acceptance criteria.",
+                "check": lambda task: any(keyword in task.description.lower() for keyword in [
+                    "requirements", "stakeholder", "interview", "functional", "acceptance", "criteria"
                 ])
             },
             {
-                "id": "categorization",
-                "category": "Organization",
-                "title": "Proper Categorization",
-                "description": "All tasks must have a specific project category assigned.",
-                "check": lambda task: task.category != "Uncategorized" and len(task.category) > 0
+                "id": "project_planning",
+                "category": "Project Management", 
+                "title": "Project Planning",
+                "description": "Tasks should include proper project planning elements like objectives, schedule, resources, and risk management.",
+                "check": lambda task: any(keyword in task.description.lower() for keyword in [
+                    "plan", "schedule", "timeline", "resource", "risk", "objective", "milestone"
+                ])
+            },
+            {
+                "id": "code_quality",
+                "category": "Technical Standards",
+                "title": "Code Quality Standards",
+                "description": "Development tasks should mention code quality measures like testing, reviews, and linting.",
+                "check": lambda task: any(keyword in task.description.lower() for keyword in [
+                    "test", "review", "lint", "quality", "coverage", "unit", "integration"
+                ])
+            },
+            {
+                "id": "security_practices",
+                "category": "Technical Standards",
+                "title": "Security Practices",
+                "description": "Technical tasks should include security considerations like authentication, validation, and OWASP guidelines.",
+                "check": lambda task: any(keyword in task.description.lower() for keyword in [
+                    "security", "authentication", "authorization", "validation", "owasp", "https", "encryption"
+                ])
+            },
+            {
+                "id": "documentation",
+                "category": "Project Management",
+                "title": "Documentation Standards",
+                "description": "Tasks should include appropriate documentation with context, purpose, and outcomes.",
+                "check": lambda task: len(task.description) >= 30 and any(keyword in task.description.lower() for keyword in [
+                    "document", "context", "purpose", "outcome", "procedure", "process"
+                ])
+            },
+            {
+                "id": "communication",
+                "category": "Project Management",
+                "title": "Communication Management",
+                "description": "Tasks involving stakeholders should include communication plans and status reporting.",
+                "check": lambda task: any(keyword in task.description.lower() for keyword in [
+                    "communicate", "stakeholder", "report", "status", "meeting", "update", "escalate"
+                ])
+            },
+            {
+                "id": "deployment",
+                "category": "Technical Standards",
+                "title": "Deployment Procedures",
+                "description": "Deployment tasks should include pre-deployment checks, monitoring, and rollback procedures.",
+                "check": lambda task: any(keyword in task.description.lower() for keyword in [
+                    "deploy", "pipeline", "monitor", "rollback", "blue-green", "automation"
+                ])
+            },
+            {
+                "id": "quality_assurance",
+                "category": "Project Management",
+                "title": "Quality Assurance",
+                "description": "Tasks should include quality checkpoints, testing procedures, and review processes.",
+                "check": lambda task: any(keyword in task.description.lower() for keyword in [
+                    "quality", "assurance", "testing", "review", "check", "verify", "validate"
+                ])
             }
         ]
     

@@ -18,9 +18,20 @@ celery_app = Celery(
         'core.tasks.notion_tasks',
         'core.tasks.ai_tasks', 
         'core.tasks.email_tasks',
-        'core.tasks.dashboard_tasks'
+        'core.tasks.dashboard_tasks',
+        'core.tasks.correction_tasks'  # Add correction tasks
     ]
 )
+
+# Auto-discover tasks to ensure all tasks are registered
+celery_app.autodiscover_tasks(['src.core.tasks'], force=True)
+
+# Explicitly import correction tasks to ensure they're registered
+try:
+    import src.core.tasks.correction_tasks
+    print("✅ Correction tasks imported successfully")
+except Exception as e:
+    print(f"⚠️ Warning: Could not import correction tasks: {e}")
 
 # Celery settings
 celery_app.conf.update(
@@ -30,6 +41,7 @@ celery_app.conf.update(
         'core.tasks.ai_tasks.*': {'queue': 'ai'},
         'core.tasks.email_tasks.*': {'queue': 'email'},
         'core.tasks.dashboard_tasks.*': {'queue': 'dashboard'},
+        'core.tasks.correction_tasks.*': {'queue': 'corrections'},  # Add correction queue
     },
     
     # Task execution settings
@@ -53,6 +65,7 @@ celery_app.conf.update(
         'core.tasks.notion_tasks.*': {'rate_limit': '10/m'},  # 10 tasks per minute
         'core.tasks.ai_tasks.*': {'rate_limit': '30/m'},      # 30 tasks per minute
         'core.tasks.email_tasks.*': {'rate_limit': '5/m'},    # 5 tasks per minute
+        'core.tasks.correction_tasks.*': {'rate_limit': '10/m'},  # 10 correction tasks per minute
     },
     
     # Result expiration

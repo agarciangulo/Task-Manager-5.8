@@ -38,12 +38,13 @@ class PeerFeedbackPlugin(PluginBase):
         """
         # Test connection to the feedback database
         if not self.feedback_db_id:
-            print("No feedback database ID configured")
+            print("No feedback database ID configured - plugin will be disabled")
             return False
             
         # Check if we can fetch sample feedback
         try:
             test_feedback = notion_service.fetch_peer_feedback("test", self.feedback_db_id, days_back=1)
+            print(f"✅ PeerFeedbackPlugin initialized successfully with database ID: {self.feedback_db_id}")
             return True
         except Exception as e:
             print(f"Error connecting to feedback database: {e}")

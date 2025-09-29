@@ -1,4 +1,13 @@
 import imaplib
+import os
+import sys
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Add the project root to the path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Import from your processor to ensure credentials are correct
 from gmail_processor import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, GMAIL_SERVER

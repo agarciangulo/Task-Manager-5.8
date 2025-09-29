@@ -135,4 +135,14 @@ swagger/
 # Backup files
 *.backup
 *.old
-*.orig 
+*.orig
+
+# Additional secret protection
+.env.backup
+.env.production
+.env.local
+.env.development
+deployment/env-gmail-processor.yaml
+deployment/env.yaml
+deployment/env-secure.yaml
+deployment/env-secure.yaml.backup 

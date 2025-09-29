@@ -8,7 +8,7 @@ import ast
 import os
 import sys
 
-from core.task_similarity import check_task_similarity_ai
+from src.core.task_similarity import check_task_similarity_ai
 
 def load_test_tasks(test_file: str = None) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Load test cases with existing tasks and new tasks to test."""

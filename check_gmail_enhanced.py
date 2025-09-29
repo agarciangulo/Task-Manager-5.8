@@ -1,6 +1,11 @@
 import time
 import sys
 import traceback
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 from src.utils.gmail_processor_enhanced import check_gmail_for_updates_enhanced
 from src.config.settings import GMAIL_ADDRESS
 

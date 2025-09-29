@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-PROJECT_ID="your-project-id"  # Replace with your actual project ID
+PROJECT_ID="ai-task-manager-prod"  # Replace with your actual project ID
 REGION="us-central1"
 SERVICE_NAME="gmail-processor"
 SCHEDULER_NAME="gmail-processor-scheduler"
@@ -35,7 +35,10 @@ gcloud run deploy $SERVICE_NAME \
     --cpu 1 \
     --timeout 300 \
     --max-instances 1 \
-    --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID"
+    --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,DATABASE_URL=postgresql://postgres:S2uwupRe@34.58.40.214:5432/email_archive,REDIS_URL=redis://10.96.205.195:6379/0,NOTION_DATABASE_ID=1e35c6ec3b80804f922ce6cc63d0c36b,NOTION_FEEDBACK_DB_ID=1cc5c6ec3b8080ab934feb388e729447,NOTION_PARENT_PAGE_ID=2175c6ec3b8080d183d0c0e4fb219f9d,NOTION_USERS_DB_ID=2175c6ec3b8080ac9d60c035a3000f52" \
+    --add-cloudsql-instances ai-task-manager-prod:us-central1:ai-task-manager \
+    --vpc-connector redis-connector \
+    --set-secrets "NOTION_TOKEN=notion-token:latest,GEMINI_API_KEY=gemini-api-key:latest,JWT_SECRET_KEY=jwt-secret-key:latest"
 
 # Get the service URL
 SERVICE_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format="value(status.url)")

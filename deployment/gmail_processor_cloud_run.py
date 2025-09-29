@@ -8,6 +8,7 @@ import sys
 import traceback
 from datetime import datetime
 import logging
+from flask import Flask, request, jsonify
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -19,6 +20,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Create Flask app
+app = Flask(__name__)
+
 def process_gmail_batch():
     """
     Process Gmail batch - designed for Cloud Run execution.
@@ -27,7 +31,7 @@ def process_gmail_batch():
     try:
         logger.info("🚀 Starting Gmail batch processing...")
         
-        # Import here to avoid issues during container build
+        # Import here to avoid heavy initialization at startup
         from src.utils.gmail_processor_enhanced import check_gmail_for_updates_enhanced
         
         # Run the enhanced processor
@@ -49,17 +53,27 @@ def process_gmail_batch():
             'error': str(e)
         }
 
+@app.route('/', methods=['POST', 'GET'])
+def handle_request():
+    """Handle requests from Cloud Scheduler."""
+    try:
+        logger.info("📧 Received Gmail processing request")
+        result = process_gmail_batch()
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error processing request: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/health', methods=['GET'])
 def health_check():
-    """
-    Health check endpoint for Cloud Run.
-    """
-    return {
+    """Health check endpoint for Cloud Run."""
+    return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
         'service': 'gmail-processor'
-    }
+    })
 
-# For local testing
 if __name__ == "__main__":
-    result = process_gmail_batch()
-    print(f"Result: {result}") 
+    # Always start Flask server for Cloud Run
+    logger.info("🚀 Starting Gmail processor service...")
+    app.run(host='0.0.0.0', port=8080, debug=False) 

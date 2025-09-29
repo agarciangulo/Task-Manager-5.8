@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 from typing import Dict, List, Any
 
-from core.task_extractor import extract_tasks_from_update
+from src.core.task_extractor import extract_tasks_from_update
 
 def load_test_tasks(test_file: str) -> Dict[str, List[Dict[str, Any]]]:
     """

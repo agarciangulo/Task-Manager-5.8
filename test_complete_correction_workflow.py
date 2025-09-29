@@ -7,6 +7,10 @@ This tests the entire correction handler system end-to-end.
 import os
 import sys
 import traceback
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def test_complete_correction_workflow():
     """

@@ -13,6 +13,10 @@ import pandas as pd
 import sys
 import os
 import uuid
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 import json
 import re
 import datetime
@@ -36,7 +40,36 @@ from src.core.tasks.correction_tasks import process_correction
 if EMAIL_ARCHIVE_ENABLED:
     from src.core.services.email_archive_service import EmailArchiveService
 
-from src.core.ai.extractors import chunk_email_text
+# Removed OpenAI dependency - using simple text chunking instead
+def chunk_email_text(text, max_chunks=20):
+    """Simple text chunking without OpenAI dependency."""
+    if not text:
+        return []
+    
+    # Split by paragraphs first
+    paragraphs = text.split('\n\n')
+    chunks = []
+    
+    for paragraph in paragraphs:
+        if len(paragraph.strip()) > 0:
+            # If paragraph is too long, split by sentences
+            if len(paragraph) > 1000:
+                sentences = paragraph.split('. ')
+                current_chunk = ""
+                for sentence in sentences:
+                    if len(current_chunk + sentence) > 1000:
+                        if current_chunk:
+                            chunks.append(current_chunk.strip())
+                        current_chunk = sentence
+                    else:
+                        current_chunk += sentence + ". " if not sentence.endswith('.') else sentence + " "
+                if current_chunk:
+                    chunks.append(current_chunk.strip())
+            else:
+                chunks.append(paragraph.strip())
+    
+    # Limit to max_chunks
+    return chunks[:max_chunks]
 from src.plugins.plugin_manager_instance import plugin_manager
 
 # Import context verification utilities
@@ -266,7 +299,7 @@ def send_confirmation_email_with_correction_support(recipient, tasks, coaching_i
             html_content += f"""
                 <div class="correction-section">
                     <h3>AI Coaching Insights</h3>
-                    <p>{coaching_insights.replace('\n', '<br>')}</p>
+                    <p>{coaching_insights.replace(chr(10), '<br>')}</p>
                 </div>
             """
         
@@ -274,16 +307,16 @@ def send_confirmation_email_with_correction_support(recipient, tasks, coaching_i
         html_content += f"""
                 <div class="correction-section">
                     <h3>📝 Correction Instructions</h3>
-                    <p>If you need to make changes to any of these tasks, simply reply to this email with your corrections.</p>
+                    <p>If you need to make changes to any of these tasks, simply reply to this email with your corrections.</p>                                 
                     
                     <h4>Examples:</h4>
                     <ul>
-                        <li>"Change task 1 status to completed"</li>
-                        <li>"Delete task 2, it's no longer needed"</li>
-                        <li>"Update task 3 priority to high and due date to 2024-01-15"</li>
+                        <li>Change task 1 status to completed</li>
+                        <li>Delete task 2, it is no longer needed</li>
+                        <li>Update task 3 priority to high and due date to 2024-01-15</li>                                                                    
                     </ul>
                     
-                    <p>I'll process your corrections and send you a confirmation.</p>
+                    <p>I will process your corrections and send you a confirmation.</p>                                                                           
                 </div>
                 
                 <div class="correlation-id">

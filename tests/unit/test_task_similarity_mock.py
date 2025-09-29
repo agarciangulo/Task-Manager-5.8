@@ -11,8 +11,8 @@ from datetime import datetime
 # Add the project root to the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from core.task_similarity import check_task_similarity, find_top_k_similar_tasks
-from core.chroma_embedding_manager_simple import SimpleChromaEmbeddingManager
+from src.core.task_similarity import check_task_similarity, find_top_k_similar_tasks
+from src.core.chroma_embedding_manager_simple import SimpleChromaEmbeddingManager
 
 def create_mock_tasks():
     """Create realistic mock tasks for testing."""

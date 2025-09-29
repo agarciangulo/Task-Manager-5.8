@@ -13,7 +13,7 @@ from typing import List, Dict, Any
 # Add the project root to the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from core.task_similarity import (
+from src.core.task_similarity import (
     check_task_similarity,
     check_task_similarity_mode,
     find_similar_tasks,

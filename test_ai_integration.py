@@ -6,6 +6,10 @@ This tests the AI's ability to interpret natural language corrections.
 
 import os
 import sys
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def test_ai_integration():
     """

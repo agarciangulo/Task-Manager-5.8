@@ -1,0 +1,12 @@
+steps:
+  # Build the Docker image for Gmail processor
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-f', 'deployment/Dockerfile.gmail-processor',
+      '-t', 'gcr.io/$PROJECT_ID/gmail-processor',
+      '.'
+    ]
+  # Push the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/gmail-processor']

@@ -12,7 +12,7 @@ pytz
 PyYAML
 requests
 python-dotenv
-notion-client
+notion-client==1.0.0
 PyJWT
 bcrypt
 chromadb

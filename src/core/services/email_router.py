@@ -82,10 +82,12 @@ class EmailRouter:
             if match:
                 return True, match.group(1)
             
-            # Check for correction keywords in body
-            body_lower = body.lower()
-            if any(keyword in body_lower for keyword in self.correction_keywords):
-                return True, None
+            # Only check for correction keywords if this is a reply to a confirmation email
+            # (which would have a correlation ID in the subject)
+            if re.search(correlation_pattern, subject):
+                body_lower = body.lower()
+                if any(keyword in body_lower for keyword in self.correction_keywords):
+                    return True, None
         
         return False, None
     

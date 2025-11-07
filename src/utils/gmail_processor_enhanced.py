@@ -708,10 +708,14 @@ def check_gmail_for_updates_enhanced():
                 
             else:
                 # Process as new task email (existing logic)
-                process_new_task_email(msg, body, sender_email, sender_name)
-            
-            # Mark as read
-            mail.store(msg_id, "+FLAGS", "\\Seen")
+                success = process_new_task_email(msg, body, sender_email, sender_name)
+                
+                # Only mark as read if processing succeeded (or returned None for context verification)
+                # If user not found, function returns early and email stays unread for reprocessing
+                if success is not False:  # None or True means we can mark as read
+                    mail.store(msg_id, "+FLAGS", "\\Seen")
+                else:
+                    print(f"⚠️ Email NOT marked as read - will retry on next check")
         
         # Close the connection
         mail.close()
@@ -1141,6 +1145,9 @@ def process_new_task_email(msg, body, sender_email, sender_name):
         body: Email body
         sender_email: Sender email address
         sender_name: Sender name
+        
+    Returns:
+        bool: True if processing succeeded, False if failed (user not found), None if context verification needed
     """
     try:
         print(f"📧 Processing new task email from {sender_email}")
@@ -1153,7 +1160,10 @@ def process_new_task_email(msg, body, sender_email, sender_name):
         
         if not user:
             print(f"❌ User not found for email: {sender_email}")
-            return
+            print(f"   ACTION REQUIRED: Register this email in the Notion users database")
+            print(f"   The email will NOT be marked as read so it can be reprocessed after registration")
+            # Don't mark as read - allow reprocessing after user is registered
+            return False  # Return False to indicate failure
         
         # Get existing tasks from user's database
         existing_tasks = fetch_notion_tasks(user.task_database_id)
@@ -1168,7 +1178,7 @@ def process_new_task_email(msg, body, sender_email, sender_name):
         
         if not tasks:
             print("No tasks found in email")
-            return
+            return True  # Mark as read - no tasks to process
         
         print(f"📋 Extracted {len(tasks)} tasks")
         
@@ -1183,14 +1193,54 @@ def process_new_task_email(msg, body, sender_email, sender_name):
         if context_needed_tasks:
             print(f"📧 Context verification needed for {len(context_needed_tasks)} tasks")
             
+            # Process ready tasks immediately (even when context verification is needed)
+            if ready_tasks:
+                print(f"✅ Processing {len(ready_tasks)} ready tasks immediately (before context verification)")
+                ready_successful = 0
+                for task in ready_tasks:
+                    try:
+                        success, message = insert_or_update_task(
+                            database_id=user.task_database_id,
+                            task=task,
+                            existing_tasks=existing_tasks
+                        )
+                        if success:
+                            ready_successful += 1
+                            print(f"✅ Processed ready task: {task.get('task', '')[:50]}...")
+                        else:
+                            print(f"❌ Failed to process ready task: {message}")
+                    except Exception as e:
+                        print(f"❌ Error processing ready task: {e}")
+                
+                # Send confirmation for ready tasks if any were processed
+                if ready_successful > 0:
+                    try:
+                        coaching_insights = get_coaching_insight(
+                            sender_name,
+                            ready_tasks,
+                            existing_tasks,
+                            []
+                        )
+                    except Exception as e:
+                        print(f"⚠️ Failed to generate coaching insights: {e}")
+                        coaching_insights = None
+                    
+                    send_confirmation_email_with_correction_support(
+                        recipient=sender_email,
+                        tasks=[t for i, t in enumerate(ready_tasks) if i < ready_successful],
+                        coaching_insights=coaching_insights,
+                        user_database_id=user.task_database_id
+                    )
+                    print(f"✅ Sent confirmation email for {ready_successful} processed tasks")
+            
             # Generate conversation ID for tracking
             conversation_id = generate_conversation_id()
             
-            # Store pending conversation
+            # Store pending conversation (only for context_needed_tasks, ready_tasks already processed)
             store_pending_context_conversation(
                 conversation_id=conversation_id,
                 user_email=sender_email,
-                ready_tasks=ready_tasks,
+                ready_tasks=[],  # Empty - already processed above
                 context_needed_tasks=context_needed_tasks,
                 original_email_id=msg.get('Message-ID', ''),
                 user_database_id=user.task_database_id
@@ -1201,11 +1251,11 @@ def process_new_task_email(msg, body, sender_email, sender_name):
                 recipient=sender_email,
                 context_needed_tasks=context_needed_tasks,
                 conversation_id=conversation_id,
-                ready_tasks_count=len(ready_tasks)
+                ready_tasks_count=len(ready_tasks)  # Report count of already-processed tasks
             )
             
             print(f"✅ Context request email sent with conversation_id: {conversation_id}")
-            return
+            return None  # Return None for context verification (email will be marked as read)
         
         # If no context needed, process tasks immediately
         print(f"✅ No context verification needed, processing {len(ready_tasks)} tasks immediately")
@@ -1251,9 +1301,12 @@ def process_new_task_email(msg, body, sender_email, sender_name):
         
         print(f"✅ Confirmation email with correction support sent to {sender_email}")
         
+        return True  # Success
+        
     except Exception as e:
         print(f"❌ Error processing new task email: {str(e)}")
         print(traceback.format_exc())
+        return False  # Failure
 
 
 # Global variables (would be imported from existing gmail_processor.py)

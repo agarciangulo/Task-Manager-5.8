@@ -62,10 +62,10 @@ gcloud run deploy $SERVICE_NAME \
     --cpu 1 \
     --timeout 300 \
     --max-instances 1 \
-    --env-vars-file deployment/env.yaml \
+    --env-vars-file deployment/env-gmail-processor.yaml \
     --add-cloudsql-instances $PROJECT_ID:us-central1:ai-task-manager \
     --vpc-connector redis-connector \
-    --set-secrets "NOTION_TOKEN=notion-token:latest,GEMINI_API_KEY=gemini-api-key:latest,JWT_SECRET_KEY=jwt-secret-key:latest"
+    --set-secrets "NOTION_TOKEN=notion-token:latest,GEMINI_API_KEY=gemini-api-key:latest,JWT_SECRET_KEY=jwt-secret-key:latest,GMAIL_ADDRESS=gmail-address:latest,GMAIL_APP_PASSWORD=gmail-app-password:latest"
 
 # Get the service URL
 SERVICE_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format="value(status.url)")

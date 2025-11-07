@@ -13,6 +13,12 @@ SCHEDULER_NAME="gmail-processor-scheduler-safe"
 TOPIC_NAME="gmail-processor-trigger-safe"
 BUDGET_AMOUNT="50"  # $50 monthly budget limit
 
+# Optional: comma-separated list of budget notification channels (projects/PROJECT_ID/notificationChannels/ID)
+BUDGET_NOTIFICATION_CHANNELS=${BUDGET_NOTIFICATION_CHANNELS:-""}
+
+# Optional: comma-separated list of monitoring notification channels (projects/PROJECT_ID/notificationChannels/ID)
+MONITORING_NOTIFICATION_CHANNELS=${MONITORING_NOTIFICATION_CHANNELS:-""}
+
 echo "🛡️ SAFE Gmail Processor Deployment"
 echo "=================================="
 echo "Project ID: $PROJECT_ID"
@@ -41,14 +47,25 @@ gcloud services enable monitoring.googleapis.com
 
 # Create budget alert
 echo "💰 Creating budget alert..."
-gcloud billing budgets create \
-    --billing-account=$(gcloud billing accounts list --format="value(ACCOUNT_ID)" --limit=1) \
-    --display-name="Gmail Processor Budget Alert" \
-    --budget-amount="$BUDGET_AMOUNT" \
-    --budget-filter="projects:$PROJECT_ID" \
-    --threshold-rule="threshold-amount=0.5,spend-basis=CURRENT_SPEND" \
-    --threshold-rule="threshold-amount=0.8,spend-basis=CURRENT_SPEND" \
-    --threshold-rule="threshold-amount=1.0,spend-basis=CURRENT_SPEND"
+BILLING_ACCOUNT_ID=$(gcloud billing accounts list --format="value(ACCOUNT_ID)" --limit=1)
+
+BUDGET_CREATE_ARGS=(
+    "--billing-account=${BILLING_ACCOUNT_ID}"
+    "--display-name=Gmail Processor Budget Alert"
+    "--budget-amount=${BUDGET_AMOUNT}USD"
+    "--filter-projects=projects/${PROJECT_ID}"
+    "--threshold-rule=percent=0.5"
+    "--threshold-rule=percent=0.8"
+    "--threshold-rule=percent=1.0"
+)
+
+if [ -n "$BUDGET_NOTIFICATION_CHANNELS" ]; then
+    BUDGET_CREATE_ARGS+=("--notifications-rule-monitoring-notification-channels=${BUDGET_NOTIFICATION_CHANNELS}")
+else
+    echo "ℹ️ No BUDGET_NOTIFICATION_CHANNELS provided. Default billing-admin emails will be used."
+fi
+
+gcloud billing budgets create "${BUDGET_CREATE_ARGS[@]}"
 
 echo "✅ Budget alert created - you'll be notified at 50%, 80%, and 100% of $${BUDGET_AMOUNT}"
 
@@ -91,9 +108,12 @@ gcloud scheduler jobs create http $SCHEDULER_NAME \
     --quiet || echo "Scheduler job already exists"
 
 # Create monitoring alert for high costs
-echo "📊 Creating cost monitoring alert..."
-gcloud alpha monitoring policies create \
-    --policy-from-file=- <<EOF
+if [ -n "$MONITORING_NOTIFICATION_CHANNELS" ]; then
+    echo "📊 Creating cost monitoring alert..."
+    MONITORING_POLICY_FILE=$(mktemp)
+    trap 'rm -f "$MONITORING_POLICY_FILE"' EXIT
+
+    cat > "$MONITORING_POLICY_FILE" <<EOF
 displayName: "Gmail Processor High Cost Alert"
 conditions:
   - displayName: "Gmail Processor Cost > $10/day"
@@ -108,10 +128,21 @@ conditions:
           crossSeriesReducer: REDUCE_SUM
           groupByFields:
             - resource.labels.service_name
-notificationChannels: []
+notificationChannels:
 EOF
 
-echo "✅ Cost monitoring alert created"
+    IFS=',' read -ra MONITORING_CHANNEL_ARRAY <<< "$MONITORING_NOTIFICATION_CHANNELS"
+    for channel in "${MONITORING_CHANNEL_ARRAY[@]}"; do
+        echo "  - ${channel}" >> "$MONITORING_POLICY_FILE"
+    done
+
+    gcloud alpha monitoring policies create --policy-from-file="$MONITORING_POLICY_FILE"
+    rm -f "$MONITORING_POLICY_FILE"
+    trap - EXIT
+    echo "✅ Cost monitoring alert created"
+else
+    echo "⚠️ Skipping cost monitoring alert (set MONITORING_NOTIFICATION_CHANNELS to enable)."
+fi
 
 # Create a cost estimation script
 cat > deployment/estimate-costs.sh << 'EOF'

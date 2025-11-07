@@ -233,12 +233,17 @@ class AuthService:
             Optional[User]: User object if found, None otherwise.
         """
         try:
-            response = self.notion_client.databases.query(
-                database_id=self.users_database_id,
-                filter={
-                    "property": "Email",
-                    "title": {
-                        "equals": email
+            # Use request method directly - databases.query() doesn't exist in notion-client 1.0.0
+            # Note: client automatically adds /v1/, so don't include it in path
+            response = self.notion_client.request(
+                path=f"databases/{self.users_database_id}/query",
+                method="POST",
+                body={
+                    "filter": {
+                        "property": "Email",
+                        "title": {
+                            "equals": email
+                        }
                     }
                 }
             )
@@ -279,12 +284,17 @@ class AuthService:
             Optional[User]: User object if found, None otherwise.
         """
         try:
-            response = self.notion_client.databases.query(
-                database_id=self.users_database_id,
-                filter={
-                    "property": "UserID",
-                    "rich_text": {
-                        "equals": user_id
+            # Use request method directly - databases.query() doesn't exist in notion-client 1.0.0
+            # Note: client automatically adds /v1/, so don't include it in path
+            response = self.notion_client.request(
+                path=f"databases/{self.users_database_id}/query",
+                method="POST",
+                body={
+                    "filter": {
+                        "property": "UserID",
+                        "rich_text": {
+                            "equals": user_id
+                        }
                     }
                 }
             )
@@ -322,8 +332,12 @@ class AuthService:
             List[User]: List of all users.
         """
         try:
-            response = self.notion_client.databases.query(
-                database_id=self.users_database_id
+            # Use request method directly - databases.query() doesn't exist in notion-client 1.0.0
+            # Note: client automatically adds /v1/, so don't include it in path
+            response = self.notion_client.request(
+                path=f"databases/{self.users_database_id}/query",
+                method="POST",
+                body={}
             )
             
             users = []
@@ -614,12 +628,17 @@ class AuthService:
     def _get_notion_page_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         """Helper to get the raw Notion page for a user by email."""
         try:
-            response = self.notion_client.databases.query(
-                database_id=self.users_database_id,
-                filter={
-                    "property": "Email",
-                    "title": {
-                        "equals": email
+            # Use request method directly - databases.query() doesn't exist in notion-client 1.0.0
+            # Note: client automatically adds /v1/, so don't include it in path
+            response = self.notion_client.request(
+                path=f"databases/{self.users_database_id}/query",
+                method="POST",
+                body={
+                    "filter": {
+                        "property": "Email",
+                        "title": {
+                            "equals": email
+                        }
                     }
                 }
             )
@@ -630,12 +649,17 @@ class AuthService:
     def _get_notion_page_by_id(self, user_id: str) -> Optional[Dict[str, Any]]:
         """Helper to get the raw Notion page for a user by UserID."""
         try:
-            response = self.notion_client.databases.query(
-                database_id=self.users_database_id,
-                filter={
-                    "property": "UserID",
-                    "rich_text": {
-                        "equals": user_id
+            # Use request method directly - databases.query() doesn't exist in notion-client 1.0.0
+            # Note: client automatically adds /v1/, so don't include it in path
+            response = self.notion_client.request(
+                path=f"databases/{self.users_database_id}/query",
+                method="POST",
+                body={
+                    "filter": {
+                        "property": "UserID",
+                        "rich_text": {
+                            "equals": user_id
+                        }
                     }
                 }
             )

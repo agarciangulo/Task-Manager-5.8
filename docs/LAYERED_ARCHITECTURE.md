@@ -104,7 +104,7 @@ Dependencies within this layer should go “sideways” sparingly; most componen
   - Cloud Scheduler job triggers the Gmail processor HTTPS endpoint.
   - Celery Beat orchestrates asynchronous jobs (reminders, cleanups).
 - **Configuration management**
-  - `.env` templates (`env.production.template`, `.env.*.example`), `docs/README.md` instructions for local/staging/prod parity.
+  - `.env` templates (`env.production.template`, `.env.*.example`), `docs/DOCKER_ENVIRONMENT_SETUP.md` instructions for local/staging/prod parity.
 - **Observability & resilience**
   - Logging utilities (`src/core/logging_config.py`) unify logging format across services.
   - Metrics services (`src/core/services/correction_metrics.py`) capture success rates and durations.

@@ -167,7 +167,7 @@ AI-Team-Support/
 Your AI Team Support tool is now **completely refactored and production-ready**! You can:
 
 1. **Deploy to Production**: Use the deployment guides in `docs/deployment/`
-2. **Add New Features**: Follow the development workflow in `docs/README.md`
+2. **Add New Features**: Follow the development workflow in `CONTRIBUTING.md`
 3. **Run Tests**: Use the organized test suite in `tests/`
 4. **Access Documentation**: Interactive API docs at `/api/docs/`
 5. **Scale the System**: Modular architecture supports growth
@@ -180,7 +180,7 @@ Your AI Team Support tool is now **completely refactored and production-ready**!
 
 - **Documentation**: Check `docs/` for comprehensive guides
 - **Testing**: Use organized test suite in `tests/`
-- **Development**: Follow guidelines in `docs/README.md`
+- **Development**: Follow guidelines in `CONTRIBUTING.md`
 - **Deployment**: Use guides in `docs/deployment/`
 
 **Your AI Team Support tool is now a professional, enterprise-grade system!** 🏆 

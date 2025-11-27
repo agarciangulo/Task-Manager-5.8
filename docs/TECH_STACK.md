@@ -97,7 +97,7 @@ This document catalogs the technologies, libraries, and managed services that po
 | Asset | Description |
 |-------|-------------|
 | `README.md` | High-level project overview |
-| `docs/README.md` | Environment setup guide |
+| `docs/DOCKER_ENVIRONMENT_SETUP.md` | Docker & environment setup guide |
 | `docs/OPERATIONAL_FLOW.md` | End-to-end runtime flow |
 | `docs/LAYERED_ARCHITECTURE.md` | Layered architecture map |
 | `docs/GOOGLE_CLOUD_DEPLOYMENT.md` | Deployment playbooks |

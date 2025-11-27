@@ -1,6 +1,7 @@
-# AI Team Support
+# Docker & Environment Setup Guide
 
-## Environment Setup Guide
+> **Note:** This guide covers Docker-based development and multi-environment setup.  
+> For the quickest setup path, see the main [README.md](../README.md).
 
 ### Prerequisites
 - Python 3.9 or higher (3.11+ recommended)

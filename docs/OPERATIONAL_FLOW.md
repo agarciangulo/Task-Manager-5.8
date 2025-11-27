@@ -117,7 +117,7 @@ The Flask app is a complement to the automation pipeline and exposes user-facing
 - **Cloud Scheduler** – Invokes the Gmail processor endpoint every five minutes; environment variables are managed through Google Secret Manager.
 - **Logging & Monitoring** – GCP logging captures stdout/stderr; instructions for log tailing live in `docs/GOOGLE_CLOUD_DEPLOYMENT.md`.
 - **Disaster Recovery** – Email archive and correction database provide replay capabilities; Notion remains the canonical data store.
-- **Environment Parity** – Local development uses `.env` files; staging and production rely on separate config bundles referenced in `docs/README.md`.
+- **Environment Parity** – Local development uses `.env` files; staging and production rely on separate config bundles referenced in `docs/DOCKER_ENVIRONMENT_SETUP.md`.
 
 ---
 

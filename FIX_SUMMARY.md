@@ -39,3 +39,6 @@ response = self.notion_client.request(
 The fix has been deployed. The code should now work correctly with `notion-client==1.0.0`.
 
 
+
+
+

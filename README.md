@@ -195,7 +195,7 @@ python check_gmail_enhanced.py
 ## 📚 Documentation
 
 - **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** - Detailed project organization
-- **[docs/README.md](docs/README.md)** - Developer environment setup
+- **[docs/DOCKER_ENVIRONMENT_SETUP.md](docs/DOCKER_ENVIRONMENT_SETUP.md)** - Docker & multi-environment setup
 - **[docs/GOOGLE_CLOUD_DEPLOYMENT.md](docs/GOOGLE_CLOUD_DEPLOYMENT.md)** - Deployment guide
 - **[docs/testing/TESTING_GUIDE.md](docs/testing/TESTING_GUIDE.md)** - Testing guide
 - **[ONBOARDING.md](ONBOARDING.md)** - New developer onboarding guide

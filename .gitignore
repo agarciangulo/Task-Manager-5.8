@@ -36,6 +36,9 @@ ENV/
 env/
 .venv/
 
+# Separate projects (not part of this repo)
+cloud_security_ai_advisor/
+
 # IDE
 .idea/
 .vscode/

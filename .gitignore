@@ -73,6 +73,14 @@ embedding_cache.db
 email_storage/
 *.json.gz
 
+# Runtime files
+celerybeat-schedule
+celerybeat-schedule.db
+*.Rhistory
+
+# Result files (generated)
+hybrid_similarity_results_*.json
+
 # Security
 security_tokens.json
 *.pem

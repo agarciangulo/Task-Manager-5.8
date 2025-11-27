@@ -381,8 +381,8 @@ redis-cli ping  # Should return "PONG"
 ### Day 2-3: Deeper Understanding
 
 1. **Read the architecture:**
-   - Review `docs/architecture/` (if available)
-   - Study `PROJECT_STRUCTURE.md`
+   - Review `docs/OPERATIONAL_FLOW.md` for end-to-end flow
+   - Study `docs/PROJECT_STRUCTURE.md` for code organization
 
 2. **Understand the test suite:**
    - Read `docs/testing/TESTING_GUIDE.md`
@@ -412,7 +412,7 @@ redis-cli ping  # Should return "PONG"
 
 - **Documentation:** Check `docs/` directory
 - **Code examples:** Look at existing tests in `tests/`
-- **Project structure:** See `PROJECT_STRUCTURE.md`
+- **Project structure:** See `docs/PROJECT_STRUCTURE.md`
 
 ### Ask Questions
 

@@ -2,6 +2,33 @@
 
 An AI-powered task management system that automatically extracts tasks from emails, processes them with AI insights, and syncs them to Notion databases. Built with Flask, PostgreSQL, Redis, and Google Cloud.
 
+## 📦 Repository Access
+
+**GitHub Repository:** [https://github.com/agarciangulo/Task-Manager-5.8](https://github.com/agarciangulo/Task-Manager-5.8)
+
+### Downloading the Code
+
+**Option 1: Clone with Git (Recommended)**
+```bash
+git clone https://github.com/agarciangulo/Task-Manager-5.8.git
+cd Task-Manager-5.8
+```
+
+**Option 2: Download ZIP**
+1. Go to [https://github.com/agarciangulo/Task-Manager-5.8](https://github.com/agarciangulo/Task-Manager-5.8)
+2. Click the green "Code" button
+3. Select "Download ZIP"
+4. Extract to your desired location
+
+### After Cloning
+
+Once you have the code:
+1. Follow the [Quick Start](#-quick-start) guide below
+2. Review [ONBOARDING.md](ONBOARDING.md) for detailed setup instructions
+3. Check [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for any current issues
+
+---
+
 ## 🎯 What This Project Does
 
 **AI Team Support** helps teams manage tasks by:
@@ -31,8 +58,8 @@ An AI-powered task management system that automatically extracts tasks from emai
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd "AI Team Support"
+   git clone https://github.com/agarciangulo/Task-Manager-5.8.git
+   cd "Task-Manager-5.8"
    ```
 
 2. **Create virtual environment**

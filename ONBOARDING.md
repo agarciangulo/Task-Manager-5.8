@@ -34,8 +34,8 @@ You'll need access to:
 ### 1.1 Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd "AI Team Support"
+git clone https://github.com/agarciangulo/Task-Manager-5.8.git
+cd "Task-Manager-5.8"
 ```
 
 ### 1.2 Create Virtual Environment
@@ -431,5 +431,8 @@ Once you can:
 **You're ready to contribute!** 🎉
 
 Check out [CONTRIBUTING.md](CONTRIBUTING.md) for next steps.
+
+
+
 
 

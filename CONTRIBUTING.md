@@ -15,9 +15,9 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ```bash
 # Fork the repository on GitHub, then:
-git clone <your-fork-url>
-cd "AI Team Support"
-git remote add upstream <original-repo-url>
+git clone https://github.com/YOUR-USERNAME/Task-Manager-5.8.git
+cd "Task-Manager-5.8"
+git remote add upstream https://github.com/agarciangulo/Task-Manager-5.8.git
 ```
 
 ### 2. Create a Branch
@@ -419,5 +419,8 @@ Your contributions make this project better for everyone. Thank you for taking t
 ---
 
 **Remember:** Every contribution, no matter how small, is valuable! 🎉
+
+
+
 
 

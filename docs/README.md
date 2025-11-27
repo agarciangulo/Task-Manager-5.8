@@ -3,8 +3,8 @@
 ## Environment Setup Guide
 
 ### Prerequisites
-- Python 3.9 or higher
-- Docker Desktop
+- Python 3.9 or higher (3.11+ recommended)
+- Docker Desktop (optional, for containerized deployment)
 - Git
 - Notion API access
 - Google AI (Gemini) API key
@@ -13,8 +13,8 @@
 
 1. **Clone the Repository**
    ```bash
-   git clone [your-repository-url]
-   cd ai-team-support
+   git clone https://github.com/agarciangulo/Task-Manager-5.8.git
+   cd Task-Manager-5.8
    ```
 
 2. **Environment Setup**
@@ -83,7 +83,7 @@ AI_PROVIDER=gemini  # or 'openai' if you prefer
 CHAT_MODEL=gemini-1.5-flash  # Default Gemini model
 
 # Application Settings
-FLASK_APP=app_flask.py
+FLASK_APP=src.api.app_auth
 FLASK_ENV=development  # or staging/production
 FLASK_DEBUG=1  # 0 for staging/production
 ```
@@ -205,7 +205,7 @@ For issues or questions:
 
 ## Requirements
 
-- Python 3.13+
+- Python 3.9+ (3.11+ recommended)
 - Google AI (Gemini) API key (or OpenAI API key)
 - Notion API access
 - Modern web browser
@@ -214,16 +214,25 @@ For issues or questions:
 
 ```
 .
-├── app_flask.py          # Main Flask application
-├── core/                 # Core functionality
-│   ├── ai/              # AI-related code
-│   ├── agents/          # AI agents
-│   ├── adapters/        # External service adapters
-│   └── ...
-├── static/              # Static files (CSS, JS)
-├── templates/           # HTML templates
-├── plugins/             # Plugin system
-└── requirements.txt     # Python dependencies
+├── src/                   # Main source code
+│   ├── api/              # Flask API layer
+│   │   ├── app_auth.py   # Main Flask application
+│   │   ├── routes/       # API route blueprints
+│   │   └── models/       # Request/response models
+│   ├── core/             # Core functionality
+│   │   ├── ai/           # AI-related code
+│   │   ├── agents/       # AI agents
+│   │   ├── services/     # Business logic layer
+│   │   └── security/     # Authentication & security
+│   ├── config/           # Configuration
+│   ├── plugins/          # Plugin system
+│   └── utils/            # Utilities (Gmail processor, etc.)
+├── tests/                # Test suite
+├── static/               # Static files (CSS, JS)
+├── templates/            # HTML templates
+├── deployment/           # Deployment scripts
+├── docs/                 # Documentation
+└── requirements.txt      # Python dependencies
 ```
 
 ## Contributing

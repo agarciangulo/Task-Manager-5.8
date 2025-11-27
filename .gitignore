@@ -42,6 +42,7 @@ cloud_security_ai_advisor/
 # IDE
 .idea/
 .vscode/
+.devcontainer/
 *.swp
 *.swo
 *~

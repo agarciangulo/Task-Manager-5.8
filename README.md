@@ -41,6 +41,51 @@ Once you have the code:
 - 🔐 **Secure authentication** - JWT-based user authentication and authorization
 - ⚡ **Real-time processing** - Gmail processor runs every 5 minutes via Cloud Scheduler
 
+## 🧪 Spike: Parallel Architecture Prototype
+
+> **For developers starting fresh or evaluating the architecture**
+
+This repository includes comprehensive documentation for a **spike (parallel prototype)** - a from-scratch implementation to validate and potentially improve the current architecture. 
+
+### What is the Spike?
+
+The spike is a **clean-room implementation** of the core task management flow designed to:
+- Validate a next-generation platform stack (LangGraph, Vertex AI, modern patterns)
+- Test architectural decisions without legacy constraints
+- Provide a comparison point against the current implementation
+- Serve as a blueprint for future development
+
+### Spike Documents (Read in Order)
+
+| Document | Purpose | Read Time |
+|----------|---------|-----------|
+| 1️⃣ [docs/SPIKE_SCOPE.md](docs/SPIKE_SCOPE.md) | **Start here** - Objectives, success criteria, constraints | 5 min |
+| 2️⃣ [docs/SPIKE_ARCHITECTURE.md](docs/SPIKE_ARCHITECTURE.md) | Complete architecture blueprint with layers, components, data flows | 15 min |
+| 3️⃣ [docs/SPIKE_EXECUTION_PLAN.md](docs/SPIKE_EXECUTION_PLAN.md) | Day-by-day implementation roadmap | 5 min |
+| 4️⃣ [docs/SPIKE_ROADMAP.md](docs/SPIKE_ROADMAP.md) | Future phases from MVP to enterprise | 5 min |
+
+### Supporting Architecture Documents
+
+| Document | Purpose |
+|----------|---------|
+| [docs/OPERATIONAL_FLOW.md](docs/OPERATIONAL_FLOW.md) | End-to-end flow of the **current** system (12 detailed sections) |
+| [docs/LAYERED_ARCHITECTURE.md](docs/LAYERED_ARCHITECTURE.md) | Current system's 5-layer architecture |
+| [docs/TECH_STACK.md](docs/TECH_STACK.md) | Complete technology catalog |
+
+### How to Use the Spike Docs
+
+**If you're building the prototype:**
+1. Read SPIKE_SCOPE.md to understand what to build
+2. Use SPIKE_ARCHITECTURE.md as your blueprint
+3. Follow SPIKE_EXECUTION_PLAN.md day-by-day
+
+**If you're comparing architectures:**
+1. Read OPERATIONAL_FLOW.md to understand the current system
+2. Compare with SPIKE_ARCHITECTURE.md to see proposed changes
+3. Use SPIKE_ROADMAP.md to understand the evolution path
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -138,7 +183,7 @@ AI-Team-Support/
 └── scripts/               # Utility scripts
 ```
 
-For detailed structure, see [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
+For detailed structure, see [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md).
 
 ## 🧪 Testing
 
@@ -189,16 +234,29 @@ python -m src.api.app_auth
 Run Gmail processor locally:
 
 ```bash
-python check_gmail_enhanced.py
+python scripts/check_gmail_enhanced.py
 ```
 
 ## 📚 Documentation
 
-- **[ONBOARDING.md](ONBOARDING.md)** - New developer onboarding guide
+### Getting Started
+- **[ONBOARDING.md](ONBOARDING.md)** - New developer onboarding guide (Day 1)
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 - **[KNOWN_ISSUES.md](KNOWN_ISSUES.md)** - Current issues and technical debt
-- **[docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)** - Detailed project organization
-- **[docs/OPERATIONAL_FLOW.md](docs/OPERATIONAL_FLOW.md)** - End-to-end system flow
+
+### Architecture & Design
+- **[docs/OPERATIONAL_FLOW.md](docs/OPERATIONAL_FLOW.md)** - End-to-end system flow ⭐
+- **[docs/LAYERED_ARCHITECTURE.md](docs/LAYERED_ARCHITECTURE.md)** - 5-layer architecture overview
+- **[docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)** - Code organization
+- **[docs/TECH_STACK.md](docs/TECH_STACK.md)** - Technology catalog
+
+### Spike (Parallel Prototype)
+- **[docs/SPIKE_SCOPE.md](docs/SPIKE_SCOPE.md)** - Spike objectives and success criteria
+- **[docs/SPIKE_ARCHITECTURE.md](docs/SPIKE_ARCHITECTURE.md)** - Architecture blueprint ⭐
+- **[docs/SPIKE_EXECUTION_PLAN.md](docs/SPIKE_EXECUTION_PLAN.md)** - Implementation roadmap
+- **[docs/SPIKE_ROADMAP.md](docs/SPIKE_ROADMAP.md)** - Future phases
+
+### Operations
 - **[docs/GOOGLE_CLOUD_DEPLOYMENT.md](docs/GOOGLE_CLOUD_DEPLOYMENT.md)** - Deployment guide
 - **[docs/testing/TESTING_GUIDE.md](docs/testing/TESTING_GUIDE.md)** - Testing guide
 

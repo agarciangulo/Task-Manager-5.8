@@ -1,241 +1,495 @@
 # Spike Architecture – AI Task Management Agent (Parallel Prototype)
 
-This document outlines the proposed architecture for the spike described in `docs/SPIKE_SCOPE.md`. It highlights layers, components, data flows, and extension points so the implementation can follow a clear blueprint.
+This document outlines the proposed architecture for the spike described in `docs/SPIKE_SCOPE.md`. It defines three core processes, their components, data flows, and the databases that support them.
 
 ---
 
-## 1. Layered View
+## 1. System Overview
+
+The AI Task Management Agent consists of **three core processes** that work together to help users manage tasks, receive insights, and query their data:
 
 ```
-┌────────────────────────────────────────────────────┐
-│ Interaction Layer                                   │
-│  - API Gateway (Next.js API Routes or FastAPI)      │
-│  - Optional Operator UI (Vercel v0 dashboard)       │
-│  - Admin CLI / Postman Collection                   │
-└──────────────▲─────────────────────────────────────┘
-               │ HTTP requests (task intake, corrections)
-┌──────────────┴─────────────────────────────────────┐
-│ Orchestration Layer                                │
-│  - LangGraph Flow (Vertex AI execution environment)│
-│     • IntakeNode                                   │
-│     • ExtractionNode (Gemini)                      │
-│     • ContextCheckNode (optional)                  │
-│     • PersistNode                                  │
-│     • InsightNode                                  │
-│     • ResponseNode                                 │
-│  - Workflow Monitoring Hooks                       │
-└──────────────▲─────────────────────────────────────┘
-               │ Commands/events, structured payloads
-┌──────────────┴─────────────────────────────────────┐
-│ Application Services Layer                         │
-│  - Task Repository (CRUD abstractions)             │
-│  - Correction Service (diff/apply, audit logging)  │
-│  - Insight Service (lightweight analytics)         │
-│  - Notification Service (stub for email/slack)     │
-└──────────────▲─────────────────────────────────────┘
-               │ Data access requests
-┌──────────────┴─────────────────────────────────────┐
-│ Data & Integration Layer                           │
-│  - PostgreSQL / Cloud SQL (tasks, corrections, runs)│
-│  - Vertex AI (Gemini 1.5 Flash)                     │
-│  - Optional: Vector Store (Vertex Matching Engine)  │
-└──────────────▲─────────────────────────────────────┘
-               │ Configuration, deployment, monitoring
-┌──────────────┴─────────────────────────────────────┐
-│ Infrastructure & Ops                               │
-│  - Cloud Run / Vercel deploy targets                │
-│  - Cloud Build CI/CD                                │
-│  - Cloud Logging & Monitoring                       │
-│  - Secret Manager (API keys, DB creds)              │
-└────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          AI TASK MANAGEMENT AGENT                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐             │
+│  │   PROCESS 1     │  │   PROCESS 2     │  │   PROCESS 3     │             │
+│  │   Task Intake   │  │  Prioritization │  │  Query System   │             │
+│  │   & Processing  │  │   & Insights    │  │  & Analytics    │             │
+│  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘             │
+│           │                    │                    │                       │
+│           ▼                    ▼                    ▼                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        DATA LAYER                                    │   │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────────┐        │   │
+│  │  │ Task DB  │ │ User     │ │ Insights │ │ Best Practices   │        │   │
+│  │  │          │ │ Behaviour│ │    DB    │ │       DB         │        │   │
+│  │  │          │ │    DB    │ │          │ │                  │        │   │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────────────┘        │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Component Breakdown
+## 2. Process 1: Task Intake & Processing Pipeline
 
-| Component | Responsibilities | Notes |
-|-----------|------------------|-------|
-| **API Gateway** | Expose `/tasks/intake` and `/tasks/corrections` endpoints, validate payloads, emit run IDs | Choose Next.js (Vercel) for fast iteration or FastAPI (Cloud Run) for Python parity |
-| **IntakeNode** | Normalize payload, enrich metadata, hand off to extraction node | Logging and request ID assignment |
-| **ExtractionNode** | Prompt Gemini to generate structured tasks; enforce JSON schema | Use Vertex Function calling or manual validation |
-| **ContextCheckNode** | Optional follow-up: detect missing info, generate clarifying questions | Stores pending context state if needed |
-| **PersistNode** | Call Task Repository to write tasks and run metadata | Handles transactions |
-| **InsightNode** | Compute quick insight using stored data or AI summarization | Light logic only |
-| **ResponseNode** | Assemble final response object for API; optionally enqueue notification | |
-| **Task Repository** | Abstract DB operations (create/read/update tasks); expose models | Keeps LangGraph nodes free of SQL |
-| **Correction Service** | Fetch tasks, apply updates/deletes, log before/after, emit events | Should be idempotent |
-| **Insight Service** | Provide derived metrics (count due soon, etc.) | Reused by both new-task flow and correction flow |
-| **Notification Service (stub)** | Future integration point for email/Slack | Include interface but keep implementation minimal |
-| **Observability Hooks** | Decorators/middleware capturing latency, success/failure counts | Feed into Cloud Logging/Monitoring |
+### 2.1 Overview
+
+This process handles all incoming emails from users, extracts tasks, compares with existing data, and updates the database accordingly.
+
+### 2.2 Flow Diagram
+
+```
+                                              ┌─────────────────────┐
+                                              │ User Behaviour DB   │
+                                              │ (patterns/habits)   │
+                                              └──────────▲──────────┘
+                                                         │ logs behavior
+                                                         │
+┌─────────────┐      ┌─────────────────┐      ┌─────────┴─────────┐         ┌──────────┐
+│   EMAIL     │      │  Task Extractor │      │  Task Processor   │  ──▶    │  Task    │
+│             │      │                 │      │                   │ writes  │    DB    │
+│ Contains:   │ ──▶  │ - Classifies    │ ──▶  │ - Compares new    │         │          │
+│ • Activities│      │   intent        │      │   vs existing     │  ◀──    │          │
+│ • Corrections      │ - Checks context│      │ - Decides: ADD or │ reads   │          │
+│ • Context   │ ◀──  │ - Asks for more │      │   UPDATE          │         │          │
+│   replies   │      │   if needed     │      │ - Updates DB      │         │          │
+└─────────────┘      └─────────────────┘      └───────────────────┘         └────┬─────┘
+       ▲                                                                         │
+       │                                                                         │
+       │                                                              ┌──────────▼──────┐
+       │                                                              │ Task Presenter  │
+       └──────────────────────────────────────────────────────────────│                 │
+                              (email response)                        │ Outputs:        │
+                                                                      │ • Daily summary │
+                                                                      │ • High priority │
+                                                                      │ • Corrections   │
+                                                                      │   confirmed     │
+                                                                      └─────────────────┘
+```
+
+### 2.3 Email Input Types
+
+| Content Type | Example | Purpose |
+|--------------|---------|---------|
+| **New Activities** | "Today I completed X, Y, Z" | Log completed tasks |
+| **Corrections** | "Task was due Wednesday not Thursday" | Update existing tasks |
+| **Context Replies** | Response to system's clarification request | Fill in missing information |
+
+### 2.4 Component Details
+
+#### Task Extractor
+| Responsibility | Description |
+|----------------|-------------|
+| **Classify Intent** | Determine if email contains new activities, corrections, or context replies |
+| **Check Completeness** | Verify tasks have required info (due date, priority, etc.) |
+| **Request Context** | Send email back to user if information is missing |
+| **Log User Behavior** | Record patterns to User Behaviour DB (e.g., "user often omits due dates") |
+
+#### Task Processor
+| Responsibility | Description |
+|----------------|-------------|
+| **Read Existing Tasks** | Fetch current tasks from Task DB for comparison |
+| **Compare & Decide** | Determine which tasks are NEW (add) vs existing (update) |
+| **Apply Corrections** | Process correction requests from user |
+| **Update Database** | Write final state to Task DB |
+
+#### Task Presenter
+| Responsibility | Description |
+|----------------|-------------|
+| **Generate Summary** | Create summary of tasks completed that day |
+| **Highlight Priorities** | List high-priority activities needing immediate attention |
+| **Confirm Changes** | Acknowledge corrections that were applied |
+| **Send Response** | Email the combined output back to user |
+
+### 2.5 Email Response Strategy
+
+| Scenario | Email Type | Reason |
+|----------|-----------|--------|
+| Daily summary / Tasks completed | New email | Read-only, no response needed |
+| Confirmation of corrections | Reply to original | Context matters, closes the loop |
+| Asking for more context | Reply to original | User needs to see what was unclear |
+| High priority alerts | New email | Stands out, urgent |
 
 ---
 
-## 3. Data Flow (New Task Intake)
+## 3. Process 2: Prioritization & Insights Generation
+
+### 3.1 Overview
+
+This process generates daily task priorities and personalized insights by analyzing the user's task database against organizational best practices.
+
+### 3.2 Flow Diagram
 
 ```
-Client → API Gateway → LangGraph Flow
-  1. IntakeNode: validate payload, log run
-  2. ExtractionNode: Gemini prompt → structured tasks
-  3. PersistNode: Task Repository writes to Postgres
-  4. InsightNode: compute summary insight
-  5. ResponseNode: return JSON {tasks, insight, run_id}
-  6. (Optional) Notification Service sends confirmation
+┌──────────────┐         ┌───────────────────┐
+│   Task DB    │────────▶│  Task Prioritizer │──────────────┐
+│              │ reads   │                   │              │
+│              │         │ Creates prioritized              │ prioritized
+│              │         │ list for next day │              │ task list
+│              │         └───────────────────┘              │
+│              │                                            │
+│              │         ┌───────────────────┐              ▼
+│              │────────▶│ Insight Generator │      ┌───────────────┐
+└──────────────┘ reads   │                   │      │   Combined    │      ┌──────────┐
+                         │ - Analyzes backlog│      │   Email to    │ ──▶  │   USER   │
+┌──────────────┐         │ - Creates advice  │      │     User      │      └──────────┘
+│Best Practices│────────▶│ - What to improve │      │               │
+│      DB      │ reads   │ - What to fix     │      │ Contains:     │
+│              │         │                   │      │ • Task list   │
+│              │         └─────────┬─────────┘      │ • Insights    │
+└──────────────┘                   │                │   (separate)  │
+                                   │ stores         └───────▲───────┘
+                                   ▼                        │
+                         ┌───────────────────┐              │ insights
+                         │ Insights Database │──────────────┘
+                         │                   │
+                         │ (all generated    │
+                         │  insights logged) │
+                         └───────────────────┘
 ```
 
-## 4. Data Flow (Correction Request)
+### 3.3 Component Details
+
+#### Task Prioritizer
+| Responsibility | Description |
+|----------------|-------------|
+| **Read Task Backlog** | Fetch all open/pending tasks from Task DB |
+| **Apply Prioritization Logic** | Consider due dates, priority flags, dependencies |
+| **Generate Priority List** | Create ordered list of tasks for next day |
+
+#### Insight Generator
+| Responsibility | Description |
+|----------------|-------------|
+| **Analyze User Backlog** | Read current state from Task DB |
+| **Compare to Best Practices** | Check patterns against Best Practices DB |
+| **Generate Advice** | Create actionable recommendations |
+| **Store Insights** | Log all generated insights to Insights Database |
+
+### 3.4 Example Insights
+
+- "You have 5 overdue tasks - consider addressing these first"
+- "You've been logging tasks without due dates - try adding deadlines"
+- "Your high-priority queue is growing - consider delegating"
+- "Great job completing 12 tasks this week - above your average!"
+
+### 3.5 Combined Email Output
+
+The Task Prioritizer and Insight Generator outputs are combined (but kept as separate sections) in a single email:
 
 ```
-Client → API Gateway → LangGraph Correction Flow
-  1. IntakeNode: verify original run/task IDs
-  2. CorrectionNode: Gemini prompt → update actions
-  3. ApplyNode: Correction Service applies diff, logs audit records
-  4. InsightNode: recalc summary insight
-  5. ResponseNode: return updated tasks + correction log ID
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 YOUR PRIORITIES FOR TOMORROW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Complete quarterly report (High Priority, Due: Tomorrow)
+2. Send client follow-up emails (Medium Priority)
+3. Review team submissions (Medium Priority)
+...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 INSIGHTS & RECOMMENDATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• You have 3 tasks overdue by more than a week - consider re-prioritizing
+• Great job completing 12 tasks this week - above your average!
+• Suggestion: Your "Admin" category is growing - block time for admin work
+...
 ```
 
 ---
 
-## 5. Data Model (Minimum Viable)
+## 4. Process 3: Query/Analytics System
 
-| Table | Key Fields | Purpose |
-|-------|------------|---------|
-| `runs` | `id`, `type` (intake/correction), `status`, `created_at`, `latency_ms`, `raw_input`, `raw_output` | Track orchestrated executions |
-| `tasks` | `id`, `run_id`, `title`, `status`, `priority`, `due_date`, `metadata` | Canonical tasks produced by extraction |
-| `corrections` | `id`, `run_id`, `task_id`, `action` (update/delete), `before`, `after`, `success`, `error` | Audit trail for corrections |
-| `insights` | `id`, `run_id`, `summary`, `details`, `created_at` | Store response/insight per run |
+### 4.1 Overview
 
-Optional future tables: `pending_context`, `notifications`.
+This process enables users and managers to query data across all databases with appropriate access controls and privacy safeguards.
 
----
+### 4.2 Flow Diagram
 
-## 6. Node Connectivity & Data Contracts
-
-Detailed view of the LangGraph nodes, inputs, outputs, and transitions.
-
-### 6.1 New Task Flow Nodes
-
-| Node | Upstream | Downstream | Input Payload | Output Payload |
-|------|----------|------------|---------------|----------------|
-| `IntakeNode` | API Gateway | `ExtractionNode` | `{ run_id, request: { subject, body, sender, metadata } }` | `{ run_id, normalized_email: { text, sender, thread_id }, context: {...}}` |
-| `ExtractionNode` | `IntakeNode` | `ContextCheckNode` (optional) or `PersistNode` | `{ run_id, normalized_email, context }` | `{ run_id, tasks_raw: <Gemini response>, tasks_validated: [ {title, status, ...} ], context }` |
-| `ContextCheckNode` | `ExtractionNode` (only when confidence low) | `PersistNode` or API callback | `{ run_id, tasks_validated, gaps: [...], normalized_email }` | Either `{ run_id, clarification_needed: true, questions: [...] }` or pass-through `{ run_id, tasks_validated }` |
-| `PersistNode` | `ExtractionNode` or `ContextCheckNode` | `InsightNode` | `{ run_id, tasks_validated, context }` | `{ run_id, tasks_db: [task_records], context }` |
-| `InsightNode` | `PersistNode` | `ResponseNode` | `{ run_id, tasks_db }` | `{ run_id, insight: { summary, metrics }, tasks_db }` |
-| `ResponseNode` | `InsightNode` | API Gateway | `{ run_id, insight, tasks_db }` | `{ status: "success", run_id, tasks: [...], insight }` (and optionally event for Notification Service) |
-
-### 6.2 Correction Flow Nodes
-
-| Node | Upstream | Downstream | Input Payload | Output Payload |
-|------|----------|------------|---------------|----------------|
-| `CorrectionIntakeNode` | API Gateway | `CorrectionAgentNode` | `{ correction_run_id, original_run_id, corrections_request: { text, task_ids } }` | `{ correction_run_id, original_tasks, correction_text }` |
-| `CorrectionAgentNode` | `CorrectionIntakeNode` | `ApplyCorrectionNode` | `{ correction_run_id, original_tasks, correction_text }` | `{ correction_run_id, actions: [ {task_id, type, updates} ] }` |
-| `ApplyCorrectionNode` | `CorrectionAgentNode` | `CorrectionInsightNode` | `{ correction_run_id, actions }` | `{ correction_run_id, updated_tasks, audit_log }` |
-| `CorrectionInsightNode` | `ApplyCorrectionNode` | `CorrectionResponseNode` | `{ correction_run_id, updated_tasks, audit_log }` | `{ correction_run_id, insight, updated_tasks, audit_log }` |
-| `CorrectionResponseNode` | `CorrectionInsightNode` | API Gateway | `{ correction_run_id, insight, updated_tasks, audit_log }` | `{ status: "success", correction_run_id, updated_tasks, insight, audit_reference }` |
-
-### 6.3 Error & Fallback Paths
-
-- Any node can emit `{ status: "error", run_id, reason, payload }` which routes to an error handler node logging to `runs` table and returning an HTTP 500/4xx.
-- `ContextCheckNode` returning `clarification_needed` should short-circuit the main flow and send a response indicating pending state.
-
----
-
-## 7. State Management Strategy
-
-LangGraph relies on an explicit state object that flows through nodes. The spike will implement the following state constructs:
-
-### 7.1 Shared State Schema
-
-```json
-{
-  "run_id": "uuid",
-  "flow_type": "intake | correction",
-  "request": { "...raw request payload..." },
-  "normalized_email": { "...processed content..." },
-  "tasks_validated": [ { "...task fields..." } ],
-  "pending_questions": [ { "question": "...", "reason": "missing_due_date" } ],
-  "actions": [ { "task_id": "...", "type": "update", "updates": {...} } ],
-  "insight": { "summary": "...", "metrics": {...} },
-  "audit_log": [ { "task_id": "...", "before": {...}, "after": {...} } ],
-  "status": "in_progress | awaiting_context | success | error",
-  "error": { "message": "...", "context": {...} }
-}
+```
+                                                      ┌─────────────────────────────────┐
+                                                      │        DATA ACCESS LAYER        │
+                                                      ├─────────────────┬───────────────┤
+                                                      │   User's Own    │   Firm Total  │
+                                                      │   (Full Access) │  (Summarized) │
+                                                      ├─────────────────┼───────────────┤
+┌──────────┐                                          │                 │               │
+│   USER   │──┐                                   ┌──▶│ UB-DB (personal)│ UB-DB (total) │
+└──────────┘  │                                   │   │                 │  [summarized] │
+              │      ┌───────────────────────┐    │   ├─────────────────┼───────────────┤
+              ├─────▶│     Query Router      │────┼──▶│Task DB (personal│Task DB (total)│
+              │      │                       │    │   │                 │  [summarized] │
+              │      │ • Breakdown           │    │   ├─────────────────┼───────────────┤
+              │      │   (decomposes query)  │    │   │Ins DB (personal)│Ins DB (total) │
+┌──────────┐  │      │                       │    │   │                 │  [summarized] │
+│ MANAGER  │──┘      │ • Coordinator         │    │   ├─────────────────┼───────────────┤
+│          │         │   (routes to sources) │    └──▶│  Best Practices │Best Practices │
+│ Can also │         │                       │        │                 │               │
+│ access:  │         │ • Synthesizer         │        └─────────────────┴───────────────┘
+│ • Team   │         │   (combines results)  │
+│   members│         └───────────────────────┘
+│ • Team   │
+│   totals │
+└──────────┘
 ```
 
-- **Mutation rules:** Each node receives the state object, mutates only its owned keys, and returns a shallow copy. Immutable snapshots are persisted in the `runs` table for replay.
-- **Concurrency:** LangGraph’s built-in state store (in-memory for the spike) will later be backed by Redis/Vertex memory for resilience.
+### 4.3 Access Control Matrix
 
-### 7.2 Node-Specific State Responsibilities
+| Requester | Own Data | Team Members | Team Total | Firm Total |
+|-----------|----------|--------------|------------|------------|
+| **User** | ✅ Full | ❌ No | ⚠️ Summarized | ⚠️ Summarized |
+| **Manager** | ✅ Full | ✅ Full | ✅ Full | ⚠️ Summarized |
 
-| Node | Reads | Writes | Persistence Hooks |
-|------|-------|--------|-------------------|
-| `IntakeNode` | `request` | `normalized_email`, `status` | Insert `runs` row (`status='in_progress'`) |
-| `ExtractionNode` | `normalized_email` | `tasks_validated`, `pending_questions`, `status` | Append to `runs.raw_output` (LLM response) |
-| `ContextCheckNode` | `tasks_validated`, `pending_questions` | `status` (set to `awaiting_context`) | If awaiting, update run status and emit pending question record |
-| `PersistNode` | `tasks_validated` | `tasks_db`, `status` | Create task rows; update run with `tasks_db` IDs |
-| `InsightNode` | `tasks_db` | `insight` | Write insight row linked to `run_id` |
-| `ResponseNode` | `insight`, `tasks_db`, `status` | Finalize `status='success'`, add response payload | Update `runs` status and response |
-| `CorrectionAgentNode` | `original_tasks`, `correction_text` | `actions`, `status` | Store raw LLM correction response |
-| `ApplyCorrectionNode` | `actions` | `audit_log`, `updated_tasks`, `status` | Persist correction rows, update tasks |
-| `CorrectionResponseNode` | `updated_tasks`, `insight` | Final `status` | Update `runs` + return payload |
+### 4.4 Query Router Components
 
-### 7.3 Context & Memory Handling
+| Component | Responsibility |
+|-----------|----------------|
+| **Breakdown** | Decomposes complex queries into sub-queries |
+| **Coordinator** | Routes sub-queries to appropriate data sources |
+| **Synthesizer** | Combines results from multiple sources into coherent response |
 
-- **Short-term memory:** State object carries context within a single run.
-- **Long-term memory:** `runs`, `tasks`, and `corrections` tables act as durable memory; future LangGraph sessions can hydrate state by querying these tables.
-- **Pending clarifications:** When `ContextCheckNode` flags missing data, a `pending_context` record is written with the current state. Upon receiving user clarification, the state is rehydrated from the record and the graph resumes at the appropriate node.
-- **Idempotency:** `run_id` and `correction_run_id` enforce single-write operations. Replays reuse the same IDs to prevent duplicate persistence.
+### 4.5 Query Examples
 
-### 7.4 Error State Transitions
+| Who | Query | Data Source | Response Type |
+|-----|-------|-------------|---------------|
+| User | "What tasks did I complete this week?" | Task DB (personal) | Full detail |
+| User | "How does my productivity compare to the firm?" | Task DB (total) | Summarized ("top 25%") |
+| User | "How is my team doing?" | Task DB (team total) | Summarized |
+| Manager | "Show me Alex's overdue tasks" | Task DB (Alex's personal) | Full detail |
+| Manager | "What's my team's completion rate?" | Task DB (team total) | Full aggregated |
+| Manager | "How does my team compare to the firm?" | Task DB (firm total) | Summarized |
 
-- On exception, nodes set `state.status = "error"` and attach `state.error`.
-- Error handler node logs the state snapshot and writes `runs.status='failed'`.
-- Replay is supported by reloading the snapshot and restarting the graph from a designated node (to be implemented in future iterations).
+### 4.6 Sensitivity Handling
+
+When accessing **team or firm-wide data**, the Query Router:
+- Aggregates/anonymizes individual data
+- Returns summaries, percentages, trends (not raw data)
+- Examples:
+  - ✅ "Average task completion: 85%"
+  - ✅ "You completed 20% more tasks than average"
+  - ❌ NOT "John completed 5 tasks, Sarah completed 12..."
+
+### 4.7 MVP Scope Note
+
+This process is intentionally **scoped as a foundation** for the spike. Future enhancements may include:
+- More granular role-based access control
+- Department-level views
+- Audit logging of sensitive queries
+- Permission management UI
+
+---
+
+## 5. Data Model
+
+### 5.1 Databases Overview
+
+| Database | Purpose | Key Data |
+|----------|---------|----------|
+| **Task DB** | Canonical store for all tasks | Tasks, status, priority, due dates, metadata |
+| **User Behaviour DB** | Patterns and habits about user interactions | Behavioral observations, trends, flags |
+| **Best Practices DB** | Organizational standards and guidelines | Rules, templates, benchmarks |
+| **Insights DB** | Historical record of generated insights | All insights with timestamps, context |
+
+### 5.2 Task DB Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | Owner of the task |
+| `title` | String | Task description |
+| `status` | Enum | pending, in_progress, completed, cancelled |
+| `priority` | Enum | low, medium, high, urgent |
+| `due_date` | DateTime | When task is due |
+| `category` | String | Task category/project |
+| `created_at` | DateTime | When task was created |
+| `updated_at` | DateTime | Last modification |
+| `source_email_id` | String | Reference to originating email |
+| `metadata` | JSON | Additional flexible data |
+
+### 5.3 User Behaviour DB Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | User being tracked |
+| `pattern_type` | String | Type of behavior (e.g., "missing_context", "late_logging") |
+| `observation` | String | Description of the pattern |
+| `frequency` | Integer | How often observed |
+| `first_seen` | DateTime | When first noticed |
+| `last_seen` | DateTime | Most recent occurrence |
+| `is_active` | Boolean | Whether pattern is still relevant |
+
+### 5.4 Best Practices DB Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `category` | String | Category (productivity, prioritization, etc.) |
+| `rule` | String | The best practice rule |
+| `description` | String | Detailed explanation |
+| `benchmark` | JSON | Quantitative benchmarks if applicable |
+| `is_active` | Boolean | Whether currently enforced |
+
+### 5.5 Insights DB Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | User who received the insight |
+| `insight_type` | String | Category of insight |
+| `content` | String | The insight text |
+| `context` | JSON | Data that drove the insight |
+| `created_at` | DateTime | When generated |
+| `was_actioned` | Boolean | Whether user acted on it (future) |
+
+---
+
+## 6. Technology Stack
+
+| Layer | Technology | Notes |
+|-------|------------|-------|
+| **AI/LLM** | Google Gemini (Vertex AI) | Task extraction, insight generation, query understanding |
+| **Orchestration** | LangGraph | Agent workflow management |
+| **API** | FastAPI or Next.js API Routes | HTTP endpoints |
+| **Database** | PostgreSQL (Cloud SQL) | All four databases |
+| **Email** | Gmail API / IMAP+SMTP | Input and output channel |
+| **Deployment** | Google Cloud Run | Containerized services |
+| **Secrets** | Google Secret Manager | API keys, credentials |
+| **Monitoring** | Cloud Logging & Monitoring | Observability |
+
+---
+
+## 7. Agent Architecture
+
+### 7.1 LangGraph Node Structure
+
+Each process is implemented as a LangGraph workflow with specialized nodes:
+
+#### Process 1 Nodes
+| Node | Input | Output | LLM Call? |
+|------|-------|--------|-----------|
+| `EmailIntakeNode` | Raw email | Normalized email object | No |
+| `IntentClassifierNode` | Normalized email | Intent (activity/correction/context) | Yes |
+| `TaskExtractorNode` | Email + Intent | Extracted tasks | Yes |
+| `ContextCheckerNode` | Extracted tasks | Tasks or clarification questions | Yes |
+| `BehaviorLoggerNode` | User patterns | Log to User Behaviour DB | No |
+| `TaskComparisonNode` | New tasks + DB tasks | Diff (add/update list) | No |
+| `TaskPersistNode` | Diff | Updated Task DB | No |
+| `PresenterNode` | Task DB state | Email response | Yes |
+
+#### Process 2 Nodes
+| Node | Input | Output | LLM Call? |
+|------|-------|--------|-----------|
+| `TaskFetchNode` | User ID | Current tasks | No |
+| `PrioritizerNode` | Tasks | Prioritized list | Yes |
+| `BestPracticesFetchNode` | Category | Relevant practices | No |
+| `InsightGeneratorNode` | Tasks + Practices | Insights | Yes |
+| `InsightPersistNode` | Insights | Stored to Insights DB | No |
+| `EmailComposerNode` | Priorities + Insights | Combined email | No |
+
+#### Process 3 Nodes
+| Node | Input | Output | LLM Call? |
+|------|-------|--------|-----------|
+| `QueryIntakeNode` | Natural language query | Parsed query | Yes |
+| `BreakdownNode` | Parsed query | Sub-queries | Yes |
+| `AccessControlNode` | User + Query | Allowed data scopes | No |
+| `CoordinatorNode` | Sub-queries + Scopes | Routed queries | No |
+| `DataFetchNode` | Routed queries | Raw results | No |
+| `SummarizerNode` | Raw results + Privacy rules | Summarized if needed | Yes |
+| `SynthesizerNode` | All results | Combined response | Yes |
 
 ---
 
 ## 8. Integration Points & Future Extensions
 
-- **Gmail Intake** – Replace HTTP payload with a Gmail webhook or Cloud Function pushing messages into the API.
-- **Notion Sync** – Add a downstream service that consumes `tasks` table changes and writes to Notion.
-- **Multi-Channel Output** – Notification service connects to email, Slack, Teams.
-- **Analytics** – Export `runs` and `corrections` to BigQuery for evaluation dashboards.
-- **Security** – Layer on OAuth/JWT once UI/API is exposed to real users.
+| Integration | Description | Priority |
+|-------------|-------------|----------|
+| **Gmail Intake** | Process incoming emails automatically | MVP |
+| **Email Output** | Send summaries, priorities, insights | MVP |
+| **Notion Sync** | Bidirectional sync with Notion databases | Post-MVP |
+| **Slack Integration** | Query via Slack, receive alerts | Future |
+| **Calendar Integration** | Consider calendar when prioritizing | Future |
+| **Team Dashboard** | Manager UI for team oversight | Future |
 
 ---
 
-## 9. Observability & Resilience Plan
+## 9. Observability & Resilience
 
-- Per-node logging with run IDs.
-- Latency and failure metrics aggregated into Cloud Monitoring dashboards.
-- Retry policies:
-  - LangGraph nodes retry once on transient Vertex/DB errors.
-  - Correction application guarded by transactions.
-- Dead-letter strategy: failed runs written to `runs` table with `status='failed'` and error payload for replay.
+### 9.1 Logging Strategy
+- Every LangGraph node logs entry/exit with run ID
+- LLM calls log prompt hash, latency, token count
+- Email operations log message IDs for traceability
+
+### 9.2 Error Handling
+- Failed extractions trigger context requests (not silent failures)
+- Database errors trigger retries with exponential backoff
+- Unrecoverable errors logged with full state for replay
+
+### 9.3 Metrics
+- Task extraction accuracy (manual review sampling)
+- End-to-end latency per process
+- User engagement with insights (future)
 
 ---
 
-## 10. Deployment Sketch
+## 10. Deployment Architecture
 
-| Component | Deployment Target |
-|-----------|------------------|
-| API Gateway | Vercel (if Next.js) or Cloud Run (if FastAPI) |
-| LangGraph Service | Vertex AI custom container / Cloud Run job |
-| Database | Cloud SQL (Postgres) |
-| Secret Store | Google Secret Manager |
-| CI/CD | Cloud Build or GitHub Actions building container + deploy |
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      Google Cloud Platform                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
+│  │ Cloud Run    │    │ Cloud Run    │    │ Cloud Run    │       │
+│  │ Process 1    │    │ Process 2    │    │ Process 3    │       │
+│  │ (Intake)     │    │ (Priority)   │    │ (Query)      │       │
+│  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘       │
+│         │                   │                   │                │
+│         └───────────────────┼───────────────────┘                │
+│                             │                                    │
+│                    ┌────────▼────────┐                          │
+│                    │   Cloud SQL     │                          │
+│                    │   (PostgreSQL)  │                          │
+│                    │                 │                          │
+│                    │ • Task DB       │                          │
+│                    │ • User Behav DB │                          │
+│                    │ • Insights DB   │                          │
+│                    │ • Best Prac DB  │                          │
+│                    └─────────────────┘                          │
+│                                                                  │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
+│  │ Cloud        │    │ Secret       │    │ Cloud        │       │
+│  │ Scheduler    │    │ Manager      │    │ Logging      │       │
+│  └──────────────┘    └──────────────┘    └──────────────┘       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## 11. Next Implementation Steps
 
-1. Create repository structure reflecting layers (apps/, services/, infra/, docs/).
-2. Scaffold API Gateway with stub endpoints returning mock data.
-3. Implement LangGraph flow skeleton (nodes logging and passing through data).
-4. Hook up Postgres via SQLAlchemy/Prisma (depending on language choice).
-5. Integrate Gemini prompts and validation.
-6. Add logging/metrics wrappers and finalize spike demo script.
+1. **Set up repository** with process-based folder structure
+2. **Implement Process 1** (Task Intake) as MVP core
+3. **Create database schemas** for all four databases
+4. **Implement Process 2** (Prioritization & Insights)
+5. **Implement Process 3** (Query System) - foundation only
+6. **Add email integration** (Gmail IMAP/SMTP)
+7. **Deploy to Cloud Run** with basic monitoring
+8. **Document learnings** and comparison with current system
 
-This architecture positions the spike to deliver the scoped flow while highlighting clear seams for expansion into a full production platform.
+---
 
+## 12. Summary
+
+This architecture defines three interconnected processes:
+
+| Process | Purpose | Key Innovation |
+|---------|---------|----------------|
+| **1. Task Intake** | Get tasks from email, process, store | User behavior tracking, intelligent comparison |
+| **2. Prioritization & Insights** | Daily priorities + improvement advice | Best practices comparison, combined output |
+| **3. Query System** | Natural language data access | Role-based access, privacy-aware summarization |
+
+Together, these processes create an intelligent task management agent that not only tracks tasks but actively helps users improve their productivity through personalized insights and easy data access.

@@ -1,22 +1,75 @@
-# Spike Scope – AI Task Management Flow (Parallel Prototype)
+# Spike Scope – AI Task Management Agent (Parallel Prototype)
 
 ## Objective
-Validate a next-generation platform stack by delivering a minimal, business-critical flow end-to-end: intake a task request, extract structured tasks with an AI agent, persist them, accept a correction, apply it, and emit an insight/summary. The spike results will inform the decision to migrate or integrate the new architecture with the existing system.
+
+Validate a next-generation AI task management platform by implementing three core processes end-to-end:
+
+1. **Task Intake & Processing** - Intelligent email processing with activity logging, corrections, and context handling
+2. **Prioritization & Insights** - Daily task priorities combined with personalized improvement advice
+3. **Query & Analytics** - Natural language data access with role-based privacy controls
+
+The spike results will inform the decision to migrate, integrate, or evolve the new architecture alongside the existing system.
 
 ---
 
-## Use Cases to Demonstrate
+## Core Processes to Demonstrate
 
-1. **New Task Intake**
-   - Trigger: HTTP POST (mocked email payload with subject, body, metadata).
-   - Output: Structured task entries stored in the database + generated confirmation summary.
+### Process 1: Task Intake & Processing Pipeline
 
-2. **Correction Request**
-   - Trigger: HTTP POST referencing original task IDs plus natural language correction text.
-   - Output: Updated tasks with before/after audit trail; correction summary for the user.
+**Trigger:** User sends an email containing activities, corrections, or context replies.
 
-3. **Insight Generation**
-   - For each run, produce a lightweight insight or recommendation that illustrates AI reasoning (e.g., “You have 3 tasks due this week.”).
+**Capabilities:**
+- Classify email intent (new activities vs. corrections vs. context)
+- Extract structured tasks from natural language
+- Request additional context when information is missing
+- Compare new tasks against existing database (add vs. update logic)
+- Track user behavior patterns (e.g., "often omits due dates")
+- Send confirmation/summary emails back to user
+
+**Output:**
+- Tasks added/updated in Task DB
+- User behavior patterns logged to User Behaviour DB
+- Email response with daily summary, high priorities, and correction confirmations
+
+---
+
+### Process 2: Prioritization & Insights Generation
+
+**Trigger:** Scheduled (daily) or on-demand.
+
+**Capabilities:**
+- Read user's task backlog and generate prioritized list for next day
+- Analyze tasks against organizational best practices
+- Generate personalized improvement advice and recommendations
+- Store all insights for historical reference
+
+**Output:**
+- Single email containing:
+  - Prioritized task list (separate section)
+  - Insights and recommendations (separate section)
+- All insights persisted to Insights Database
+
+---
+
+### Process 3: Query & Analytics System
+
+**Trigger:** User or Manager submits a natural language query.
+
+**Capabilities:**
+- Parse and decompose complex queries
+- Route to appropriate data sources (Task DB, User Behaviour DB, Insights DB, Best Practices DB)
+- Apply access controls based on requester role
+- Summarize sensitive data (team/firm totals) for privacy
+
+**Access Control:**
+| Requester | Own Data | Team Members | Team Total | Firm Total |
+|-----------|----------|--------------|------------|------------|
+| **User** | ✅ Full | ❌ No | ⚠️ Summarized | ⚠️ Summarized |
+| **Manager** | ✅ Full | ✅ Full | ✅ Full | ⚠️ Summarized |
+
+**Output:**
+- Natural language response to the query
+- Appropriate level of detail based on access rights
 
 ---
 
@@ -24,51 +77,77 @@ Validate a next-generation platform stack by delivering a minimal, business-crit
 
 | Category | Criteria |
 |----------|----------|
-| Functionality | Endpoints accept intake and correction payloads; tasks persisted; corrections applied; summaries returned |
-| AI Quality | Extracted tasks match expected structure (title, status, due_date, etc.); corrections interpreted accurately |
-| Observability | Each orchestrated step logs start/end, latency, and status; run IDs trace through storage |
-| Architecture | Documentation + diagram describing layers, components, data flow, and future plugs (Gmail, Notion, Slack) |
-| Extendability | Clear seams identified for swapping intake channels, AI providers, or storage backends |
-| Decision Support | Spike report compares new stack against existing system (pros, cons, migration path) |
+| **Process 1** | Email correctly classified; tasks extracted and stored; corrections applied; context requested when needed; user behavior logged |
+| **Process 2** | Priorities generated based on due dates and importance; insights compare against best practices; combined email sent successfully |
+| **Process 3** | Queries parsed correctly; access controls enforced; summarization applied to protected data |
+| **Data Model** | All four databases (Task, User Behaviour, Best Practices, Insights) implemented and functional |
+| **Observability** | Each step logs with run IDs; latency tracked; errors captured with context |
+| **Architecture** | Clear separation of three processes; documented data flows; extension points identified |
+
+---
+
+## Databases Required
+
+| Database | Purpose | MVP Scope |
+|----------|---------|-----------|
+| **Task DB** | Store all user tasks with status, priority, due dates | Full implementation |
+| **User Behaviour DB** | Track user patterns and habits | Basic pattern logging |
+| **Best Practices DB** | Organizational standards for comparison | Seed with sample practices |
+| **Insights DB** | Historical record of generated insights | Full implementation |
 
 ---
 
 ## Constraints & Assumptions
 
-- **Scope:** Focus on the core agent flow; defer UI, authentication hardening, and non-essential plugins.
-- **Stability:** No production traffic; spike runs in an isolated project/environment.
-- **Timebox:** 5–7 day effort including build, validation, and documentation.
-- **Team:** Primary owner (you) with optional reviewers; no dependency on current production pipeline operators.
-- **Data:** Use synthetic or anonymized email samples; demo-ready but not production-grade.
+- **Scope:** Focus on the three core processes; defer complex UI, multi-tenant auth, and non-essential features
+- **Stability:** Spike runs in isolated environment; no production traffic
+- **Timebox:** 5-7 day effort for MVP of all three processes
+- **Team:** Primary owner with optional reviewers
+- **Data:** Use synthetic or anonymized data; demo-ready but not production-grade
+- **Process 3 Note:** Query system is foundational MVP; full access control and analytics are future enhancements
 
 ---
 
 ## Deliverables
 
-1. **Working Prototype**
-   - Minimal API (task intake, correction intake).
-   - LangGraph/Vertex agent orchestration implementing the flow.
-   - Persistence layer storing tasks, corrections, and run metadata.
-   - Insight/summary generator.
-   - *(Optional stretch)* Operator UI built with Vercel v0 consuming the same endpoints.
+### 1. Working Prototype
+- [ ] Process 1: Email intake → extraction → comparison → storage → response
+- [ ] Process 2: Task prioritization + insight generation → combined email
+- [ ] Process 3: Query parsing → routing → access control → response (MVP)
+- [ ] Four databases implemented with schemas
+- [ ] Email integration (receive and send)
 
-2. **Architecture Documentation**
-   - Layered diagram showing components, integrations, and data flows.
-   - Text explanation of responsibilities, technology choices, and future extension points.
+### 2. Architecture Documentation
+- [ ] Updated SPIKE_ARCHITECTURE.md with all three processes
+- [ ] Data flow diagrams for each process
+- [ ] Database schema documentation
+- [ ] Component responsibility descriptions
 
-3. **Evaluation Report**
-   - Performance metrics (latency, cost estimates, AI accuracy observations).
-   - Comparison against current architecture.
-   - Recommendation for next steps (integrate, iterate, or sunset).
+### 3. Evaluation Report
+- [ ] Latency measurements for each process
+- [ ] AI accuracy observations (task extraction, intent classification)
+- [ ] Comparison against current system architecture
+- [ ] Recommendations for next phase
+
+---
+
+## Out of Scope (Deferred)
+
+- Production-grade authentication and authorization
+- Complex team hierarchy management
+- Real-time collaboration features
+- Mobile app or dedicated UI (beyond email)
+- Notion bidirectional sync (post-MVP)
+- Calendar integration (future)
 
 ---
 
 ## Next Steps
 
-1. Build the architecture diagram (see accompanying documentation).
-2. Scaffold the spike repository with agreed layering.
-3. Implement minimal LangGraph template and endpoints.
-4. Capture results and synthesize the evaluation.
+1. Review and approve this scope document
+2. Implement Process 1 as the core MVP
+3. Add Process 2 for daily value delivery
+4. Scaffold Process 3 as foundation for future analytics
+5. Document learnings and prepare evaluation report
 
-This scope keeps the spike laser-focused on demonstrating the new platform’s viability while generating actionable insights for strategic planning. When satisfied with the flow, you can iterate on channel integrations, UI, and enterprise hardening.
-
+This scope ensures the spike demonstrates real business value (task management + insights) while establishing the foundation for future analytics capabilities.

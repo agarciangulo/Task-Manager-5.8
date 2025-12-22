@@ -43,13 +43,7 @@ This process handles all incoming emails from users, extracts tasks, compares wi
 ### 2.2 Flow Diagram
 
 ```
-                                              ┌─────────────────────┐
-                                              │ User Behaviour DB   │
-                                              │ (patterns/habits)   │
-                                              └──────────▲──────────┘
-                                                         │ logs behavior
-                                                         │
-┌─────────────┐      ┌─────────────────┐      ┌─────────┴─────────┐         ┌──────────┐
+┌─────────────┐      ┌─────────────────┐      ┌───────────────────┐         ┌──────────┐
 │   EMAIL     │      │  Task Extractor │      │  Task Processor   │  ──▶    │  Task    │
 │             │      │                 │      │                   │ writes  │    DB    │
 │ Contains:   │ ──▶  │ - Classifies    │ ──▶  │ - Compares new    │         │          │
@@ -57,18 +51,28 @@ This process handles all incoming emails from users, extracts tasks, compares wi
 │ • Corrections      │ - Checks context│      │ - Decides: ADD or │ reads   │          │
 │ • Context   │ ◀──  │ - Asks for more │      │   UPDATE          │         │          │
 │   replies   │      │   if needed     │      │ - Updates DB      │         │          │
-└─────────────┘      └─────────────────┘      └───────────────────┘         └────┬─────┘
-       ▲                                                                         │
-       │                                                                         │
-       │                                                              ┌──────────▼──────┐
-       │                                                              │ Task Presenter  │
-       └──────────────────────────────────────────────────────────────│                 │
-                              (email response)                        │ Outputs:        │
-                                                                      │ • Daily summary │
-                                                                      │ • High priority │
-                                                                      │ • Corrections   │
-                                                                      │   confirmed     │
-                                                                      └─────────────────┘
+└─────────────┘      └────────┬────────┘      └───────────────────┘         └────┬─────┘
+       ▲                      │                                                  │
+       │                      │ analyzes patterns (AI)                           │
+       │                      ▼                                                  │
+       │             ┌─────────────────┐                              ┌──────────▼──────┐
+       │             │ Behavior        │                              │ Task Presenter  │
+       │             │ Analyzer (AI)   │                              │                 │
+       │             │                 │                              │ Outputs:        │
+       │             │ - Detects meta  │                              │ • Daily summary │
+       │             │   patterns      │                              │ • High priority │
+       │             │ - Generates     │                              │ • Corrections   │
+       │             │   observations  │                              │   confirmed     │
+       │             └────────┬────────┘                              └─────────────────┘
+       │                      │ stores                                        │
+       │                      ▼                                               │
+       │             ┌─────────────────┐                                      │
+       │             │ User Behaviour  │                                      │
+       │             │      DB         │                                      │
+       │             └─────────────────┘                                      │
+       │                                                                      │
+       └──────────────────────────────────────────────────────────────────────┘
+                              (email response)
 ```
 
 ### 2.3 Email Input Types
@@ -87,7 +91,21 @@ This process handles all incoming emails from users, extracts tasks, compares wi
 | **Classify Intent** | Determine if email contains new activities, corrections, or context replies |
 | **Check Completeness** | Verify tasks have required info (due date, priority, etc.) |
 | **Request Context** | Send email back to user if information is missing |
-| **Log User Behavior** | Record patterns to User Behaviour DB (e.g., "user often omits due dates") |
+| **Trigger Behavior Analysis** | Pass interaction data to Behavior Analyzer for pattern detection |
+
+#### Behavior Analyzer (AI-Powered)
+| Responsibility | Description |
+|----------------|-------------|
+| **Analyze Patterns** | Use AI to detect meta-patterns in user behavior over time |
+| **Generate Observations** | Create human-readable observations (e.g., "User tends to submit tasks without due dates") |
+| **Track Frequency** | Monitor how often patterns occur |
+| **Store to DB** | Persist observations to User Behaviour DB |
+
+**Example Meta-Behavior Observations:**
+- "User frequently submits tasks without context - consider prompting for details"
+- "User tends to forget to log completed tasks - send reminders"
+- "User often corrects due dates within 24 hours - verify dates at intake"
+- "User is highly responsive to context requests - can ask follow-ups"
 
 #### Task Processor
 | Responsibility | Description |
@@ -122,7 +140,14 @@ This process handles all incoming emails from users, extracts tasks, compares wi
 
 This process generates daily task priorities and personalized insights by analyzing the user's task database against organizational best practices.
 
-### 3.2 Flow Diagram
+### 3.2 Trigger
+
+**Scheduled Daily Job** (e.g., Cloud Scheduler at 6:00 PM)
+- Runs automatically for all active users
+- Generates priorities for the next day
+- Sends combined email with priorities + insights
+
+### 3.3 Flow Diagram
 
 ```
 ┌──────────────┐         ┌───────────────────┐
@@ -152,7 +177,7 @@ This process generates daily task priorities and personalized insights by analyz
                          └───────────────────┘
 ```
 
-### 3.3 Component Details
+### 3.4 Component Details
 
 #### Task Prioritizer
 | Responsibility | Description |
@@ -169,14 +194,14 @@ This process generates daily task priorities and personalized insights by analyz
 | **Generate Advice** | Create actionable recommendations |
 | **Store Insights** | Log all generated insights to Insights Database |
 
-### 3.4 Example Insights
+### 3.5 Example Insights
 
 - "You have 5 overdue tasks - consider addressing these first"
 - "You've been logging tasks without due dates - try adding deadlines"
 - "Your high-priority queue is growing - consider delegating"
 - "Great job completing 12 tasks this week - above your average!"
 
-### 3.5 Combined Email Output
+### 3.6 Combined Email Output
 
 The Task Prioritizer and Insight Generator outputs are combined (but kept as separate sections) in a single email:
 
@@ -206,7 +231,15 @@ The Task Prioritizer and Insight Generator outputs are combined (but kept as sep
 
 This process enables users and managers to query data across all databases with appropriate access controls and privacy safeguards.
 
-### 4.2 Flow Diagram
+### 4.2 Interface
+
+| Phase | Interface | Description |
+|-------|-----------|-------------|
+| **MVP** | Email | Users send queries via email (e.g., "What tasks do I have due this week?") |
+| **Future** | Web UI | Dedicated query interface with chat-like experience |
+| **Future** | Slack/Teams | Query via messaging platforms |
+
+### 4.3 Flow Diagram
 
 ```
                                                       ┌─────────────────────────────────┐
@@ -235,14 +268,14 @@ This process enables users and managers to query data across all databases with 
 └──────────┘
 ```
 
-### 4.3 Access Control Matrix
+### 4.4 Access Control Matrix
 
 | Requester | Own Data | Team Members | Team Total | Firm Total |
 |-----------|----------|--------------|------------|------------|
 | **User** | ✅ Full | ❌ No | ⚠️ Summarized | ⚠️ Summarized |
 | **Manager** | ✅ Full | ✅ Full | ✅ Full | ⚠️ Summarized |
 
-### 4.4 Query Router Components
+### 4.5 Query Router Components
 
 | Component | Responsibility |
 |-----------|----------------|
@@ -250,7 +283,7 @@ This process enables users and managers to query data across all databases with 
 | **Coordinator** | Routes sub-queries to appropriate data sources |
 | **Synthesizer** | Combines results from multiple sources into coherent response |
 
-### 4.5 Query Examples
+### 4.6 Query Examples
 
 | Who | Query | Data Source | Response Type |
 |-----|-------|-------------|---------------|
@@ -261,7 +294,7 @@ This process enables users and managers to query data across all databases with 
 | Manager | "What's my team's completion rate?" | Task DB (team total) | Full aggregated |
 | Manager | "How does my team compare to the firm?" | Task DB (firm total) | Summarized |
 
-### 4.6 Sensitivity Handling
+### 4.7 Sensitivity Handling
 
 When accessing **team or firm-wide data**, the Query Router:
 - Aggregates/anonymizes individual data
@@ -271,7 +304,7 @@ When accessing **team or firm-wide data**, the Query Router:
   - ✅ "You completed 20% more tasks than average"
   - ❌ NOT "John completed 5 tasks, Sarah completed 12..."
 
-### 4.7 MVP Scope Note
+### 4.8 MVP Scope Note
 
 This process is intentionally **scoped as a foundation** for the spike. Future enhancements may include:
 - More granular role-based access control
@@ -374,7 +407,8 @@ Each process is implemented as a LangGraph workflow with specialized nodes:
 | `IntentClassifierNode` | Normalized email | Intent (activity/correction/context) | Yes |
 | `TaskExtractorNode` | Email + Intent | Extracted tasks | Yes |
 | `ContextCheckerNode` | Extracted tasks | Tasks or clarification questions | Yes |
-| `BehaviorLoggerNode` | User patterns | Log to User Behaviour DB | No |
+| `BehaviorAnalyzerNode` | User interaction history | Meta-behavior observations | **Yes** |
+| `BehaviorPersistNode` | Observations | Stored to User Behaviour DB | No |
 | `TaskComparisonNode` | New tasks + DB tasks | Diff (add/update list) | No |
 | `TaskPersistNode` | Diff | Updated Task DB | No |
 | `PresenterNode` | Task DB state | Email response | Yes |

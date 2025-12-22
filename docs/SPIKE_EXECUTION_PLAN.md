@@ -69,8 +69,12 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 ### Task Processor
 - [ ] Implement `TaskComparisonNode` - compare extracted tasks vs. DB
 - [ ] Implement add/update logic based on comparison
-- [ ] Implement `BehaviorLoggerNode` - log user patterns to User Behaviour DB
 - [ ] Implement `TaskPersistNode` - write changes to Task DB
+
+### Behavior Analyzer (AI-Powered)
+- [ ] Implement `BehaviorAnalyzerNode` - use AI to detect meta-patterns in user behavior (Gemini)
+- [ ] Generate observations like "user frequently omits due dates", "user often forgets to log hours"
+- [ ] Implement `BehaviorPersistNode` - store observations to User Behaviour DB
 
 ### Task Presenter
 - [ ] Implement `PresenterNode` - generate summary, priorities, confirmations
@@ -104,8 +108,10 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 
 ## Day 5 – Process 3: Query System (MVP)
 
+**Note:** MVP uses email as the query interface. Future phases will add a dedicated Web UI.
+
 ### Query Router
-- [ ] Implement `QueryIntakeNode` - parse natural language query (Gemini)
+- [ ] Implement `QueryIntakeNode` - parse natural language query from email (Gemini)
 - [ ] Implement `BreakdownNode` - decompose complex queries (Gemini)
 - [ ] Implement `AccessControlNode` - determine allowed data scopes
 

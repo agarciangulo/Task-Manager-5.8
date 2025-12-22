@@ -23,19 +23,19 @@ The spike results will inform the decision to migrate, integrate, or evolve the 
 - Extract structured tasks from natural language
 - Request additional context when information is missing
 - Compare new tasks against existing database (add vs. update logic)
-- Track user behavior patterns (e.g., "often omits due dates")
+- **AI-powered Behavior Analyzer:** Detect meta-patterns in user behavior and generate observations (e.g., "user frequently omits due dates - consider prompting for details")
 - Send confirmation/summary emails back to user
 
 **Output:**
 - Tasks added/updated in Task DB
-- User behavior patterns logged to User Behaviour DB
+- **AI-generated behavior observations** logged to User Behaviour DB
 - Email response with daily summary, high priorities, and correction confirmations
 
 ---
 
 ### Process 2: Prioritization & Insights Generation
 
-**Trigger:** Scheduled (daily) or on-demand.
+**Trigger:** Scheduled daily job (e.g., Cloud Scheduler at 6:00 PM).
 
 **Capabilities:**
 - Read user's task backlog and generate prioritized list for next day
@@ -54,6 +54,12 @@ The spike results will inform the decision to migrate, integrate, or evolve the 
 ### Process 3: Query & Analytics System
 
 **Trigger:** User or Manager submits a natural language query.
+
+**Interface:**
+| Phase | Channel |
+|-------|---------|
+| **MVP** | Email (e.g., "What tasks do I have due this week?") |
+| **Future** | Web UI with chat-like experience |
 
 **Capabilities:**
 - Parse and decompose complex queries

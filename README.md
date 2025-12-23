@@ -60,9 +60,10 @@ The spike is a **clean-room implementation** of the core task management flow de
 | Document | Purpose | Read Time |
 |----------|---------|-----------|
 | 1️⃣ [docs/SPIKE_SCOPE.md](docs/SPIKE_SCOPE.md) | **Start here** - Objectives, success criteria, constraints | 5 min |
-| 2️⃣ [docs/SPIKE_ARCHITECTURE.md](docs/SPIKE_ARCHITECTURE.md) | Complete architecture blueprint with layers, components, data flows | 15 min |
-| 3️⃣ [docs/SPIKE_EXECUTION_PLAN.md](docs/SPIKE_EXECUTION_PLAN.md) | Day-by-day implementation roadmap | 5 min |
-| 4️⃣ [docs/SPIKE_ROADMAP.md](docs/SPIKE_ROADMAP.md) | Future phases from MVP to enterprise | 5 min |
+| 2️⃣ [docs/SPIKE_ARCHITECTURE.md](docs/SPIKE_ARCHITECTURE.md) | Complete architecture blueprint with three core processes | 15 min |
+| 3️⃣ [docs/SPIKE_TECH_STACK.md](docs/SPIKE_TECH_STACK.md) | Technology stack for the spike (LangGraph, PostgreSQL, etc.) | 10 min |
+| 4️⃣ [docs/SPIKE_EXECUTION_PLAN.md](docs/SPIKE_EXECUTION_PLAN.md) | Day-by-day implementation roadmap | 5 min |
+| 5️⃣ [docs/SPIKE_ROADMAP.md](docs/SPIKE_ROADMAP.md) | Future phases from MVP to enterprise | 5 min |
 
 ### Supporting Architecture Documents
 

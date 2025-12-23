@@ -9,7 +9,7 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 - [ ] Confirm spike objectives and three processes (`docs/SPIKE_SCOPE.md`)
 - [ ] Review architecture blueprint (`docs/SPIKE_ARCHITECTURE.md`)
 - [ ] Secure required accounts/quotas:
-  - Vertex AI project with Gemini API access
+  - Vertex AI project with Gemini 3.0 API access
   - Cloud SQL instance (PostgreSQL)
   - GitHub repository
 - [ ] Gather sample data:

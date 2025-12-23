@@ -42,7 +42,7 @@ This roadmap outlines the planned evolution of the spike prototype into a full-f
 ### Infrastructure
 - [ ] Four PostgreSQL databases (Task, User Behaviour, Best Practices, Insights)
 - [ ] LangGraph orchestration with state persistence
-- [ ] Vertex AI (Gemini) for all LLM calls
+- [ ] Vertex AI (Gemini 3.0) for all LLM calls
 - [ ] Basic observability (logs, latency metrics)
 - [ ] Single-tenant operation (no user segregation)
 

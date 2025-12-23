@@ -74,8 +74,25 @@ This document catalogs the technologies, libraries, and services required for th
 
 | Technology | Model | Purpose |
 |------------|-------|---------|
-| **Google Vertex AI** | Gemini 1.5 Flash | Primary LLM for all AI tasks |
+| **Google Vertex AI** | Gemini 3.0 | Primary LLM for all AI tasks |
 | **google-generativeai** | Latest SDK | Python client for Gemini API |
+
+### Why Gemini 3.0?
+
+| Feature | Benefit for Spike |
+|---------|-------------------|
+| **Enhanced reasoning** | Better task extraction and intent classification accuracy |
+| **1.5M token context** | Handle long email threads and full task history |
+| **Improved multimodal** | Future support for email attachments/images |
+| **Faster inference** | Lower latency for real-time email processing |
+
+### Model Selection
+
+| Use Case | Recommended Model |
+|----------|-------------------|
+| **Production (MVP)** | Gemini 3.0 Flash - Best balance of speed, cost, and quality |
+| **Complex reasoning** | Gemini 3.0 Pro - For difficult query decomposition or insight generation |
+| **Development/Testing** | Gemini 3.0 Flash - Lower cost during iteration |
 
 ### LLM Usage by Node
 
@@ -96,10 +113,12 @@ This document catalogs the technologies, libraries, and services required for th
 
 ### Cost Optimization Notes
 
-- Use **Gemini 1.5 Flash** for speed and cost (vs. Pro for complex reasoning)
+- Use **Gemini 3.0 Flash** for most nodes (speed + cost efficiency)
+- Consider **Gemini 3.0 Pro** for `BehaviorAnalyzerNode` and `InsightGeneratorNode` where deeper reasoning adds value
 - Batch similar operations where possible
 - Cache common classifications/transformations
 - Monitor token usage per process
+- Leverage the 1.5M context window to reduce redundant context-building calls
 
 ---
 
@@ -362,7 +381,7 @@ pre-commit>=3.6.0
 | **Orchestration** | Custom Python + Celery | LangGraph |
 | **Task Storage** | Notion API | PostgreSQL |
 | **State Management** | File-based (JSON) | LangGraph checkpoints (Postgres) |
-| **LLM Provider** | Gemini (direct) | Gemini via LangChain |
+| **LLM Provider** | Gemini 1.5 (direct) | Gemini 3.0 via LangChain |
 | **Scheduling** | Celery Beat | Cloud Scheduler |
 | **Email** | Custom processing | Same (IMAP/SMTP) |
 | **Architecture** | Single pipeline | Three distinct processes |

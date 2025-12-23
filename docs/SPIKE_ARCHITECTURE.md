@@ -428,7 +428,7 @@ This process is intentionally **scoped as a foundation** for the spike. Future e
 
 | Layer | Technology | Notes |
 |-------|------------|-------|
-| **AI/LLM** | Google Gemini (Vertex AI) | Task extraction, insight generation, query understanding |
+| **AI/LLM** | Google Gemini 3.0 (Vertex AI) | Task extraction, insight generation, query understanding |
 | **Orchestration** | LangGraph | Agent workflow management |
 | **API** | FastAPI or Next.js API Routes | HTTP endpoints |
 | **Database** | PostgreSQL (Cloud SQL) | All four databases |

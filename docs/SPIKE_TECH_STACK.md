@@ -204,7 +204,10 @@ CREATE TABLE recurring_patterns (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     title VARCHAR(500) NOT NULL,
-    expected_frequency VARCHAR(50),       -- "daily", "weekly", "MWF", etc.
+    expected_frequency VARCHAR(50),        -- "daily", "weekly:mon,wed,fri", "monthly"
+    detection_method VARCHAR(50),          -- "language", "pattern_analysis", "user_explicit"
+    status VARCHAR(20) DEFAULT 'assumed',  -- "assumed", "confirmed", "rejected"
+    announced_at TIMESTAMP,                -- When user was notified
     last_logged_at TIMESTAMP,
     streak_count INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW()

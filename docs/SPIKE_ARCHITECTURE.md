@@ -236,7 +236,46 @@ The spike will leverage the existing `src/core/task_similarity.py` which impleme
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### Recurring Patterns
+#### Recurring Patterns: Assume → Announce → Correct
+
+Since this is email communication (not a UI), we minimize back-and-forth by:
+1. **Assuming** patterns automatically based on detection
+2. **Announcing** assumptions in Task Presenter emails
+3. **Correcting** only if user replies with disagreement
+
+**Detection Flow:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  AUTOMATIC DETECTION (no user interaction required)             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │ 1. Language     │  │ 2. Pattern      │  │ 3. User         │ │
+│  │    Signals      │  │    Analysis     │  │    Explicit     │ │
+│  │                 │  │                 │  │                 │ │
+│  │ "daily",        │  │ 3+ similar      │  │ User says       │ │
+│  │ "weekly",       │  │ tasks on        │  │ "I do this      │ │
+│  │ "standup",      │  │ different days  │  │ every day"      │ │
+│  │ "sync"          │  │                 │  │                 │ │
+│  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘ │
+│           │                    │                    │           │
+│           └────────────────────┴────────────────────┘           │
+│                                │                                │
+│                                ▼                                │
+│                   AUTO-CREATE PATTERN                           │
+│                   (status: "assumed")                           │
+│                                │                                │
+│                                ▼                                │
+│              ANNOUNCE IN TASK PRESENTER EMAIL                   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Detection Priority:**
+| Priority | Method | Example | Confidence |
+|----------|--------|---------|------------|
+| 1 | User explicit | "I do this every day" | Highest |
+| 2 | Language signals | "Weekly report", "daily standup" | High |
+| 3 | Pattern analysis | 3+ similar on different days | Medium |
 
 **New Table: `recurring_patterns`**
 | Field | Type | Description |
@@ -244,18 +283,47 @@ The spike will leverage the existing `src/core/task_similarity.py` which impleme
 | `id` | UUID | Primary key |
 | `user_id` | UUID | Owner |
 | `title` | String | Activity name (e.g., "Daily standup with Acme") |
-| `expected_frequency` | String | "daily", "weekly", "MWF", etc. |
+| `expected_frequency` | String | "daily", "weekly:mon,wed,fri", "monthly" |
+| `detection_method` | String | "language", "pattern_analysis", "user_explicit" |
+| `status` | String | "assumed", "confirmed", "rejected" |
+| `announced_at` | DateTime | When user was notified |
 | `last_logged_at` | DateTime | Most recent occurrence |
 | `streak_count` | Integer | Consecutive occurrences logged |
 | `created_at` | DateTime | When pattern was detected |
 
-**Detection Logic:**
-- After 3 similar activities logged on different days → auto-create recurring pattern
-- User can also explicitly mark an activity as recurring
+**Status Values:**
+- `assumed` - System detected and announced, user hasn't responded
+- `confirmed` - User explicitly confirmed or corrected frequency
+- `rejected` - User said "not recurring", won't track anymore
+
+**Announcement in Task Presenter:**
+```
+🔄 NEW RECURRING PATTERNS DETECTED:
+• "Daily standup with Acme" → marked as DAILY
+  (logged 4 times this week on different days)
+• "Weekly report to leadership" → marked as WEEKLY
+  (detected from language)
+
+↩️ Reply to correct: "Daily standup is not recurring"
+   or "Weekly report is actually monthly"
+```
+
+**Correction Handling (via Process 1):**
+| User Says | Action |
+|-----------|--------|
+| "X is not recurring" | Set status='rejected', delete pattern |
+| "X is weekly, not daily" | Update frequency, set status='confirmed' |
+| "Stop tracking X" | Set status='rejected' |
 
 **Missing Activity Check (for Process 2):**
-- Compare `last_logged_at` against `expected_frequency`
-- Include in daily email: "⚠️ 'Daily standup with Acme' not logged today"
+```
+⚠️ RECURRING ACTIVITIES NOT LOGGED TODAY:
+• "Daily standup with Acme" - usually logged by now
+  Reply "Done" if completed, or "Skip today" to note the miss
+
+🔥 STREAK UPDATE:
+• "Weekly report" - 8 week streak! Keep it up!
+```
 
 #### Task Presenter
 | Responsibility | Description |

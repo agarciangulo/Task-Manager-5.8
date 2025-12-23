@@ -89,9 +89,54 @@ This process handles all incoming emails from users, extracts tasks, compares wi
 | Responsibility | Description |
 |----------------|-------------|
 | **Classify Intent** | Determine if email contains new activities, corrections, or context replies |
+| **Extract Tasks** | Identify individual tasks from free-form text or lists |
+| **Transform to JSON** | Use AI to convert extracted tasks into uniform JSON schema (see below) |
 | **Check Completeness** | Verify tasks have required info (due date, priority, etc.) |
 | **Request Context** | Send email back to user if information is missing |
 | **Trigger Behavior Analysis** | Pass interaction data to Behavior Analyzer for pattern detection |
+
+**Task JSON Schema:**
+```json
+{
+  "task_id": "uuid",
+  "title": "string (required)",
+  "description": "string (optional)",
+  "due_date": "ISO 8601 date (optional)",
+  "priority": "high | medium | low (default: medium)",
+  "status": "pending | in_progress | completed",
+  "category": "string (optional)",
+  "estimated_hours": "number (optional)",
+  "source_email_id": "string",
+  "extracted_at": "ISO 8601 timestamp",
+  "raw_text": "original text from email"
+}
+```
+
+**Example Transformation:**
+
+*User writes:*
+> "Tomorrow I need to finish the quarterly report (urgent!) and also send follow-up emails to the 3 clients from last week's meeting"
+
+*AI transforms to:*
+```json
+[
+  {
+    "title": "Finish quarterly report",
+    "due_date": "2025-12-24",
+    "priority": "high",
+    "status": "pending",
+    "raw_text": "finish the quarterly report (urgent!)"
+  },
+  {
+    "title": "Send follow-up emails to clients",
+    "description": "3 clients from last week's meeting",
+    "due_date": "2025-12-24",
+    "priority": "medium",
+    "status": "pending",
+    "raw_text": "send follow-up emails to the 3 clients from last week's meeting"
+  }
+]
+```
 
 #### Behavior Analyzer (AI-Powered)
 | Responsibility | Description |
@@ -405,13 +450,16 @@ Each process is implemented as a LangGraph workflow with specialized nodes:
 |------|-------|--------|-----------|
 | `EmailIntakeNode` | Raw email | Normalized email object | No |
 | `IntentClassifierNode` | Normalized email | Intent (activity/correction/context) | Yes |
-| `TaskExtractorNode` | Email + Intent | Extracted tasks | Yes |
-| `ContextCheckerNode` | Extracted tasks | Tasks or clarification questions | Yes |
+| `TaskExtractorNode` | Email + Intent | Extracted tasks (free-form) | Yes |
+| `TaskTransformerNode` | Extracted tasks | Structured JSON tasks | **Yes** |
+| `ContextCheckerNode` | JSON tasks | Tasks or clarification questions | Yes |
 | `BehaviorAnalyzerNode` | User interaction history | Meta-behavior observations | **Yes** |
 | `BehaviorPersistNode` | Observations | Stored to User Behaviour DB | No |
-| `TaskComparisonNode` | New tasks + DB tasks | Diff (add/update list) | No |
+| `TaskComparisonNode` | JSON tasks + DB tasks | Diff (add/update list) | No |
 | `TaskPersistNode` | Diff | Updated Task DB | No |
 | `PresenterNode` | Task DB state | Email response | Yes |
+
+> **Note:** `TaskExtractorNode` and `TaskTransformerNode` can be combined into a single LLM call for efficiency, but are logically separate steps.
 
 #### Process 2 Nodes
 | Node | Input | Output | LLM Call? |

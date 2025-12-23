@@ -20,7 +20,8 @@ The spike results will inform the decision to migrate, integrate, or evolve the 
 
 **Capabilities:**
 - Classify email intent (new activities vs. corrections vs. context)
-- Extract structured tasks from natural language
+- Extract tasks from free-form text or lists
+- **Transform to structured JSON:** Use AI to convert extracted tasks into uniform schema (title, due_date, priority, status, etc.)
 - Request additional context when information is missing
 - Compare new tasks against existing database (add vs. update logic)
 - **AI-powered Behavior Analyzer:** Detect meta-patterns in user behavior and generate observations (e.g., "user frequently omits due dates - consider prompting for details")

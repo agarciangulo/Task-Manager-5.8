@@ -54,7 +54,9 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 ### Task Extractor
 - [ ] Implement `EmailIntakeNode` - parse raw email into structured format
 - [ ] Implement `IntentClassifierNode` - classify as activity/correction/context (Gemini)
-- [ ] Implement `TaskExtractorNode` - extract tasks from email content (Gemini)
+- [ ] Implement `TaskExtractorNode` - extract tasks from free-form text/lists (Gemini)
+- [ ] Implement `TaskTransformerNode` - convert extracted tasks to uniform JSON schema (Gemini)
+- [ ] Define Task JSON schema (title, due_date, priority, status, category, etc.)
 - [ ] Implement `ContextCheckerNode` - detect missing info, generate questions (Gemini)
 
 ### Basic Pipeline

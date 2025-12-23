@@ -179,6 +179,54 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 
 ---
 
+---
+
+## Testing Strategy
+
+### Test Types
+
+| Type | Scope | When |
+|------|-------|------|
+| **Unit Tests** | Individual nodes (e.g., `TaskExtractorNode`) | During development |
+| **Integration Tests** | Full process flow (e.g., email → Task DB) | After each process complete |
+| **End-to-End Tests** | Complete scenarios (email in → response out) | Day 6-7 |
+
+### Sample Test Data
+
+Prepare sample emails for each scenario:
+
+| Scenario | Test Email |
+|----------|------------|
+| New activities | "Today I completed the quarterly report and sent 3 client emails" |
+| Correction | "Actually the report is due Thursday, not Wednesday" |
+| Context reply | "The meeting is with Acme Corp about the Q4 proposal" |
+| Recurring activity | "Had my daily standup with the engineering team" |
+| Query (own data) | "What tasks do I have due this week?" |
+| Query (team data) | "How is my team's completion rate?" |
+
+### Test Cases by Process
+
+**Process 1:**
+- [ ] New task extraction → creates task in DB
+- [ ] Correction → updates existing task
+- [ ] Recurring activity → logs new occurrence
+- [ ] Missing context → sends clarification email
+- [ ] Unknown sender → rejects with registration prompt
+
+**Process 2:**
+- [ ] Generates prioritized list for user with tasks
+- [ ] Empty task list → sends appropriate message
+- [ ] Missing recurring activity → includes in email
+- [ ] Insights compare to best practices
+
+**Process 3:**
+- [ ] User query for own data → full details
+- [ ] User query for team data → summarized
+- [ ] Manager query for team member → full details
+- [ ] Malformed query → graceful error response
+
+---
+
 ## Deliverables Checklist
 
 ### Code
@@ -187,6 +235,7 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 - [ ] Process 3: Query System - MVP complete
 - [ ] All four databases - implemented and seeded
 - [ ] Email integration - working
+- [ ] Tests passing for all processes
 
 ### Documentation
 - [ ] `docs/SPIKE_SCOPE.md` - updated with final scope

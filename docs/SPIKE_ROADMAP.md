@@ -55,10 +55,12 @@ This roadmap outlines the planned evolution of the spike prototype into a full-f
 **Objective:** Introduce user management and secure access across all processes.
 
 ### Authentication & Authorization
-- [ ] Add `users` table with roles (User, Manager, Admin)
-- [ ] Implement JWT or OAuth authentication layer
+- [ ] Upgrade from simple `users` table lookup to full JWT authentication
+- [ ] Implement OAuth integration (Google Workspace, Microsoft 365)
+- [ ] Add roles (User, Manager, Admin) with permission enforcement
 - [ ] Scope all data by `user_id` / `tenant_id`
 - [ ] API key intake for programmatic access
+- [ ] Session management and token refresh
 
 ### Process 1 Enhancements
 - [ ] Per-user Behavior profiles

@@ -34,6 +34,40 @@ The AI Task Management Agent consists of **three core processes** that work toge
 
 ---
 
+## 1.5 Email Router (Pre-Process)
+
+Before routing to Process 1 or Process 3, incoming emails pass through the Email Router:
+
+```
+┌─────────────┐      ┌─────────────────┐      ┌─────────────────┐
+│   EMAIL     │      │  Email Router   │      │  Process 1 or 3 │
+│   INBOX     │ ──▶  │                 │ ──▶  │                 │
+│             │      │ 1. Validate     │      │                 │
+└─────────────┘      │ 2. Deduplicate  │      └─────────────────┘
+                     │ 3. Classify     │
+                     └─────────────────┘
+```
+
+### Router Responsibilities
+
+| Step | Action | Details |
+|------|--------|---------|
+| **1. Validate Sender** | Check `users` table | Reject unknown senders with "please register" reply |
+| **2. Deduplicate** | Check Gmail Message-ID | Skip if already processed |
+| **3. Classify Intent** | AI classification | Task/Activity → Process 1, Query → Process 3 |
+| **4. Truncate** | Limit email size | Truncate >10K characters with warning |
+
+### Intent Classification Examples
+
+| Email Content | Classification | Route To |
+|---------------|----------------|----------|
+| "I completed the report today" | Task/Activity | Process 1 |
+| "Actually the due date is Thursday" | Correction | Process 1 |
+| "What tasks do I have due tomorrow?" | Query | Process 3 |
+| "The report is done, what's next?" | Task + Query | Process 1 (primary), note query for follow-up |
+
+---
+
 ## 2. Process 1: Task Intake & Processing Pipeline
 
 ### 2.1 Overview
@@ -156,9 +190,72 @@ This process handles all incoming emails from users, extracts tasks, compares wi
 | Responsibility | Description |
 |----------------|-------------|
 | **Read Existing Tasks** | Fetch current tasks from Task DB for comparison |
-| **Compare & Decide** | Determine which tasks are NEW (add) vs existing (update) |
+| **Hybrid Comparison** | Use embeddings + AI to find similar tasks (existing implementation) |
+| **Classify Match Type** | Distinguish between: correction, recurring occurrence, or new task |
 | **Apply Corrections** | Process correction requests from user |
+| **Log Recurring** | Create new occurrence linked to recurring pattern |
 | **Update Database** | Write final state to Task DB |
+
+**Hybrid Comparison Logic (Existing):**
+The spike will leverage the existing `src/core/task_similarity.py` which implements:
+1. Chroma embeddings for fast top-k candidate retrieval
+2. AI (Gemini) for semantic analysis of candidates
+3. Returns confidence score and matched task
+
+**Match Classification:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    MATCH CLASSIFICATION                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Similar task found?                                            │
+│         │                                                        │
+│    ┌────┴────┐                                                  │
+│    │         │                                                  │
+│   NO        YES                                                 │
+│    │         │                                                  │
+│    ▼         ▼                                                  │
+│  CREATE    Is it a recurring pattern?                           │
+│   NEW      (logged 3+ times before)                             │
+│  TASK            │                                              │
+│           ┌──────┴──────┐                                       │
+│           │             │                                       │
+│          NO            YES                                      │
+│           │             │                                       │
+│           ▼             ▼                                       │
+│      Same day?    LOG NEW OCCURRENCE                            │
+│           │       (link to pattern,                             │
+│      ┌────┴────┐   update streak)                               │
+│      │         │                                                │
+│     YES       NO                                                │
+│      │         │                                                │
+│      ▼         ▼                                                │
+│  CORRECTION  CREATE NEW                                         │
+│  (update)    (different day)                                    │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Recurring Patterns
+
+**New Table: `recurring_patterns`**
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | Owner |
+| `title` | String | Activity name (e.g., "Daily standup with Acme") |
+| `expected_frequency` | String | "daily", "weekly", "MWF", etc. |
+| `last_logged_at` | DateTime | Most recent occurrence |
+| `streak_count` | Integer | Consecutive occurrences logged |
+| `created_at` | DateTime | When pattern was detected |
+
+**Detection Logic:**
+- After 3 similar activities logged on different days → auto-create recurring pattern
+- User can also explicitly mark an activity as recurring
+
+**Missing Activity Check (for Process 2):**
+- Compare `last_logged_at` against `expected_frequency`
+- Include in daily email: "⚠️ 'Daily standup with Acme' not logged today"
 
 #### Task Presenter
 | Responsibility | Description |
@@ -564,7 +661,63 @@ Each process is implemented as a LangGraph workflow with specialized nodes:
 
 ---
 
-## 12. Summary
+## 12. MVP Operational Considerations
+
+### 12.1 User Authentication (Simple)
+
+For MVP, use a simple `users` table lookup:
+
+```sql
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255),
+    role VARCHAR(50) DEFAULT 'user',  -- 'user' or 'manager'
+    timezone VARCHAR(50) DEFAULT 'UTC',
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**Authentication Flow:**
+1. Email arrives → extract sender address
+2. Lookup in `users` table
+3. If found → proceed with user_id
+4. If not found → reply with "Please register" or auto-create (configurable)
+
+> **Note:** Full JWT/OAuth authentication is deferred to Phase 1 (see SPIKE_ROADMAP.md)
+
+### 12.2 Error Handling
+
+| Failure | Handling | User Impact |
+|---------|----------|-------------|
+| **Gemini API down** | Retry 3x with exponential backoff, then queue for later | Delayed response |
+| **Gemini returns malformed JSON** | Fallback prompt or flag for manual review | Generic acknowledgment |
+| **Task DB unavailable** | Queue email, alert operator, retry on recovery | Delayed processing |
+| **Email send fails** | Retry 3x, log failure, alert operator | User doesn't receive response |
+| **Unknown error** | Log full state, send generic "processing delayed" response | Graceful degradation |
+
+### 12.3 Cost Controls
+
+| Control | Implementation |
+|---------|----------------|
+| **Daily budget alert** | Alert if LLM costs exceed $X/day |
+| **Rate limiting** | 50 emails/user/day for MVP |
+| **Email truncation** | Truncate emails >10K characters |
+| **Token monitoring** | Log token usage per process for analysis |
+
+### 12.4 Assumptions & Constraints
+
+| Assumption | Notes |
+|------------|-------|
+| **Single timezone** | All times in UTC or configured timezone; per-user timezones deferred to Phase 1 |
+| **English-only** | Gemini handles other languages, but not formally tested |
+| **Email attachments** | Ignored for MVP; logged for future processing |
+| **Process 3 read-only** | Queries are read-only; mutations (corrections, updates) go through Process 1 |
+| **Empty state handling** | P2 with 0 tasks sends "No tasks to prioritize - time to add some!" |
+
+---
+
+## 13. Summary
 
 This architecture defines three interconnected processes:
 

@@ -197,6 +197,33 @@ CREATE TABLE insights (
 );
 ```
 
+### Recurring Patterns Schema
+
+```sql
+CREATE TABLE recurring_patterns (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    expected_frequency VARCHAR(50),       -- "daily", "weekly", "MWF", etc.
+    last_logged_at TIMESTAMP,
+    streak_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### Users Table (Simple Auth for MVP)
+
+```sql
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255),
+    role VARCHAR(50) DEFAULT 'user',      -- 'user' or 'manager'
+    timezone VARCHAR(50) DEFAULT 'UTC',
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
 ### Database Access
 
 | Technology | Purpose |

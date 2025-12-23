@@ -683,7 +683,380 @@ Each process is implemented as a LangGraph workflow with specialized nodes:
 
 ---
 
-## 8. Integration Points & Future Extensions
+## 8. Prompt Specifications
+
+This section defines the prompt structure for each LLM-calling node. These are the "contracts" that the Gemini model must fulfill.
+
+### 8.1 UnifiedExtractionNode (Process 1)
+
+**Purpose:** Single call to classify intent, extract tasks, transform to JSON, detect missing context, and identify entities.
+
+**Temperature:** 0.3 (conservative for structured output)
+
+**Input:**
+```
+Email from: {sender_email}
+Subject: {subject}
+Body:
+{email_body}
+```
+
+**Prompt Structure:**
+```
+You are an AI task management assistant. Analyze this email and extract all relevant information.
+
+EMAIL:
+From: {sender_email}
+Subject: {subject}
+Body: {email_body}
+
+INSTRUCTIONS:
+1. Classify the PRIMARY intent of this email
+2. Extract all tasks mentioned (activities, completions, todos)
+3. Convert each task to structured JSON
+4. Identify any missing information that needs clarification
+5. Detect entities (dates, people, projects)
+6. Check for recurring activity signals ("daily", "weekly", "standup", etc.)
+
+RETURN THIS EXACT JSON STRUCTURE:
+{
+  "intent": "activity" | "correction" | "context_reply" | "query",
+  "tasks": [
+    {
+      "title": "string (required)",
+      "description": "string or null",
+      "due_date": "YYYY-MM-DD or null",
+      "priority": "high" | "medium" | "low",
+      "status": "pending" | "in_progress" | "completed",
+      "category": "string or null",
+      "raw_text": "original text from email"
+    }
+  ],
+  "corrections": [
+    {
+      "original_task_hint": "what task to correct",
+      "field_to_update": "due_date" | "priority" | "status" | "title",
+      "new_value": "the corrected value"
+    }
+  ],
+  "missing_context": [
+    "Question to ask user if info is missing"
+  ],
+  "detected_entities": {
+    "dates": ["list of dates mentioned"],
+    "people": ["list of people mentioned"],
+    "projects": ["list of projects mentioned"]
+  },
+  "is_recurring_signal": true | false,
+  "recurring_frequency_hint": "daily" | "weekly" | "monthly" | null
+}
+
+RULES:
+- If intent is "query", tasks array should be empty
+- Always preserve the raw_text for each task
+- Infer priority from language: "urgent", "ASAP", "!!!" = high
+- Infer dates: "tomorrow" = next day, "next week" = 7 days, etc.
+- If unsure about a field, use null
+```
+
+**Example Input:**
+```
+From: john@company.com
+Subject: Today's update
+Body: Today I finished the quarterly report (finally!) and had my daily standup 
+with the Acme team. Tomorrow I need to send 5 follow-up emails to clients - 
+this is urgent! Also, I said the budget review was due Wednesday but it's 
+actually Thursday.
+```
+
+**Example Output:**
+```json
+{
+  "intent": "activity",
+  "tasks": [
+    {
+      "title": "Finished quarterly report",
+      "description": null,
+      "due_date": null,
+      "priority": "medium",
+      "status": "completed",
+      "category": null,
+      "raw_text": "finished the quarterly report (finally!)"
+    },
+    {
+      "title": "Daily standup with Acme team",
+      "description": null,
+      "due_date": "2025-12-23",
+      "priority": "medium",
+      "status": "completed",
+      "category": "Acme",
+      "raw_text": "had my daily standup with the Acme team"
+    },
+    {
+      "title": "Send follow-up emails to clients",
+      "description": "5 clients",
+      "due_date": "2025-12-24",
+      "priority": "high",
+      "status": "pending",
+      "category": null,
+      "raw_text": "send 5 follow-up emails to clients - this is urgent!"
+    }
+  ],
+  "corrections": [
+    {
+      "original_task_hint": "budget review",
+      "field_to_update": "due_date",
+      "new_value": "Thursday"
+    }
+  ],
+  "missing_context": [],
+  "detected_entities": {
+    "dates": ["today", "tomorrow", "Wednesday", "Thursday"],
+    "people": [],
+    "projects": ["Acme"]
+  },
+  "is_recurring_signal": true,
+  "recurring_frequency_hint": "daily"
+}
+```
+
+---
+
+### 8.2 BehaviorAnalyzerNode (Process 1)
+
+**Purpose:** Analyze user interaction patterns and generate meta-observations.
+
+**Temperature:** 0.5 (moderate creativity for insights)
+
+**Input:**
+```
+User: {user_email}
+Recent interactions: {last_N_interactions}
+Current extraction: {current_extraction_result}
+Existing patterns: {existing_patterns_from_db}
+```
+
+**Prompt Structure:**
+```
+You are analyzing user behavior patterns for a task management system.
+
+USER: {user_email}
+RECENT INTERACTIONS (last 20):
+{interactions_summary}
+
+CURRENT EXTRACTION:
+{current_extraction}
+
+EXISTING PATTERNS WE'VE DETECTED:
+{existing_patterns}
+
+ANALYZE and identify NEW or REINFORCED patterns. Consider:
+- Do they frequently omit due dates?
+- Do they often need context clarification?
+- Do they correct tasks shortly after submitting?
+- Are they consistent with recurring activities?
+- Do they use vague language often?
+
+RETURN JSON:
+{
+  "new_patterns": [
+    {
+      "pattern_type": "missing_due_dates" | "needs_context" | "frequent_corrections" | etc,
+      "observation": "Human-readable observation",
+      "confidence": 0.0-1.0,
+      "evidence": "What led to this conclusion"
+    }
+  ],
+  "reinforced_patterns": [
+    {
+      "pattern_id": "existing pattern ID",
+      "additional_evidence": "new supporting evidence"
+    }
+  ]
+}
+```
+
+---
+
+### 8.3 PrioritizerNode (Process 2)
+
+**Purpose:** Generate prioritized task list for the next day.
+
+**Temperature:** 0.3 (structured output)
+
+**Prompt Structure:**
+```
+You are a productivity coach helping prioritize tasks for tomorrow.
+
+USER'S OPEN TASKS:
+{tasks_json}
+
+TODAY'S DATE: {today}
+USER'S PATTERNS: {relevant_behavior_patterns}
+
+Generate a prioritized list for tomorrow. Consider:
+1. Due dates (overdue first, then tomorrow, then this week)
+2. Priority flags (high > medium > low)
+3. User's patterns (if they often miss deadlines, emphasize those)
+4. Realistic daily capacity (5-7 focus tasks)
+
+RETURN JSON:
+{
+  "priority_tasks": [
+    {
+      "task_id": "uuid",
+      "title": "task title",
+      "reason": "Why this is prioritized",
+      "suggested_time": "morning" | "afternoon" | "anytime"
+    }
+  ],
+  "deferred_tasks": [
+    {
+      "task_id": "uuid",
+      "reason": "Why this can wait"
+    }
+  ],
+  "warnings": [
+    "Any urgent warnings (overdue, capacity exceeded, etc.)"
+  ]
+}
+```
+
+---
+
+### 8.4 InsightGeneratorNode (Process 2)
+
+**Purpose:** Generate personalized productivity insights.
+
+**Temperature:** 0.6 (creative but grounded)
+
+**Prompt Structure:**
+```
+You are a supportive productivity coach generating insights.
+
+USER'S TASK DATA:
+{task_summary}
+
+BEST PRACTICES TO COMPARE AGAINST:
+{best_practices}
+
+USER'S BEHAVIOR PATTERNS:
+{behavior_patterns}
+
+MISSED RECURRING ACTIVITIES:
+{missed_recurring}
+
+Generate 2-4 actionable insights. Be:
+- Supportive, not critical
+- Specific, not generic
+- Actionable, not just observational
+
+RETURN JSON:
+{
+  "insights": [
+    {
+      "type": "celebration" | "improvement" | "reminder" | "warning",
+      "message": "The insight message",
+      "action": "Specific action they can take",
+      "related_practice_id": "uuid or null"
+    }
+  ]
+}
+```
+
+---
+
+### 8.5 QueryParserNode (Process 3)
+
+**Purpose:** Parse natural language query and decompose into sub-queries.
+
+**Temperature:** 0.3 (structured)
+
+**Prompt Structure:**
+```
+You are parsing a user's query about their task data.
+
+USER: {user_email}
+USER ROLE: {role: user | manager}
+QUERY: "{query_text}"
+
+Parse this query and decompose if needed.
+
+RETURN JSON:
+{
+  "query_type": "personal" | "team" | "comparison" | "aggregate",
+  "time_range": {
+    "start": "YYYY-MM-DD or null",
+    "end": "YYYY-MM-DD or null",
+    "relative": "today" | "this_week" | "this_month" | null
+  },
+  "sub_queries": [
+    {
+      "target_db": "tasks" | "insights" | "behaviors" | "best_practices",
+      "filter": "description of what to fetch",
+      "aggregation": "count" | "list" | "average" | null
+    }
+  ],
+  "requires_summarization": true | false,
+  "original_intent": "What the user wants to know"
+}
+```
+
+---
+
+### 8.6 ResponseGeneratorNode (Process 3)
+
+**Purpose:** Synthesize data into natural language response with privacy rules.
+
+**Temperature:** 0.5 (conversational)
+
+**Prompt Structure:**
+```
+Generate a response to the user's query.
+
+ORIGINAL QUERY: "{query}"
+USER ROLE: {role}
+DATA RESULTS:
+{raw_results}
+
+PRIVACY RULES:
+- If data is about OTHER users and role is "user", summarize only
+- Never expose individual names when summarizing team/firm data
+- Use percentages and aggregates for protected data
+
+Generate a helpful, conversational response.
+
+RETURN JSON:
+{
+  "response": "The natural language response",
+  "data_displayed": "personal" | "summarized" | "aggregate",
+  "follow_up_suggestion": "Optional follow-up question" 
+}
+```
+
+---
+
+### 8.7 Temperature Guidelines
+
+| Temperature | Use Case | Nodes |
+|-------------|----------|-------|
+| **0.3** | Structured extraction, parsing | UnifiedExtraction, QueryParser |
+| **0.5** | Balanced creativity/structure | BehaviorAnalyzer, ResponseGenerator |
+| **0.6** | Creative insights | InsightGenerator |
+
+---
+
+### 8.8 Prompt Engineering Best Practices
+
+1. **Always request JSON** - Structured output is easier to parse
+2. **Provide examples** - Few-shot prompts improve accuracy
+3. **Set boundaries** - Clear rules prevent hallucination
+4. **Include context** - User patterns, date, role
+5. **Handle edge cases** - What to return if no tasks, no matches, etc.
+
+---
+
+## 9. Integration Points & Future Extensions
 
 | Integration | Description | Priority |
 |-------------|-------------|----------|
@@ -696,26 +1069,26 @@ Each process is implemented as a LangGraph workflow with specialized nodes:
 
 ---
 
-## 9. Observability & Resilience
+## 10. Observability & Resilience
 
-### 9.1 Logging Strategy
+### 10.1 Logging Strategy
 - Every LangGraph node logs entry/exit with run ID
 - LLM calls log prompt hash, latency, token count
 - Email operations log message IDs for traceability
 
-### 9.2 Error Handling
+### 10.2 Error Handling
 - Failed extractions trigger context requests (not silent failures)
 - Database errors trigger retries with exponential backoff
 - Unrecoverable errors logged with full state for replay
 
-### 9.3 Metrics
+### 10.3 Metrics
 - Task extraction accuracy (manual review sampling)
 - End-to-end latency per process
 - User engagement with insights (future)
 
 ---
 
-## 10. Deployment Architecture
+## 11. Deployment Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -750,7 +1123,7 @@ Each process is implemented as a LangGraph workflow with specialized nodes:
 
 ---
 
-## 11. Next Implementation Steps
+## 12. Next Implementation Steps
 
 1. **Set up repository** with process-based folder structure
 2. **Implement Process 1** (Task Intake) as MVP core
@@ -763,9 +1136,9 @@ Each process is implemented as a LangGraph workflow with specialized nodes:
 
 ---
 
-## 12. MVP Operational Considerations
+## 13. MVP Operational Considerations
 
-### 12.1 User Authentication (Simple)
+### 13.1 User Authentication (Simple)
 
 For MVP, use a simple `users` table lookup:
 
@@ -788,7 +1161,7 @@ CREATE TABLE users (
 
 > **Note:** Full JWT/OAuth authentication is deferred to Phase 1 (see SPIKE_ROADMAP.md)
 
-### 12.2 Error Handling
+### 13.2 Error Handling
 
 | Failure | Handling | User Impact |
 |---------|----------|-------------|
@@ -798,7 +1171,7 @@ CREATE TABLE users (
 | **Email send fails** | Retry 3x, log failure, alert operator | User doesn't receive response |
 | **Unknown error** | Log full state, send generic "processing delayed" response | Graceful degradation |
 
-### 12.3 Cost Controls
+### 13.3 Cost Controls
 
 | Control | Implementation |
 |---------|----------------|
@@ -807,7 +1180,7 @@ CREATE TABLE users (
 | **Email truncation** | Truncate emails >10K characters |
 | **Token monitoring** | Log token usage per process for analysis |
 
-### 12.4 Assumptions & Constraints
+### 13.4 Assumptions & Constraints
 
 | Assumption | Notes |
 |------------|-------|
@@ -819,7 +1192,7 @@ CREATE TABLE users (
 
 ---
 
-## 13. Summary
+## 14. Summary
 
 This architecture defines three interconnected processes:
 

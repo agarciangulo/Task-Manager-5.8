@@ -80,9 +80,25 @@ This roadmap outlines the planned evolution of the spike prototype into a full-f
 
 ---
 
-## Phase 2 – Multi-Channel & Automation
+## Phase 2 – Multi-Channel & Automation + AI Optimization
 
-**Objective:** Move beyond email to production-grade intake/output channels.
+**Objective:** Move beyond email to production-grade intake/output channels, and optimize AI usage.
+
+### Fast Layer (Pre-LLM Processing)
+- [ ] Implement embedding-based intent classification (use ChromaDB)
+- [ ] Add regex-based entity extraction (dates, times, numbers)
+- [ ] Create rules engine for simple pattern matching
+- [ ] Route simple cases to Fast Layer, complex to Gemini
+- [ ] Expected result: 50% of emails skip LLM entirely
+
+### Intent Classification Cache
+- [ ] Cache intent decisions by email embedding similarity
+- [ ] If new email is 95%+ similar to cached → reuse intent
+- [ ] Reduces repeat LLM calls for similar emails
+
+### Query Pattern Cache (Process 3)
+- [ ] Cache common query patterns ("What's due tomorrow?")
+- [ ] Template-based responses for frequent queries
 
 ### Multi-Channel Intake (Process 1)
 - [ ] Gmail webhook or Cloud Function (real-time)
@@ -166,6 +182,51 @@ This roadmap outlines the planned evolution of the spike prototype into a full-f
 - [ ] Automated coaching suggestions
 
 **Dependencies:** Enterprise rollout stable; metrics demonstrating value.
+
+---
+
+## Phase 5 – Non-LLM AI & Advanced ML
+
+**Objective:** Reduce LLM dependency with specialized AI models for speed and cost.
+
+### Small Specialized Models
+- [ ] Fine-tuned intent classifier (replace embedding fallback)
+- [ ] NER model for entity extraction (dates, people, projects)
+- [ ] Sentiment analysis model for user tone detection
+- [ ] Priority scoring model based on historical patterns
+
+### Time Series & Predictions
+- [ ] Predict task completion likelihood
+- [ ] Anomaly detection (user disengagement)
+- [ ] Smart scheduling recommendations
+- [ ] Workload forecasting
+
+### Advanced Embeddings
+- [ ] Task clustering for automatic project grouping
+- [ ] User behavior clustering for cohort analysis
+- [ ] Semantic search across all databases
+
+### Recommendation Systems
+- [ ] "Next task" recommendations based on context
+- [ ] Collaborative filtering for best practices
+- [ ] Personalized insight ranking
+
+**Dependencies:** Phase 4 analytics providing training data; ML infrastructure in place.
+
+---
+
+## AI Strategy Summary
+
+| Phase | AI Focus | Primary Tech |
+|-------|----------|--------------|
+| **MVP (Phase 0)** | Consolidated LLM calls, existing ChromaDB | Gemini 3.0 |
+| **Phase 1** | Per-user AI profiles | Gemini 3.0 |
+| **Phase 2** | Fast Layer + caching | Embeddings + Gemini fallback |
+| **Phase 3** | Cost optimization, monitoring | LLM cost tracking |
+| **Phase 4** | Proactive AI coaching | Gemini 3.0 + analytics |
+| **Phase 5** | Specialized ML models | Small models + Gemini |
+
+**Guiding Principle:** Use Gemini (enterprise LLM) as the primary AI, but layer in faster/cheaper alternatives for well-defined tasks as the system matures.
 
 ---
 

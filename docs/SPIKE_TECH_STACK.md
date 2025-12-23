@@ -60,13 +60,16 @@ This document catalogs the technologies, libraries, and services required for th
 - **Checkpointing:** Saves state to PostgreSQL for durability
 - **Observability:** Built-in tracing and debugging
 
-### LangGraph Nodes by Process
+### LangGraph Nodes by Process (Optimized)
 
-| Process | Nodes |
-|---------|-------|
-| **Process 1** | `EmailIntakeNode`, `IntentClassifierNode`, `TaskExtractorNode`, `TaskTransformerNode`, `ContextCheckerNode`, `BehaviorAnalyzerNode`, `BehaviorPersistNode`, `TaskComparisonNode`, `TaskPersistNode`, `PresenterNode` |
-| **Process 2** | `TaskFetchNode`, `PrioritizerNode`, `BestPracticesFetchNode`, `InsightGeneratorNode`, `InsightPersistNode`, `EmailComposerNode` |
-| **Process 3** | `QueryIntakeNode`, `BreakdownNode`, `AccessControlNode`, `CoordinatorNode`, `DataFetchNode`, `SummarizerNode`, `SynthesizerNode` |
+| Process | Nodes | LLM Calls |
+|---------|-------|-----------|
+| **Process 1** | `EmailIntakeNode`, `UnifiedExtractionNode`, `BehaviorAnalyzerNode`, `BehaviorPersistNode`, `TaskComparisonNode`, `TaskPersistNode`, `PresenterNode` | 2 |
+| **Process 2** | `TaskFetchNode`, `PrioritizerNode`, `BestPracticesFetchNode`, `InsightGeneratorNode`, `InsightPersistNode`, `EmailComposerNode` | 2 |
+| **Process 3** | `QueryParserNode`, `AccessControlNode`, `CoordinatorNode`, `DataFetchNode`, `ResponseGeneratorNode` | 2 |
+
+**Total Nodes:** 18 (down from 23)
+**Total LLM Calls per full cycle:** 6 (down from 11)
 
 ---
 
@@ -94,22 +97,26 @@ This document catalogs the technologies, libraries, and services required for th
 | **Complex reasoning** | Gemini 3.0 Pro - For difficult query decomposition or insight generation |
 | **Development/Testing** | Gemini 3.0 Flash - Lower cost during iteration |
 
-### LLM Usage by Node
+### LLM Usage by Node (Optimized)
 
-| Node | LLM Call? | Purpose |
-|------|-----------|---------|
-| `IntentClassifierNode` | ✅ Yes | Classify email intent |
-| `TaskExtractorNode` | ✅ Yes | Extract tasks from text |
-| `TaskTransformerNode` | ✅ Yes | Convert to JSON schema |
-| `ContextCheckerNode` | ✅ Yes | Detect missing info |
-| `BehaviorAnalyzerNode` | ✅ Yes | Detect meta-patterns |
-| `PrioritizerNode` | ✅ Yes | Generate priority list |
-| `InsightGeneratorNode` | ✅ Yes | Generate advice |
-| `QueryIntakeNode` | ✅ Yes | Parse natural language query |
-| `BreakdownNode` | ✅ Yes | Decompose complex queries |
-| `SummarizerNode` | ✅ Yes | Apply privacy rules |
-| `SynthesizerNode` | ✅ Yes | Combine results |
-| `PresenterNode` | ✅ Yes | Generate email response |
+**Consolidated calls reduce LLM usage from 12 to 6:**
+
+| Node | LLM Call? | Purpose | Replaces |
+|------|-----------|---------|----------|
+| `UnifiedExtractionNode` | ✅ Yes | Intent + tasks + JSON + context + entities | IntentClassifier, TaskExtractor, TaskTransformer, ContextChecker |
+| `BehaviorAnalyzerNode` | ✅ Yes | Detect meta-patterns | - |
+| `PrioritizerNode` | ✅ Yes | Generate priority list | - |
+| `InsightGeneratorNode` | ✅ Yes | Generate advice | - |
+| `QueryParserNode` | ✅ Yes | Parse + decompose query | QueryIntake, Breakdown |
+| `ResponseGeneratorNode` | ✅ Yes | Summarize + synthesize response | Summarizer, Synthesizer |
+
+**LLM Call Reduction:**
+| Process | Before | After | Savings |
+|---------|--------|-------|---------|
+| Process 1 | 5 calls | 2 calls | 60% |
+| Process 2 | 2 calls | 2 calls | 0% |
+| Process 3 | 4 calls | 2 calls | 50% |
+| **Total** | **11 calls** | **6 calls** | **45%** |
 
 ### Cost Optimization Notes
 

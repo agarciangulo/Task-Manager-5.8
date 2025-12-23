@@ -153,13 +153,22 @@ CREATE TABLE tasks (
     due_date DATE,
     priority VARCHAR(20) DEFAULT 'medium',  -- high, medium, low
     status VARCHAR(20) DEFAULT 'pending',   -- pending, in_progress, completed
-    category VARCHAR(100),
+    -- Classification hierarchy: Client > Project > Category
+    category VARCHAR(100),                   -- Task type: Admin, Meetings, Development, etc.
+    project VARCHAR(255),                    -- Project name: Q4 Budget Review, Website Redesign
+    client VARCHAR(255),                     -- Client name: Acme Corp, Beta Industries
+    classification_source VARCHAR(20),       -- header, explicit, inferred, unknown
     estimated_hours DECIMAL(5,2),
     source_email_id VARCHAR(255),
     raw_text TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Indexes for common queries
+CREATE INDEX idx_tasks_user_client ON tasks(user_id, client);
+CREATE INDEX idx_tasks_user_project ON tasks(user_id, project);
+CREATE INDEX idx_tasks_user_status ON tasks(user_id, status);
 ```
 
 ### User Behaviour DB Schema

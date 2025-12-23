@@ -138,13 +138,37 @@ This process handles all incoming emails from users, extracts tasks, compares wi
   "due_date": "ISO 8601 date (optional)",
   "priority": "high | medium | low (default: medium)",
   "status": "pending | in_progress | completed",
-  "category": "string (optional)",
+  "classification": {
+    "category": "string (optional) - e.g., Admin, Meetings, Development",
+    "project": "string (optional) - e.g., Q4 Budget Review, Website Redesign",
+    "client": "string (optional) - e.g., Acme Corp, Beta Industries"
+  },
+  "classification_source": "header | explicit | inferred | unknown",
   "estimated_hours": "number (optional)",
   "source_email_id": "string",
   "extracted_at": "ISO 8601 timestamp",
   "raw_text": "original text from email"
 }
 ```
+
+**Classification Detection:**
+Users typically specify classification as headers before listing tasks:
+
+```
+Email example:
+"Acme Corp:
+- Had standup with team
+- Reviewed contract proposal
+
+Beta Industries:  
+- Sent follow-up emails
+- Scheduled demo"
+```
+
+The system should:
+1. **Detect headers** - Look for patterns like "Client:", "Project:", or standalone names followed by colon/tasks
+2. **Apply to tasks below** - All tasks under a header inherit that classification
+3. **Ask if unclear** - If tasks have no classification and can't be inferred, add to `missing_context`
 
 **Example Transformation:**
 
@@ -549,14 +573,34 @@ This process is intentionally **scoped as a foundation** for the spike. Future e
 | `id` | UUID | Primary key |
 | `user_id` | UUID | Owner of the task |
 | `title` | String | Task description |
+| `description` | String | Additional details |
 | `status` | Enum | pending, in_progress, completed, cancelled |
 | `priority` | Enum | low, medium, high, urgent |
 | `due_date` | DateTime | When task is due |
-| `category` | String | Task category/project |
+| `category` | String | Task category (Admin, Meetings, Development, etc.) |
+| `project` | String | Project name (Q4 Budget Review, Website Redesign, etc.) |
+| `client` | String | Client name (Acme Corp, Beta Industries, etc.) |
+| `classification_source` | Enum | header, explicit, inferred, unknown |
 | `created_at` | DateTime | When task was created |
 | `updated_at` | DateTime | Last modification |
 | `source_email_id` | String | Reference to originating email |
 | `metadata` | JSON | Additional flexible data |
+
+**Classification Hierarchy:**
+```
+Client (highest level)
+  └── Project
+       └── Category (task type)
+            └── Task
+```
+
+**Example:**
+```
+Acme Corp (client)
+  └── Q4 Budget Review (project)
+       └── Admin (category)
+            └── "Send budget summary to CFO" (task)
+```
 
 ### 5.3 User Behaviour DB Schema
 
@@ -728,30 +772,54 @@ RETURN THIS EXACT JSON STRUCTURE:
       "due_date": "YYYY-MM-DD or null",
       "priority": "high" | "medium" | "low",
       "status": "pending" | "in_progress" | "completed",
-      "category": "string or null",
+      "classification": {
+        "category": "Admin | Meetings | Development | etc or null",
+        "project": "project name or null",
+        "client": "client name or null"
+      },
+      "classification_source": "header" | "explicit" | "inferred" | "unknown",
       "raw_text": "original text from email"
     }
   ],
   "corrections": [
     {
       "original_task_hint": "what task to correct",
-      "field_to_update": "due_date" | "priority" | "status" | "title",
+      "field_to_update": "due_date" | "priority" | "status" | "title" | "client" | "project" | "category",
       "new_value": "the corrected value"
     }
   ],
   "missing_context": [
     "Question to ask user if info is missing"
   ],
+  "detected_headers": [
+    {
+      "header_text": "the header as written",
+      "header_type": "client" | "project" | "category" | "unknown",
+      "applies_to_tasks": [0, 1, 2]
+    }
+  ],
   "detected_entities": {
     "dates": ["list of dates mentioned"],
     "people": ["list of people mentioned"],
+    "clients": ["list of clients mentioned"],
     "projects": ["list of projects mentioned"]
   },
   "is_recurring_signal": true | false,
   "recurring_frequency_hint": "daily" | "weekly" | "monthly" | null
 }
 
-RULES:
+CLASSIFICATION RULES:
+- Look for HEADERS before groups of tasks (e.g., "Acme Corp:", "Project Alpha:", "Admin tasks:")
+- Headers are usually followed by a colon or newline, then indented/bulleted tasks
+- Apply the header's classification to ALL tasks listed under it
+- classification_source values:
+  - "header": Task inherited classification from a header above it
+  - "explicit": User explicitly stated classification in the task text
+  - "inferred": AI inferred from context (client name in task, project keywords)
+  - "unknown": No classification could be determined
+- If classification is "unknown" AND the task seems important, add a question to missing_context
+
+GENERAL RULES:
 - If intent is "query", tasks array should be empty
 - Always preserve the raw_text for each task
 - Infer priority from language: "urgent", "ASAP", "!!!" = high
@@ -763,10 +831,18 @@ RULES:
 ```
 From: john@company.com
 Subject: Today's update
-Body: Today I finished the quarterly report (finally!) and had my daily standup 
-with the Acme team. Tomorrow I need to send 5 follow-up emails to clients - 
-this is urgent! Also, I said the budget review was due Wednesday but it's 
-actually Thursday.
+Body: 
+
+Acme Corp:
+- Had my daily standup with the team
+- Reviewed the Q4 contract proposal
+- Sent invoice to accounting
+
+Beta Industries:
+- Finished the quarterly report (finally!)
+- Tomorrow I need to send 5 follow-up emails - this is urgent!
+
+Also, I said the budget review was due Wednesday but it's actually Thursday.
 ```
 
 **Example Output:**
@@ -775,31 +851,74 @@ actually Thursday.
   "intent": "activity",
   "tasks": [
     {
+      "title": "Daily standup with team",
+      "description": null,
+      "due_date": "2025-12-23",
+      "priority": "medium",
+      "status": "completed",
+      "classification": {
+        "category": "Meetings",
+        "project": null,
+        "client": "Acme Corp"
+      },
+      "classification_source": "header",
+      "raw_text": "Had my daily standup with the team"
+    },
+    {
+      "title": "Reviewed Q4 contract proposal",
+      "description": null,
+      "due_date": null,
+      "priority": "medium",
+      "status": "completed",
+      "classification": {
+        "category": null,
+        "project": "Q4 Contract",
+        "client": "Acme Corp"
+      },
+      "classification_source": "header",
+      "raw_text": "Reviewed the Q4 contract proposal"
+    },
+    {
+      "title": "Sent invoice to accounting",
+      "description": null,
+      "due_date": null,
+      "priority": "medium",
+      "status": "completed",
+      "classification": {
+        "category": "Admin",
+        "project": null,
+        "client": "Acme Corp"
+      },
+      "classification_source": "header",
+      "raw_text": "Sent invoice to accounting"
+    },
+    {
       "title": "Finished quarterly report",
       "description": null,
       "due_date": null,
       "priority": "medium",
       "status": "completed",
-      "category": null,
-      "raw_text": "finished the quarterly report (finally!)"
+      "classification": {
+        "category": null,
+        "project": null,
+        "client": "Beta Industries"
+      },
+      "classification_source": "header",
+      "raw_text": "Finished the quarterly report (finally!)"
     },
     {
-      "title": "Daily standup with Acme team",
-      "description": null,
-      "due_date": "2025-12-23",
-      "priority": "medium",
-      "status": "completed",
-      "category": "Acme",
-      "raw_text": "had my daily standup with the Acme team"
-    },
-    {
-      "title": "Send follow-up emails to clients",
-      "description": "5 clients",
+      "title": "Send follow-up emails",
+      "description": "5 emails",
       "due_date": "2025-12-24",
       "priority": "high",
       "status": "pending",
-      "category": null,
-      "raw_text": "send 5 follow-up emails to clients - this is urgent!"
+      "classification": {
+        "category": null,
+        "project": null,
+        "client": "Beta Industries"
+      },
+      "classification_source": "header",
+      "raw_text": "send 5 follow-up emails - this is urgent!"
     }
   ],
   "corrections": [
@@ -810,14 +929,35 @@ actually Thursday.
     }
   ],
   "missing_context": [],
+  "detected_headers": [
+    {
+      "header_text": "Acme Corp:",
+      "header_type": "client",
+      "applies_to_tasks": [0, 1, 2]
+    },
+    {
+      "header_text": "Beta Industries:",
+      "header_type": "client",
+      "applies_to_tasks": [3, 4]
+    }
+  ],
   "detected_entities": {
     "dates": ["today", "tomorrow", "Wednesday", "Thursday"],
     "people": [],
-    "projects": ["Acme"]
+    "clients": ["Acme Corp", "Beta Industries"],
+    "projects": ["Q4 Contract"]
   },
   "is_recurring_signal": true,
   "recurring_frequency_hint": "daily"
 }
+```
+
+**Example with Missing Classification:**
+```
+Input: "Today I sent some emails and worked on the presentation."
+
+Output missing_context would include:
+["Which client or project are these tasks for?"]
 ```
 
 ---

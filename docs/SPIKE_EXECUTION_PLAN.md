@@ -91,6 +91,12 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 
 ## Day 4 – Process 2: Prioritization & Insights
 
+**Trigger:** This process runs as a scheduled daily job via Cloud Scheduler.
+
+### Scheduling Setup
+- [ ] Configure Cloud Scheduler job (e.g., 6:00 PM daily)
+- [ ] Create Cloud Run endpoint for Process 2 trigger
+
 ### Task Prioritizer
 - [ ] Implement `TaskFetchNode` - get user's open tasks
 - [ ] Implement `PrioritizerNode` - generate prioritized list (Gemini)

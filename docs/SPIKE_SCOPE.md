@@ -111,6 +111,7 @@ The spike results will inform the decision to migrate, integrate, or evolve the 
 - **Timebox:** 5-7 day effort for MVP of all three processes
 - **Team:** Primary owner with optional reviewers
 - **Data:** Use synthetic or anonymized data; demo-ready but not production-grade
+- **AI/LLM:** Use Google Gemini 3.0 (via Vertex AI) for all AI tasks
 - **Process 3 Note:** Query system is foundational MVP; full access control and analytics are future enhancements
 
 ---

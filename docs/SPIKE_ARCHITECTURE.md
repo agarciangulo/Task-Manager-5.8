@@ -36,14 +36,14 @@ The AI Task Management Agent consists of **three core processes** that work toge
 
 ## 1.5 Email Router (Pre-Process)
 
-Before routing to Process 1 or Process 3, incoming emails pass through the Email Router:
+Before routing to Process 1, 2, or 3, incoming emails pass through the Email Router:
 
 ```
-┌─────────────┐      ┌─────────────────┐      ┌─────────────────┐
-│   EMAIL     │      │  Email Router   │      │  Process 1 or 3 │
-│   INBOX     │ ──▶  │                 │ ──▶  │                 │
-│             │      │ 1. Validate     │      │                 │
-└─────────────┘      │ 2. Deduplicate  │      └─────────────────┘
+┌─────────────┐      ┌─────────────────┐      ┌───────────────────┐
+│   EMAIL     │      │  Email Router   │      │  Process 1, 2, or 3│
+│   INBOX     │ ──▶  │                 │ ──▶  │                   │
+│             │      │ 1. Validate     │      │                   │
+└─────────────┘      │ 2. Deduplicate  │      └───────────────────┘
                      │ 3. Classify     │
                      └─────────────────┘
 ```
@@ -54,8 +54,7 @@ Before routing to Process 1 or Process 3, incoming emails pass through the Email
 |------|--------|---------|
 | **1. Validate Sender** | Check `users` table | Reject unknown senders with "please register" reply |
 | **2. Deduplicate** | Check Gmail Message-ID | Skip if already processed |
-| **3. Classify Intent** | AI classification | Task/Activity → Process 1, Query → Process 3 |
-| **4. Truncate** | Limit email size | Truncate >10K characters with warning |
+| **3. Classify Intent** | AI classification | Task/Activity → Process 1, Status Request → Process 2, Query → Process 3 |
 
 ### Intent Classification Examples
 
@@ -63,6 +62,9 @@ Before routing to Process 1 or Process 3, incoming emails pass through the Email
 |---------------|----------------|----------|
 | "I completed the report today" | Task/Activity | Process 1 |
 | "Actually the due date is Thursday" | Correction | Process 1 |
+| "Send me my status report" | Status Request | Process 2 |
+| "What are my priorities?" | Status Request | Process 2 |
+| "Give me a summary of my tasks" | Status Request | Process 2 |
 | "What tasks do I have due tomorrow?" | Query | Process 3 |
 | "The report is done, what's next?" | Task + Query | Process 1 (primary), note query for follow-up |
 
@@ -85,6 +87,8 @@ This process handles all incoming emails from users, extracts tasks, compares wi
 │ • Corrections      │ - Checks context│      │ - Decides: ADD or │ reads   │          │
 │ • Context   │ ◀──  │ - Asks for more │      │   UPDATE          │         │          │
 │   replies   │      │   if needed     │      │ - Updates DB      │         │          │
+│             │      │ - Extracts to   │      │                   │         │          │
+│             │      │   standard JSON │      │                   │         │          │
 └─────────────┘      └────────┬────────┘      └───────────────────┘         └────┬─────┘
        ▲                      │                                                  │
        │                      │ analyzes patterns (AI)                           │
@@ -93,8 +97,8 @@ This process handles all incoming emails from users, extracts tasks, compares wi
        │             │ Behavior        │                              │ Task Presenter  │
        │             │ Analyzer (AI)   │                              │                 │
        │             │                 │                              │ Outputs:        │
-       │             │ - Detects meta  │                              │ • Daily summary │
-       │             │   patterns      │                              │ • High priority │
+       │             │ - Detects meta  │                              │ • Tasks processed│
+       │             │   patterns      │                              │   from email    │
        │             │ - Generates     │                              │ • Corrections   │
        │             │   observations  │                              │   confirmed     │
        │             └────────┬────────┘                              └─────────────────┘
@@ -215,9 +219,11 @@ The system should:
 |----------------|-------------|
 | **Read Existing Tasks** | Fetch current tasks from Task DB for comparison |
 | **Hybrid Comparison** | Use embeddings + AI to find similar tasks (existing implementation) |
-| **Classify Match Type** | Distinguish between: correction, recurring occurrence, or new task |
-| **Apply Corrections** | Process correction requests from user |
+| **Classify Match Type** | AI determines: status change, progress update, recurring activity, correction, or new task |
+| **Apply Status Changes** | Update task status (e.g., in_progress → completed) |
+| **Log Progress Updates** | Add notes or update progress on multi-session tasks |
 | **Log Recurring** | Create new occurrence linked to recurring pattern |
+| **Apply Corrections** | Process correction requests from user (fix wrong values) |
 | **Update Database** | Write final state to Task DB |
 
 **Hybrid Comparison Logic (Existing):**
@@ -246,26 +252,43 @@ The existing `SimpleChromaEmbeddingManager` can be extended for:
 │   NO        YES                                                 │
 │    │         │                                                  │
 │    ▼         ▼                                                  │
-│  CREATE    Is it a recurring pattern?                           │
-│   NEW      (logged 3+ times before)                             │
+│  CREATE    What type of match?                                  │
+│   NEW      (AI determines from context)                         │
 │  TASK            │                                              │
-│           ┌──────┴──────┐                                       │
-│           │             │                                       │
-│          NO            YES                                      │
-│           │             │                                       │
-│           ▼             ▼                                       │
-│      Same day?    LOG NEW OCCURRENCE                            │
-│           │       (link to pattern,                             │
-│      ┌────┴────┐   update streak)                               │
-│      │         │                                                │
-│     YES       NO                                                │
-│      │         │                                                │
-│      ▼         ▼                                                │
-│  CORRECTION  CREATE NEW                                         │
-│  (update)    (different day)                                    │
+│         ┌────────┼────────────┬────────────┐                    │
+│         │        │            │            │                    │
+│         ▼        ▼            ▼            ▼                    │
+│     STATUS   PROGRESS    RECURRING    CORRECTION                │
+│     CHANGE   UPDATE      ACTIVITY     (same task,               │
+│     (done,   (more work  (daily       wrong values)             │
+│     blocked) on same     standup,                               │
+│         │    task)       weekly sync) │                         │
+│         │        │            │        │                        │
+│         ▼        ▼            ▼        ▼                        │
+│     UPDATE   ADD NOTE/   LOG NEW    UPDATE                      │
+│     STATUS   UPDATE      OCCURRENCE FIELDS                      │
+│              PROGRESS    (streak+1)                             │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+**Match Type Definitions:**
+
+| Match Type | Description | Example | Action |
+|------------|-------------|---------|--------|
+| **Status Change** | User indicates task state changed | "Finished the report" (was in_progress) | Update status field (→ completed, blocked, cancelled) |
+| **Progress Update** | Continued work on multi-session task | "Worked more on the big report" | Add progress note, update `updated_at`, optionally log hours |
+| **Recurring Activity** | Discrete activity done repeatedly | "Had daily standup", "Weekly team sync" | Log new occurrence, update streak, link to pattern |
+| **Correction** | Same task but with wrong values | "Actually it's due Thursday not Wednesday" | Update the incorrect field(s) |
+
+**AI Classification Signals:**
+
+| Match Type | Language Signals | Context Signals |
+|------------|------------------|-----------------|
+| **Status Change** | "finished", "completed", "done with", "blocked on", "cancelled" | Task exists with status ≠ completed |
+| **Progress Update** | "worked on", "continued", "made progress", "more work on" | Task exists with status = in_progress |
+| **Recurring Activity** | "daily", "weekly", "standup", "sync", "regular" | Similar tasks logged on different days, discrete activities |
+| **Correction** | "actually", "should be", "correction", "wrong", "meant to say" | Explicit correction language |
 
 #### Recurring Patterns: Assume → Announce → Correct
 
@@ -359,19 +382,17 @@ Since this is email communication (not a UI), we minimize back-and-forth by:
 #### Task Presenter
 | Responsibility | Description |
 |----------------|-------------|
-| **Generate Summary** | Create summary of tasks completed that day |
-| **Highlight Priorities** | List high-priority activities needing immediate attention |
-| **Confirm Changes** | Acknowledge corrections that were applied |
-| **Send Response** | Email the combined output back to user |
+| **List Processed Tasks** | Show the tasks extracted and saved from the current email |
+| **Confirm Corrections** | Acknowledge any corrections that were applied |
+| **Send Response** | Email the response back to user |
 
 ### 2.5 Email Response Strategy
 
 | Scenario | Email Type | Reason |
 |----------|-----------|--------|
-| Daily summary / Tasks completed | New email | Read-only, no response needed |
+| Tasks processed from email | Reply to original | Confirms what was captured from their email |
 | Confirmation of corrections | Reply to original | Context matters, closes the loop |
 | Asking for more context | Reply to original | User needs to see what was unclear |
-| High priority alerts | New email | Stands out, urgent |
 
 ---
 
@@ -379,14 +400,19 @@ Since this is email communication (not a UI), we minimize back-and-forth by:
 
 ### 3.1 Overview
 
-This process generates daily task priorities and personalized insights by analyzing the user's task database against organizational best practices.
+This process generates daily task priorities and personalized insights by analyzing the user's task database against organizational best practices and the user's own behavioral patterns.
 
-### 3.2 Trigger
+### 3.2 Triggers
 
 **Scheduled Daily Job** (e.g., Cloud Scheduler at 6:00 PM)
 - Runs automatically for all active users
 - Generates priorities for the next day
-- Sends combined email with priorities + insights
+- Sends combined email with priorities, insights, and outstanding tasks list
+
+**On-Demand Request** (via Email Router)
+- User sends email requesting status (e.g., "Send me my status report", "What are my priorities?")
+- Email Router classifies as "Status Request" and routes to Process 2
+- Generates and sends combined email immediately for that user only
 
 ### 3.3 Flow Diagram
 
@@ -399,18 +425,20 @@ This process generates daily task priorities and personalized insights by analyz
 │              │         └───────────────────┘              │
 │              │                                            │
 │              │         ┌───────────────────┐              ▼
-│              │────────▶│ Insight Generator │      ┌───────────────┐
-└──────────────┘ reads   │                   │      │   Combined    │      ┌──────────┐
-                         │ - Analyzes backlog│      │   Email to    │ ──▶  │   USER   │
-┌──────────────┐         │ - Creates advice  │      │     User      │      └──────────┘
-│Best Practices│────────▶│ - What to improve │      │               │
-│      DB      │ reads   │ - What to fix     │      │ Contains:     │
-│              │         │                   │      │ • Task list   │
-│              │         └─────────┬─────────┘      │ • Insights    │
-└──────────────┘                   │                │   (separate)  │
-                                   │ stores         └───────▲───────┘
-                                   ▼                        │
-                         ┌───────────────────┐              │ insights
+│              │────────▶│ Insight Generator │      ┌─────────────────┐
+└──────────────┘ reads   │                   │      │  Combined Email │    ┌──────────┐
+                         │ - Analyzes backlog│      │     to User     │◀──▶│   USER   │
+┌──────────────┐         │ - Considers user  │      │                 │    └──────────┘
+│Best Practices│────────▶│   behavior patterns      │ Contains:       │      requests
+│      DB      │ reads   │ - Creates advice  │      │ • Priorities    │      on-demand
+│              │         │ - What to improve │      │ • Insights      │
+└──────────────┘         │                   │      │ • Outstanding   │
+                  reads  │                   │      │   tasks list    │
+┌──────────────┐────────▶│                   │      └───────▲─────────┘
+│User Behaviour│         └─────────┬─────────┘              │
+│      DB      │                   │ stores                 │ insights
+│              │                   ▼                        │
+└──────────────┘         ┌───────────────────┐              │
                          │ Insights Database │──────────────┘
                          │                   │
                          │ (all generated    │
@@ -432,7 +460,8 @@ This process generates daily task priorities and personalized insights by analyz
 |----------------|-------------|
 | **Analyze User Backlog** | Read current state from Task DB |
 | **Compare to Best Practices** | Check patterns against Best Practices DB |
-| **Generate Advice** | Create actionable recommendations |
+| **Consider User Patterns** | Factor in behavioral observations from User Behaviour DB (e.g., "often misses deadlines", "forgets to log hours") |
+| **Generate Personalized Advice** | Create actionable recommendations tailored to user's habits |
 | **Store Insights** | Log all generated insights to Insights Database |
 
 ### 3.5 Example Insights
@@ -444,16 +473,15 @@ This process generates daily task priorities and personalized insights by analyz
 
 ### 3.6 Combined Email Output
 
-The Task Prioritizer and Insight Generator outputs are combined (but kept as separate sections) in a single email:
+The email contains three distinct sections: suggested priorities, personalized insights, and a full list of outstanding tasks:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 YOUR PRIORITIES FOR TOMORROW
+📋 SUGGESTED PRIORITIES FOR TOMORROW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. Complete quarterly report (High Priority, Due: Tomorrow)
 2. Send client follow-up emails (Medium Priority)
 3. Review team submissions (Medium Priority)
-...
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💡 INSIGHTS & RECOMMENDATIONS
@@ -461,7 +489,26 @@ The Task Prioritizer and Insight Generator outputs are combined (but kept as sep
 • You have 3 tasks overdue by more than a week - consider re-prioritizing
 • Great job completing 12 tasks this week - above your average!
 • Suggestion: Your "Admin" category is growing - block time for admin work
-...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 ALL OUTSTANDING TASKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OVERDUE (3):
+  • Budget review (Due: Dec 20) - High Priority
+  • Update documentation (Due: Dec 22) - Low Priority
+  • Client proposal draft (Due: Dec 23) - Medium Priority
+
+DUE THIS WEEK (5):
+  • Complete quarterly report (Due: Dec 28) - High Priority
+  • Send client follow-up emails (Due: Dec 28) - Medium Priority
+  • Review team submissions (Due: Dec 29) - Medium Priority
+  • Prepare meeting agenda (Due: Dec 30) - Low Priority
+  • Submit expense report (Due: Dec 31) - Medium Priority
+
+UPCOMING (4):
+  • Q1 planning session prep (Due: Jan 5) - High Priority
+  • Annual review self-assessment (Due: Jan 10) - Medium Priority
+  • ...
 ```
 
 ---
@@ -486,35 +533,35 @@ This process enables users and managers to query data across all databases with 
                                                       ┌─────────────────────────────────┐
                                                       │        DATA ACCESS LAYER        │
                                                       ├─────────────────┬───────────────┤
-                                                      │   User's Own    │   Firm Total  │
-                                                      │   (Full Access) │  (Summarized) │
+                                                      │   User's Own    │  Firm Total   │
+                                                      │   (Full Access) │(Manager Only) │
                                                       ├─────────────────┼───────────────┤
 ┌──────────┐                                          │                 │               │
-│   USER   │──┐                                   ┌──▶│ UB-DB (personal)│ UB-DB (total) │
-└──────────┘  │                                   │   │                 │  [summarized] │
-              │      ┌───────────────────────┐    │   ├─────────────────┼───────────────┤
-              ├─────▶│     Query Router      │────┼──▶│Task DB (personal│Task DB (total)│
-              │      │                       │    │   │                 │  [summarized] │
+│   USER   │──┐                                   ┌──▶│ UB-DB (personal)│ Manager only  │
+└──────────┘  │                                   │   │                 │               │
+ Own data    │      ┌───────────────────────┐    │   ├─────────────────┼───────────────┤
+ only        ├─────▶│     Query Router      │────┼──▶│Task DB (personal│ Manager only  │
+              │      │                       │    │   │                 │               │
               │      │ • Breakdown           │    │   ├─────────────────┼───────────────┤
-              │      │   (decomposes query)  │    │   │Ins DB (personal)│Ins DB (total) │
-┌──────────┐  │      │                       │    │   │                 │  [summarized] │
+              │      │   (decomposes query)  │    │   │Ins DB (personal)│ Manager only  │
+┌──────────┐  │      │                       │    │   │                 │               │
 │ MANAGER  │──┘      │ • Coordinator         │    │   ├─────────────────┼───────────────┤
 │          │         │   (routes to sources) │    └──▶│  Best Practices │Best Practices │
 │ Can also │         │                       │        │                 │               │
 │ access:  │         │ • Synthesizer         │        └─────────────────┴───────────────┘
-│ • Team   │         │   (combines results)  │
-│   members│         └───────────────────────┘
-│ • Team   │
+│ • Any    │         │   (combines results)  │
+│   user   │         └───────────────────────┘
+│ • Firm   │
 │   totals │
 └──────────┘
 ```
 
 ### 4.4 Access Control Matrix
 
-| Requester | Own Data | Team Members | Team Total | Firm Total |
-|-----------|----------|--------------|------------|------------|
-| **User** | ✅ Full | ❌ No | ⚠️ Summarized | ⚠️ Summarized |
-| **Manager** | ✅ Full | ✅ Full | ✅ Full | ⚠️ Summarized |
+| Requester | Own Data | Any User | Firm Total |
+|-----------|----------|----------|------------|
+| **User** | ✅ Full | ❌ No | ❌ No |
+| **Manager** | ✅ Full | ✅ Full | ✅ Full |
 
 ### 4.5 Query Router Components
 
@@ -529,27 +576,28 @@ This process enables users and managers to query data across all databases with 
 | Who | Query | Data Source | Response Type |
 |-----|-------|-------------|---------------|
 | User | "What tasks did I complete this week?" | Task DB (personal) | Full detail |
-| User | "How does my productivity compare to the firm?" | Task DB (total) | Summarized ("top 25%") |
-| User | "How is my team doing?" | Task DB (team total) | Summarized |
+| User | "What's my completion rate this month?" | Task DB (personal) | Full detail |
+| User | "How does the firm compare?" | ❌ Denied | Access denied message |
 | Manager | "Show me Alex's overdue tasks" | Task DB (Alex's personal) | Full detail |
-| Manager | "What's my team's completion rate?" | Task DB (team total) | Full aggregated |
-| Manager | "How does my team compare to the firm?" | Task DB (firm total) | Summarized |
+| Manager | "What's the firm's completion rate?" | Task DB (firm total) | Full detail |
+| Manager | "How many tasks does Sarah have pending?" | Task DB (Sarah's personal) | Full detail |
 
-### 4.7 Sensitivity Handling
+### 4.7 Access Enforcement
 
-When accessing **team or firm-wide data**, the Query Router:
-- Aggregates/anonymizes individual data
-- Returns summaries, percentages, trends (not raw data)
-- Examples:
-  - ✅ "Average task completion: 85%"
-  - ✅ "You completed 20% more tasks than average"
-  - ❌ NOT "John completed 5 tasks, Sarah completed 12..."
+The Query Router enforces strict access control:
+- **Users** can only query their own data - any request for other users or firm data is denied
+- **Managers** have full access to any user's data and firm-wide aggregates
+- Firm data is simply an aggregation of all users' data
+
+**Denied Query Response:**
+When a user attempts to access data they don't have permission for:
+> "I can only show you information about your own tasks. If you need firm-wide data, please contact a manager."
 
 ### 4.8 MVP Scope Note
 
 This process is intentionally **scoped as a foundation** for the spike. Future enhancements may include:
 - More granular role-based access control
-- Department-level views
+- Team/department-level views
 - Audit logging of sensitive queries
 - Permission management UI
 
@@ -707,9 +755,10 @@ Each process is implemented as a LangGraph workflow with specialized nodes:
 | `TaskFetchNode` | User ID | Current tasks | No |
 | `PrioritizerNode` | Tasks | Prioritized list | Yes |
 | `BestPracticesFetchNode` | Category | Relevant practices | No |
-| `InsightGeneratorNode` | Tasks + Practices | Insights | Yes |
+| `UserBehaviourFetchNode` | User ID | User behavior patterns | No |
+| `InsightGeneratorNode` | Tasks + Practices + User Behaviour | Insights | Yes |
 | `InsightPersistNode` | Insights | Stored to Insights DB | No |
-| `EmailComposerNode` | Priorities + Insights | Combined email | No |
+| `EmailComposerNode` | Priorities + Insights + All Tasks | Combined email | No |
 
 #### Process 3 Nodes (Optimized)
 
@@ -772,6 +821,7 @@ RETURN THIS EXACT JSON STRUCTURE:
       "due_date": "YYYY-MM-DD or null",
       "priority": "high" | "medium" | "low",
       "status": "pending" | "in_progress" | "completed",
+      "match_type_hint": "new_task" | "status_change" | "progress_update" | "recurring_activity",
       "classification": {
         "category": "Admin | Meetings | Development | etc or null",
         "project": "project name or null",
@@ -779,6 +829,20 @@ RETURN THIS EXACT JSON STRUCTURE:
       },
       "classification_source": "header" | "explicit" | "inferred" | "unknown",
       "raw_text": "original text from email"
+    }
+  ],
+  "status_updates": [
+    {
+      "task_hint": "description of task to update",
+      "new_status": "completed" | "blocked" | "cancelled",
+      "reason": "why status changed (optional)"
+    }
+  ],
+  "progress_updates": [
+    {
+      "task_hint": "description of task being worked on",
+      "progress_note": "what was done",
+      "hours_worked": "number or null"
     }
   ],
   "corrections": [
@@ -819,6 +883,14 @@ CLASSIFICATION RULES:
   - "unknown": No classification could be determined
 - If classification is "unknown" AND the task seems important, add a question to missing_context
 
+MATCH TYPE RULES:
+- "status_change": User says "finished", "completed", "done with", "blocked on", "cancelled"
+- "progress_update": User says "worked on", "continued", "made progress on", "more work on"
+- "recurring_activity": Discrete activities with signals like "daily", "weekly", "standup", "sync"
+- "new_task": No indication this relates to an existing task
+- When user mentions completing a task, add to BOTH tasks array (with status=completed) AND status_updates array
+- When user mentions continued work, add to BOTH tasks array AND progress_updates array
+
 GENERAL RULES:
 - If intent is "query", tasks array should be empty
 - Always preserve the raw_text for each task
@@ -856,6 +928,7 @@ Also, I said the budget review was due Wednesday but it's actually Thursday.
       "due_date": "2025-12-23",
       "priority": "medium",
       "status": "completed",
+      "match_type_hint": "recurring_activity",
       "classification": {
         "category": "Meetings",
         "project": null,
@@ -870,6 +943,7 @@ Also, I said the budget review was due Wednesday but it's actually Thursday.
       "due_date": null,
       "priority": "medium",
       "status": "completed",
+      "match_type_hint": "new_task",
       "classification": {
         "category": null,
         "project": "Q4 Contract",
@@ -884,6 +958,7 @@ Also, I said the budget review was due Wednesday but it's actually Thursday.
       "due_date": null,
       "priority": "medium",
       "status": "completed",
+      "match_type_hint": "new_task",
       "classification": {
         "category": "Admin",
         "project": null,
@@ -893,11 +968,12 @@ Also, I said the budget review was due Wednesday but it's actually Thursday.
       "raw_text": "Sent invoice to accounting"
     },
     {
-      "title": "Finished quarterly report",
+      "title": "Quarterly report",
       "description": null,
       "due_date": null,
       "priority": "medium",
       "status": "completed",
+      "match_type_hint": "status_change",
       "classification": {
         "category": null,
         "project": null,
@@ -912,6 +988,7 @@ Also, I said the budget review was due Wednesday but it's actually Thursday.
       "due_date": "2025-12-24",
       "priority": "high",
       "status": "pending",
+      "match_type_hint": "new_task",
       "classification": {
         "category": null,
         "project": null,
@@ -921,6 +998,14 @@ Also, I said the budget review was due Wednesday but it's actually Thursday.
       "raw_text": "send 5 follow-up emails - this is urgent!"
     }
   ],
+  "status_updates": [
+    {
+      "task_hint": "quarterly report",
+      "new_status": "completed",
+      "reason": "User said 'finished'"
+    }
+  ],
+  "progress_updates": [],
   "corrections": [
     {
       "original_task_hint": "budget review",
@@ -1090,6 +1175,8 @@ Generate 2-4 actionable insights. Be:
 - Supportive, not critical
 - Specific, not generic
 - Actionable, not just observational
+- Personalized based on the user's behavior patterns (e.g., if they often miss deadlines, emphasize time management; if they forget to log tasks, remind them)
+- Aware of their strengths and weaknesses from past observations
 
 RETURN JSON:
 {
@@ -1124,7 +1211,7 @@ Parse this query and decompose if needed.
 
 RETURN JSON:
 {
-  "query_type": "personal" | "team" | "comparison" | "aggregate",
+  "query_type": "personal" | "other_user" | "firm" | "aggregate",
   "time_range": {
     "start": "YYYY-MM-DD or null",
     "end": "YYYY-MM-DD or null",
@@ -1159,17 +1246,18 @@ USER ROLE: {role}
 DATA RESULTS:
 {raw_results}
 
-PRIVACY RULES:
-- If data is about OTHER users and role is "user", summarize only
-- Never expose individual names when summarizing team/firm data
-- Use percentages and aggregates for protected data
+ACCESS RULES:
+- If role is "user": ONLY return their own data. Deny any requests for other users or firm data.
+- If role is "manager": Full access to any user's data and firm-wide aggregates.
+- For denied requests, respond with: "I can only show you information about your own tasks."
 
 Generate a helpful, conversational response.
 
 RETURN JSON:
 {
   "response": "The natural language response",
-  "data_displayed": "personal" | "summarized" | "aggregate",
+  "access_level": "personal" | "other_user" | "firm",
+  "access_granted": true | false,
   "follow_up_suggestion": "Optional follow-up question" 
 }
 ```
@@ -1317,7 +1405,6 @@ CREATE TABLE users (
 |---------|----------------|
 | **Daily budget alert** | Alert if LLM costs exceed $X/day |
 | **Rate limiting** | 50 emails/user/day for MVP |
-| **Email truncation** | Truncate emails >10K characters |
 | **Token monitoring** | Log token usage per process for analysis |
 
 ### 13.4 Assumptions & Constraints
@@ -1338,8 +1425,8 @@ This architecture defines three interconnected processes:
 
 | Process | Purpose | Key Innovation |
 |---------|---------|----------------|
-| **1. Task Intake** | Get tasks from email, process, store | User behavior tracking, intelligent comparison |
-| **2. Prioritization & Insights** | Daily priorities + improvement advice | Best practices comparison, combined output |
-| **3. Query System** | Natural language data access | Role-based access, privacy-aware summarization |
+| **1. Task Intake** | Get tasks from email, process, store | User behavior tracking, AI-powered match classification |
+| **2. Prioritization & Insights** | Daily/on-demand priorities + improvement advice | Best practices + user behavior patterns, combined output |
+| **3. Query System** | Natural language data access | Strict role-based access (users: own data, managers: full access) |
 
 Together, these processes create an intelligent task management agent that not only tracks tasks but actively helps users improve their productivity through personalized insights and easy data access.

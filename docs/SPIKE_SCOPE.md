@@ -23,20 +23,22 @@ The spike results will inform the decision to migrate, integrate, or evolve the 
 - Extract tasks from free-form text or lists
 - **Transform to structured JSON:** Use AI to convert extracted tasks into uniform schema (title, due_date, priority, status, etc.)
 - Request additional context when information is missing
-- Compare new tasks against existing database (add vs. update logic)
+- Compare new tasks against existing database (AI-powered match classification: status change, progress update, recurring activity, correction, or new task)
 - **AI-powered Behavior Analyzer:** Detect meta-patterns in user behavior and generate observations (e.g., "user frequently omits due dates - consider prompting for details")
 - Send confirmation/summary emails back to user
 
 **Output:**
 - Tasks added/updated in Task DB
 - **AI-generated behavior observations** logged to User Behaviour DB
-- Email response with daily summary, high priorities, and correction confirmations
+- Email response with processed tasks and correction confirmations
 
 ---
 
 ### Process 2: Prioritization & Insights Generation
 
-**Trigger:** Scheduled daily job (e.g., Cloud Scheduler at 6:00 PM).
+**Triggers:**
+- Scheduled daily job (e.g., Cloud Scheduler at 6:00 PM)
+- On-demand via email request (e.g., "Send me my status report")
 
 **Capabilities:**
 - Read user's task backlog and generate prioritized list for next day
@@ -46,8 +48,9 @@ The spike results will inform the decision to migrate, integrate, or evolve the 
 
 **Output:**
 - Single email containing:
-  - Prioritized task list (separate section)
+  - Suggested priorities for tomorrow (separate section)
   - Insights and recommendations (separate section)
+  - Full list of outstanding tasks (separate section)
 - All insights persisted to Insights Database
 
 ---
@@ -66,13 +69,13 @@ The spike results will inform the decision to migrate, integrate, or evolve the 
 - Parse and decompose complex queries
 - Route to appropriate data sources (Task DB, User Behaviour DB, Insights DB, Best Practices DB)
 - Apply access controls based on requester role
-- Summarize sensitive data (team/firm totals) for privacy
+- Enforce strict access control based on role
 
 **Access Control:**
-| Requester | Own Data | Team Members | Team Total | Firm Total |
-|-----------|----------|--------------|------------|------------|
-| **User** | ✅ Full | ❌ No | ⚠️ Summarized | ⚠️ Summarized |
-| **Manager** | ✅ Full | ✅ Full | ✅ Full | ⚠️ Summarized |
+| Requester | Own Data | Any User | Firm Total |
+|-----------|----------|----------|------------|
+| **User** | ✅ Full | ❌ No | ❌ No |
+| **Manager** | ✅ Full | ✅ Full | ✅ Full |
 
 **Output:**
 - Natural language response to the query
@@ -85,8 +88,8 @@ The spike results will inform the decision to migrate, integrate, or evolve the 
 | Category | Criteria |
 |----------|----------|
 | **Process 1** | Email correctly classified; tasks extracted and stored; corrections applied; context requested when needed; user behavior logged |
-| **Process 2** | Priorities generated based on due dates and importance; insights compare against best practices; combined email sent successfully |
-| **Process 3** | Queries parsed correctly; access controls enforced; summarization applied to protected data |
+| **Process 2** | Priorities generated based on due dates and importance; insights compare against best practices and user behavior patterns; combined email sent successfully |
+| **Process 3** | Queries parsed correctly; access controls enforced; users restricted to own data only |
 | **Data Model** | All four databases (Task, User Behaviour, Best Practices, Insights) implemented and functional |
 | **Observability** | Each step logs with run IDs; latency tracked; errors captured with context |
 | **Architecture** | Clear separation of three processes; documented data flows; extension points identified |

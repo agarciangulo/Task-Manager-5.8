@@ -70,7 +70,7 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 
 ### Task Processor
 - [ ] Implement `TaskComparisonNode` - compare extracted tasks vs. DB
-- [ ] Implement add/update logic based on comparison
+- [ ] Implement match classification logic (status change, progress update, recurring, correction, new task)
 - [ ] Implement `TaskPersistNode` - write changes to Task DB
 
 ### Behavior Analyzer (AI-Powered)
@@ -79,7 +79,7 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 - [ ] Implement `BehaviorPersistNode` - store observations to User Behaviour DB
 
 ### Task Presenter
-- [ ] Implement `PresenterNode` - generate summary, priorities, confirmations
+- [ ] Implement `PresenterNode` - list processed tasks, confirm corrections
 - [ ] Implement email sending (SMTP)
 - [ ] Test complete Process 1 flow end-to-end
 
@@ -91,11 +91,12 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 
 ## Day 4 – Process 2: Prioritization & Insights
 
-**Trigger:** This process runs as a scheduled daily job via Cloud Scheduler.
+**Triggers:** This process runs as a scheduled daily job AND can be triggered on-demand via email.
 
 ### Scheduling Setup
 - [ ] Configure Cloud Scheduler job (e.g., 6:00 PM daily)
 - [ ] Create Cloud Run endpoint for Process 2 trigger
+- [ ] Add "Status Request" intent handling in Email Router to trigger Process 2 on-demand
 
 ### Task Prioritizer
 - [ ] Implement `TaskFetchNode` - get user's open tasks
@@ -104,11 +105,11 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 
 ### Insight Generator
 - [ ] Implement `BestPracticesFetchNode` - get relevant practices
-- [ ] Implement `InsightGeneratorNode` - compare tasks to practices (Gemini)
+- [ ] Implement `InsightGeneratorNode` - compare tasks to practices + user behavior patterns (Gemini)
 - [ ] Implement `InsightPersistNode` - store insights to Insights DB
 
 ### Combined Output
-- [ ] Implement `EmailComposerNode` - combine priorities + insights
+- [ ] Implement `EmailComposerNode` - combine priorities + insights + outstanding tasks list
 - [ ] Format email with separate sections
 - [ ] Test complete Process 2 flow
 
@@ -130,8 +131,8 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
 - [ ] Implement `SynthesizerNode` - combine results into response (Gemini)
 
 ### Access Control Testing
-- [ ] Test User queries (own data: full, team/firm: summarized)
-- [ ] Test Manager queries (team members: full, firm: summarized)
+- [ ] Test User queries (own data: full, others/firm: denied)
+- [ ] Test Manager queries (any user: full, firm: full)
 
 ---
 
@@ -163,7 +164,7 @@ This plan turns the spike scope and architecture into a day-by-day execution sch
   2. User sends correction → tasks updated
   3. User receives daily priorities + insights
   4. User asks query → gets appropriate response
-  5. Manager asks team query → gets full detail
+  5. Manager asks about specific user → gets full detail
 - [ ] Record demo walkthrough (optional)
 
 ### Evaluation
@@ -202,7 +203,7 @@ Prepare sample emails for each scenario:
 | Context reply | "The meeting is with Acme Corp about the Q4 proposal" |
 | Recurring activity | "Had my daily standup with the engineering team" |
 | Query (own data) | "What tasks do I have due this week?" |
-| Query (team data) | "How is my team's completion rate?" |
+| Query (other user) | "Show me Alex's overdue tasks" |
 
 ### Test Cases by Process
 
@@ -221,8 +222,11 @@ Prepare sample emails for each scenario:
 
 **Process 3:**
 - [ ] User query for own data → full details
-- [ ] User query for team data → summarized
-- [ ] Manager query for team member → full details
+- [ ] User query for other user's data → denied
+- [ ] User query for firm data → denied
+- [ ] Manager query for any user's data → full details
+- [ ] Manager query for firm data → full details
+- [ ] Manager query for specific user → full details
 - [ ] Malformed query → graceful error response
 
 ---

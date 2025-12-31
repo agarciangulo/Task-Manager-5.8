@@ -65,10 +65,10 @@ This document catalogs the technologies, libraries, and services required for th
 | Process | Nodes | LLM Calls |
 |---------|-------|-----------|
 | **Process 1** | `EmailIntakeNode`, `UnifiedExtractionNode`, `BehaviorAnalyzerNode`, `BehaviorPersistNode`, `TaskComparisonNode`, `TaskPersistNode`, `PresenterNode` | 2 |
-| **Process 2** | `TaskFetchNode`, `PrioritizerNode`, `BestPracticesFetchNode`, `InsightGeneratorNode`, `InsightPersistNode`, `EmailComposerNode` | 2 |
+| **Process 2** | `TaskFetchNode`, `PrioritizerNode`, `BestPracticesFetchNode`, `UserBehaviourFetchNode`, `InsightGeneratorNode`, `InsightPersistNode`, `EmailComposerNode` | 2 |
 | **Process 3** | `QueryParserNode`, `AccessControlNode`, `CoordinatorNode`, `DataFetchNode`, `ResponseGeneratorNode` | 2 |
 
-**Total Nodes:** 18 (down from 23)
+**Total Nodes:** 19 (down from 23)
 **Total LLM Calls per full cycle:** 6 (down from 11)
 
 ---
@@ -106,7 +106,7 @@ This document catalogs the technologies, libraries, and services required for th
 | `UnifiedExtractionNode` | ✅ Yes | Intent + tasks + JSON + context + entities | IntentClassifier, TaskExtractor, TaskTransformer, ContextChecker |
 | `BehaviorAnalyzerNode` | ✅ Yes | Detect meta-patterns | - |
 | `PrioritizerNode` | ✅ Yes | Generate priority list | - |
-| `InsightGeneratorNode` | ✅ Yes | Generate advice | - |
+| `InsightGeneratorNode` | ✅ Yes | Generate personalized advice (uses Best Practices + User Behaviour) | - |
 | `QueryParserNode` | ✅ Yes | Parse + decompose query | QueryIntake, Breakdown |
 | `ResponseGeneratorNode` | ✅ Yes | Summarize + synthesize response | Summarizer, Synthesizer |
 
@@ -282,7 +282,7 @@ Gmail IMAP → EmailIntakeNode → [Process 1/2/3] → smtplib → Gmail SMTP
 
 | Technology | Purpose |
 |------------|---------|
-| **Google Cloud Scheduler** | Triggers Process 2 daily (e.g., 6:00 PM) |
+| **Google Cloud Scheduler** | Triggers Process 2 daily (e.g., 6:00 PM); also triggered on-demand via email |
 | **Cloud Run Jobs** | Executes scheduled processes |
 
 ### Trigger Configuration
@@ -290,7 +290,7 @@ Gmail IMAP → EmailIntakeNode → [Process 1/2/3] → smtplib → Gmail SMTP
 | Process | Trigger | Frequency |
 |---------|---------|-----------|
 | Process 1 | Email arrival (IMAP poll) | Every 5 minutes |
-| Process 2 | Cloud Scheduler | Daily at configured time |
+| Process 2 | Cloud Scheduler + Email Router | Daily at configured time OR on-demand via email |
 | Process 3 | Email arrival (query detected) | Every 5 minutes |
 
 ---

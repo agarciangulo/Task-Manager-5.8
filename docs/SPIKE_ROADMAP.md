@@ -9,8 +9,8 @@ This roadmap outlines the planned evolution of the spike prototype into a full-f
 | Process | MVP Focus | Long-Term Vision |
 |---------|-----------|------------------|
 | **Process 1: Task Intake & Processing** | Email intake, JSON transformation, behavior analysis | Multi-channel intake, advanced NLP |
-| **Process 2: Prioritization & Insights** | Daily scheduled priorities + insights email | Real-time coaching, predictive analytics |
-| **Process 3: Query & Analytics** | Email-based queries with access control | Full UI, team dashboards, reporting |
+| **Process 2: Prioritization & Insights** | Daily + on-demand priorities, insights, outstanding tasks | Real-time coaching, predictive analytics |
+| **Process 3: Query & Analytics** | Email-based queries, strict access control | Full UI, dashboards, reporting |
 
 ---
 
@@ -22,22 +22,22 @@ This roadmap outlines the planned evolution of the spike prototype into a full-f
 - [ ] Email intake (activities, corrections, context replies)
 - [ ] Intent classification (Gemini)
 - [ ] Task extraction and JSON transformation
-- [ ] Task comparison (add vs. update logic)
+- [ ] Task comparison (match classification: status change, progress update, recurring, correction, new)
 - [ ] AI-powered Behavior Analyzer (meta-pattern detection)
-- [ ] Task Presenter (summary, priorities, confirmations)
+- [ ] Task Presenter (processed tasks, correction confirmations)
 
 ### Process 2: Prioritization & Insights
 - [ ] Scheduled daily trigger (Cloud Scheduler)
+- [ ] On-demand trigger via email request
 - [ ] Task Prioritizer (reads Task DB, generates priority list)
-- [ ] Insight Generator (compares tasks to Best Practices DB)
+- [ ] Insight Generator (compares tasks to Best Practices DB + User Behaviour DB)
 - [ ] Insights stored to Insights DB
-- [ ] Combined email output (separate sections)
+- [ ] Combined email output (priorities, insights, outstanding tasks)
 
 ### Process 3: Query & Analytics (MVP)
 - [ ] Email-based query interface
 - [ ] Query Router (Breakdown → Coordinator → Synthesizer)
-- [ ] Access control enforcement (User vs. Manager roles)
-- [ ] Privacy summarization for team/firm data
+- [ ] Access control enforcement (users: own data only, managers: full access)
 
 ### Infrastructure
 - [ ] Four PostgreSQL databases (Task, User Behaviour, Best Practices, Insights)
@@ -73,7 +73,7 @@ This roadmap outlines the planned evolution of the spike prototype into a full-f
 
 ### Process 3 Enhancements
 - [ ] Full access control matrix enforcement
-- [ ] Manager hierarchy (team membership)
+- [ ] Manager access to any user's data
 - [ ] Audit logging for all queries
 
 **Dependencies:** Spike MVP completed, decision to proceed with migration.
